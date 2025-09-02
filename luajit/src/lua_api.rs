@@ -1,7 +1,11 @@
 use mlua::{Lua, Result};
 use mlua::Table;
 use std::fs;
+use std::fs::File;
 use std::path::Path;
+use std::io::copy;
+use std::sync::Arc;
+use mlua::Error as LuaError;
 
 // LUA REPL
 /*
@@ -53,14 +57,33 @@ pub fn execute_script(file: &str) -> Result<()> {
     // Registriere das API-Modul als Lua-Tabelle
     let module = lua.create_table()?;
 
-    let greet = lua.create_function(|_, name: String| {
+    // Greet function
+    let greet = lua.create_function(|_, name: String | {
         println!("Hello from Rust, {}!", name);
         Ok(())
     })?;
-    module.set("greet", greet)?;
 
-    let add = lua.create_function(|_, (a, b): (i64, i64)| Ok(a + b))?;
+    // Calculation Function
+    let add = lua.create_function(|_, (a, b): (i64, i64) | {
+        Ok(a + b)
+    })?;
+    
+    // Download Function
+    // 1: Link -  2: Destination file
+    let download = lua.create_function(|_, (url, destination): (String, String) | {
+        let mut resp = match reqwest::blocking::get(url) {
+            Ok(r) => r,
+            Err(e) => return Err(LuaError::ExternalError(Arc::new(e))),
+        };
+        let mut out = File::create(destination)?;
+        copy(&mut resp, &mut out)?;
+        Ok(())
+    })?;
+
+    // Register Lua functions
+    module.set("greet", greet)?;
     module.set("add", add)?;
+    module.set("download", download)?;
 
     // Modul beim Lua package.preload registrieren
     let globals = lua.globals();

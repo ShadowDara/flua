@@ -1,0 +1,92 @@
+name: Build & Release Rust
+
+on:
+  push:
+    tags:
+      - "*" # Trigger nur bei Tags wie v1.0.0
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            ext: ""
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            ext: ".exe"
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            ext: ""
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+          override: true
+
+      - name: Build release binary
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: luajit-${{ matrix.target }}
+          path: target/${{ matrix.target }}/release/luajit${{ matrix.ext }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: luajit-x86_64-unknown-linux-gnu
+          path: release-assets/linux
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: luajit-x86_64-pc-windows-msvc
+          path: release-assets/windows
+
+      - name: Download Mac artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: luajit-x86_64-apple-darwin
+          path: release-assets/macos
+
+      - name: Rename binaries
+        run: |
+          mv release-assets/linux/luajit release-assets/luajit-linux-x86_64
+          mv release-assets/windows/luajit.exe release-assets/luajit-windows-x86_64.exe
+          mv release-assets/macos/luajit release-assets/luajit-macos-x86_64
+    
+      - name: Debug – zeige heruntergeladene Dateien
+        run: ls -R release-assets
+      
+      - name: Flatten artifact directory
+        run: |
+          find release-assets -type f -exec mv {} release-assets/ \;
+          find release-assets -type d -empty -delete
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: |
+            Release built by CI for tag ${{ github.ref_name }}. See **[CHANGELOG.md](https://github.com/ShadowDara/luajit/blob/master/CHANGELOG.md)** for Changelogs.
+          artifacts: |
+            release-assets/*
+          artifactErrorsFailBuild: true
