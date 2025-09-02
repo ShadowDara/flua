@@ -36,13 +36,23 @@ jobs:
           override: true
 
       - name: Build release binary
-        run: cargo build --release --target ${{ matrix.target }}
+        run: |
+          cd luajit
+          cargo build --release --target ${{ matrix.target }}
+          cd ../lua5.1
+          cargo build --release --target ${{ matrix.target }}
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
           name: luajit-${{ matrix.target }}
           path: target/${{ matrix.target }}/release/luajit${{ matrix.ext }}
+      
+      - name: Upload binary artifact 2
+        uses: actions/upload-artifact@v4
+        with:
+          name: luajit-${{ matrix.target }}
+          path: target/${{ matrix.target }}/release/lua5.1${{ matrix.ext }}
 
   release:
     needs: build
@@ -71,6 +81,9 @@ jobs:
           mv release-assets/linux/luajit release-assets/luajit-linux-x86_64
           mv release-assets/windows/luajit.exe release-assets/luajit-windows-x86_64.exe
           mv release-assets/macos/luajit release-assets/luajit-macos-x86_64
+          mv release-assets/linux/lua5.1 release-assets/lua5.1-linux-x86_64
+          mv release-assets/windows/lua5.1.exe release-assets/lua5.1-windows-x86_64.exe
+          mv release-assets/macos/lua5.1 release-assets/lua5.1-macos-x86_64
     
       - name: Debug – zeige heruntergeladene Dateien
         run: ls -R release-assets
