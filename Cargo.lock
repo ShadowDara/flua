@@ -117,14 +117,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b"
 
 [[package]]
-name = "d4r_luajit_api"
-version = "0.1.1"
-dependencies = [
- "mlua",
- "reqwest",
-]
-
-[[package]]
 name = "displaydoc"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -650,6 +642,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "00bc4bd1f1d5c65b30717333cbec4fa7aa378978940a1bca62f404498d423233"
 dependencies = [
  "cc",
+]
+
+[[package]]
+name = "luajit"
+version = "0.1.1"
+dependencies = [
+ "mlua",
+ "reqwest",
 ]
 
 [[package]]
