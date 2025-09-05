@@ -86,7 +86,7 @@ jobs:
           tag: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           body: |
-            Release built by CI for tag ${{ github.ref_name }}. See **[CHANGELOG.md](https://github.com/ShadowDara/d-terminal/blob/master/CHANGELOG.md)** for Changelogs.
+            Release built by CI for tag ${{ github.ref_name }}. See **[CHANGELOG.md](https://github.com/ShadowDara/LuaAPI-Rust/blob/master/CHANGELOG.md)** for Changelogs.
           artifacts: |
             release-assets/*
           artifactErrorsFailBuild: true
