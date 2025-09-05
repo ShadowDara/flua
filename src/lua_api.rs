@@ -8,10 +8,16 @@ use std::sync::Arc;
 use mlua::Error as LuaError;
 use mlua::{StdLib, LuaOptions};
 use zip::{read::ZipArchive, ZipWriter};
+use std::env;
+use sys_info;
 
 use std::io::{self, Write};
 use walkdir::WalkDir;
 use zip::write::FileOptions;
+
+use open;
+
+pub const VERSION: &str = "v0.1.6";
 
 // Execute an Lua Script
 pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
@@ -40,7 +46,7 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
 
     //
     //
-    //
+
     // Registriere das API-Modul als Lua-Tabelle
     let dapi = lua.create_table()?;
 
@@ -55,6 +61,11 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
         Ok(a + b)
     })?;
     
+    // Version
+    let version = lua.create_function(|_, () | {
+        Ok(VERSION)
+    })?;
+    
     // Download Function
     // 1: Link -  2: Destination file
     let download = lua.create_function(|_, (url, destination): (String, String) | {
@@ -67,20 +78,24 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
         Ok(())
     })?;
     
+    // Color for colored terminal output
+    //let color =
+    
     //TODO
-    // Unzip Function
-    // Zip FUnction
     // Open Link in default browser
     // Rename
     // Copy
     // Delete
     // Run Command
-    // OS Infos
 
     // Register Lua functions
     dapi.set("greet", greet)?;
     dapi.set("add", add)?;
+    dapi.set("version", version)?;
     dapi.set("download", download)?;
+    
+    //
+    //
     
     // Register an Input Output API
     let dapi_io = lua.create_table()?;
@@ -99,7 +114,37 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
     
     // Register IO Functions
     dapi_io.set("zip", zip)?;
-    dapi_io.set("unzip", unzip)?;    
+    dapi_io.set("unzip", unzip)?;
+    
+    //
+    //
+    
+    // Register OS API
+    let dapi_os = lua.create_table()?;
+    
+    let get_os_info = lua.create_function(|lua, ()| {
+        let table = lua.create_table()?; // hier jetzt dieselbe Lua-Instanz
+
+        table.set("os_type", sys_info::os_type().unwrap_or("Unknown".to_string()))?;
+        table.set("os_release", sys_info::os_release().unwrap_or("Unknown".to_string()))?;
+        table.set("hostname", sys_info::hostname().unwrap_or("Unknown".to_string()))?;
+        table.set("cpu_num", sys_info::cpu_num().unwrap_or(0))?;
+        table.set("mem_total", sys_info::mem_info().map(|m| m.total).unwrap_or(0))?;
+
+        Ok(table)
+    })?;
+    
+    let open_link = lua.create_function(|_, url: String| {
+        open::that(url).map_err(|e| mlua::Error::external(format!("Cannot open URL: {}", e)))?;
+        Ok(())
+    })?;
+    
+    // Register OS Functions
+    dapi_os.set("get_os_info", get_os_info)?;
+    dapi_os.set("open_link", open_link)?;
+    
+    //
+    //
 
     // Modul beim Lua package.preload registrieren
     let globals = lua.globals();
@@ -115,9 +160,11 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
         "dapi_io",
         lua.create_function(move |_, ()| Ok(dapi_io.clone()))?,
     )?;
-    //
-    //
-    //
+    
+    preload.set(
+        "dapi_os",
+        lua.create_function(move |_, ()| Ok(dapi_os.clone()))?,
+    )?;
 
     // Skript ausführen
     lua.load(&script).exec()?;
@@ -173,3 +220,10 @@ fn zip_dir(src_dir: &str, zip_path: &str) -> io::Result<()> {
     Ok(())
 }
 
+// Get Infos for OS Lua
+/*
+fn get_os_info() -> mlua::Result<mlua::Table> {
+    let lua = Lua::new(); // temporäre Lua-Instanz für Table-Erzeugung
+    
+}
+*/

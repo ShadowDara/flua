@@ -1,6 +1,6 @@
 [package]
 name = "luajit"
-version = "0.1.3"
+version = "0.1.6"
 edition = "2024"
 
 [dependencies]
@@ -8,3 +8,13 @@ mlua = { version = "0.11", features = ["luajit", "vendored"] }
 reqwest = { version = "0.12", features = ["blocking", "rustls-tls"]}
 zip = "0.6"
 walkdir = "2"
+sys-info = "0.9.1"
+open = "3"
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["consoleapi", "wincon"] }
+windows = { version = "0.61.3", features = ["Win32_System_Console"] }
+
+[target.'cfg(windows)'.build-dependencies]
+winres = "0.1"
+

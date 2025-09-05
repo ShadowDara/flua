@@ -15,7 +15,7 @@ fn main() /* -> Result<(), e> */{
     
     let mut safe = false;
     
-    if args.len() < 3 {
+    if args.len() >= 3 {
         if args[2] == "-safe" {
             safe = true;
         }
@@ -24,7 +24,7 @@ fn main() /* -> Result<(), e> */{
     let path = &args[1];
 
     match lua_api::execute_script(&path, &safe) {
-        Ok(()) => {println!("Script executed!")},
+        Ok(()) => {println!("-- Script executed!")},
         Err(e) => {eprintln!("Error: {}", e)}
     }
 }
