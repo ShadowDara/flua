@@ -8,8 +8,7 @@ fn main() /* -> Result<(), e> */{
 
     // Check if filename
     if args.len() < 2 {
-        eprintln!("No Path!");
-        //eprintln!("404");
+        eprintln!("No Path provided!");
         return;
     }
     

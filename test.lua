@@ -16,5 +16,5 @@ print("Hostname:", info.hostname)
 print("CPU cores:", info.cpu_num)
 print("Total RAM (KB):", info.mem_total)
 
-dapi_os.open_link("https://www.google.com")
+dapi_os.open_link("https://github.com/ShadowDara/LuaAPI-Rust/releases/")
 
