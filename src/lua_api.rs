@@ -1,4 +1,3 @@
-use mlua::{Lua, Result};
 use mlua::Table;
 use std::fs;
 use std::fs::File;
@@ -6,7 +5,7 @@ use std::path::Path;
 use std::io::copy;
 use std::sync::Arc;
 use mlua::Error as LuaError;
-use mlua::{StdLib, LuaOptions};
+use mlua::{StdLib, LuaOptions, Value, Lua, Result};
 use zip::{read::ZipArchive, ZipWriter};
 use std::env;
 use sys_info;
@@ -15,9 +14,11 @@ use std::io::{self, Write};
 use walkdir::WalkDir;
 use zip::write::FileOptions;
 
+use std::process::Command;
+
 use open;
 
-pub const VERSION: &str = "v0.1.6";
+pub const VERSION: &str = "v0.1.7";
 
 // Execute an Lua Script
 pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
@@ -134,14 +135,44 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
         Ok(table)
     })?;
     
+    // Open Link
     let open_link = lua.create_function(|_, url: String| {
         open::that(url).map_err(|e| mlua::Error::external(format!("Cannot open URL: {}", e)))?;
         Ok(())
     })?;
     
+    // Run Command
+    let run = lua.create_function(|lua, command: String| {
+    #[cfg(target_os = "windows")]
+    let output = Command::new("cmd")
+        .arg("/C")
+        .arg(&command)
+        .output()
+        .map_err(|e| mlua::Error::external(e))?;
+
+    #[cfg(not(target_os = "windows"))]
+    let output = Command::new("sh")
+        .arg("-c")
+        .arg(&command)
+        .output()
+        .map_err(|e| mlua::Error::external(e))?;
+
+    let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+    let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+
+    let table = lua.create_table_from(vec![
+        ("status", Value::Integer(output.status.code().unwrap_or(-1) as i64)),
+        ("stdout", Value::String(lua.create_string(&stdout)?)),
+        ("stderr", Value::String(lua.create_string(&stderr)?)),
+    ])?;
+
+    Ok(table)
+})?;
+    
     // Register OS Functions
     dapi_os.set("get_os_info", get_os_info)?;
     dapi_os.set("open_link", open_link)?;
+    dapi_os.set("run", run)?;
     
     //
     //
@@ -220,10 +251,3 @@ fn zip_dir(src_dir: &str, zip_path: &str) -> io::Result<()> {
     Ok(())
 }
 
-// Get Infos for OS Lua
-/*
-fn get_os_info() -> mlua::Result<mlua::Table> {
-    let lua = Lua::new(); // temporäre Lua-Instanz für Table-Erzeugung
-    
-}
-*/
