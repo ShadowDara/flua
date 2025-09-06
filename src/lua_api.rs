@@ -1,21 +1,17 @@
+use mlua::Error as LuaError;
 use mlua::Table;
+use mlua::{Lua, Result, Value};
 use std::fs;
 use std::fs::File;
-use std::path::Path;
 use std::io::copy;
+use std::path::Path;
 use std::sync::Arc;
-use mlua::Error as LuaError;
-use mlua::{StdLib, LuaOptions, Value, Lua, Result};
-use zip::{read::ZipArchive, ZipWriter};
-use std::env;
 use sys_info;
-
-use std::io::{self, Write};
+use zip::{ZipWriter, read::ZipArchive};
+use std::io;
 use walkdir::WalkDir;
 use zip::write::FileOptions;
-
 use std::process::Command;
-
 use open;
 
 pub const VERSION: &str = "v0.1.7";
@@ -52,24 +48,20 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
     let dapi = lua.create_table()?;
 
     // Greet function
-    let greet = lua.create_function(|_, name: String | {
+    let greet = lua.create_function(|_, name: String| {
         println!("Hello from Rust, {}!", name);
         Ok(())
     })?;
 
     // Calculation Function
-    let add = lua.create_function(|_, (a, b): (i64, i64) | {
-        Ok(a + b)
-    })?;
-    
+    let add = lua.create_function(|_, (a, b): (i64, i64)| Ok(a + b))?;
+
     // Version
-    let version = lua.create_function(|_, () | {
-        Ok(VERSION)
-    })?;
-    
+    let version = lua.create_function(|_, ()| Ok(VERSION))?;
+
     // Download Function
     // 1: Link -  2: Destination file
-    let download = lua.create_function(|_, (url, destination): (String, String) | {
+    let download = lua.create_function(|_, (url, destination): (String, String)| {
         let mut resp = match reqwest::blocking::get(url) {
             Ok(r) => r,
             Err(e) => return Err(LuaError::ExternalError(Arc::new(e))),
@@ -78,10 +70,10 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
         copy(&mut resp, &mut out)?;
         Ok(())
     })?;
-    
+
     // Color for colored terminal output
     //let color =
-    
+
     //TODO
     // Open Link in default browser
     // Rename
@@ -94,86 +86,100 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
     dapi.set("add", add)?;
     dapi.set("version", version)?;
     dapi.set("download", download)?;
-    
+
     //
     //
-    
+
     // Register an Input Output API
     let dapi_io = lua.create_table()?;
-    
+
     // Zip an Archive
     let zip = lua.create_function(|_, (src_dir, zip_path): (String, String)| {
-        zip_dir(&src_dir, &zip_path)
-            .map_err(|e| mlua::Error::external(format!("Zip error: {}", e)))
+        zip_dir(&src_dir, &zip_path).map_err(|e| mlua::Error::external(format!("Zip error: {}", e)))
     })?;
-    
+
     // Unzip a Zip Archive
     let unzip = lua.create_function(|_, (zip_path, dest_dir): (String, String)| {
         unzip_file(&zip_path, &dest_dir)
             .map_err(|e| mlua::Error::external(format!("Unzip error: {}", e)))
     })?;
-    
+
     // Register IO Functions
     dapi_io.set("zip", zip)?;
     dapi_io.set("unzip", unzip)?;
-    
+
     //
     //
-    
+
     // Register OS API
     let dapi_os = lua.create_table()?;
-    
+
     let get_os_info = lua.create_function(|lua, ()| {
         let table = lua.create_table()?; // hier jetzt dieselbe Lua-Instanz
 
-        table.set("os_type", sys_info::os_type().unwrap_or("Unknown".to_string()))?;
-        table.set("os_release", sys_info::os_release().unwrap_or("Unknown".to_string()))?;
-        table.set("hostname", sys_info::hostname().unwrap_or("Unknown".to_string()))?;
+        table.set(
+            "os_type",
+            sys_info::os_type().unwrap_or("Unknown".to_string()),
+        )?;
+        table.set(
+            "os_release",
+            sys_info::os_release().unwrap_or("Unknown".to_string()),
+        )?;
+        table.set(
+            "hostname",
+            sys_info::hostname().unwrap_or("Unknown".to_string()),
+        )?;
         table.set("cpu_num", sys_info::cpu_num().unwrap_or(0))?;
-        table.set("mem_total", sys_info::mem_info().map(|m| m.total).unwrap_or(0))?;
+        table.set(
+            "mem_total",
+            sys_info::mem_info().map(|m| m.total).unwrap_or(0),
+        )?;
 
         Ok(table)
     })?;
-    
+
     // Open Link
     let open_link = lua.create_function(|_, url: String| {
         open::that(url).map_err(|e| mlua::Error::external(format!("Cannot open URL: {}", e)))?;
         Ok(())
     })?;
-    
+
     // Run Command
     let run = lua.create_function(|lua, command: String| {
-    #[cfg(target_os = "windows")]
-    let output = Command::new("cmd")
-        .arg("/C")
-        .arg(&command)
-        .output()
-        .map_err(|e| mlua::Error::external(e))?;
+        #[cfg(target_os = "windows")]
+        let output = Command::new("cmd")
+            .arg("/C")
+            .arg(&command)
+            .output()
+            .map_err(|e| mlua::Error::external(e))?;
 
-    #[cfg(not(target_os = "windows"))]
-    let output = Command::new("sh")
-        .arg("-c")
-        .arg(&command)
-        .output()
-        .map_err(|e| mlua::Error::external(e))?;
+        #[cfg(not(target_os = "windows"))]
+        let output = Command::new("sh")
+            .arg("-c")
+            .arg(&command)
+            .output()
+            .map_err(|e| mlua::Error::external(e))?;
 
-    let stdout = String::from_utf8_lossy(&output.stdout).to_string();
-    let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+        let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+        let stderr = String::from_utf8_lossy(&output.stderr).to_string();
 
-    let table = lua.create_table_from(vec![
-        ("status", Value::Integer(output.status.code().unwrap_or(-1) as i64)),
-        ("stdout", Value::String(lua.create_string(&stdout)?)),
-        ("stderr", Value::String(lua.create_string(&stderr)?)),
-    ])?;
+        let table = lua.create_table_from(vec![
+            (
+                "status",
+                Value::Integer(output.status.code().unwrap_or(-1) as i64),
+            ),
+            ("stdout", Value::String(lua.create_string(&stdout)?)),
+            ("stderr", Value::String(lua.create_string(&stderr)?)),
+        ])?;
 
-    Ok(table)
-})?;
-    
+        Ok(table)
+    })?;
+
     // Register OS Functions
     dapi_os.set("get_os_info", get_os_info)?;
     dapi_os.set("open_link", open_link)?;
     dapi_os.set("run", run)?;
-    
+
     //
     //
 
@@ -182,16 +188,13 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
     let package: Table = globals.get("package")?;
     let preload: Table = package.get("preload")?;
 
-    preload.set(
-        "dapi",
-        lua.create_function(move |_, ()| Ok(dapi.clone()))?,
-    )?;
-    
+    preload.set("dapi", lua.create_function(move |_, ()| Ok(dapi.clone()))?)?;
+
     preload.set(
         "dapi_io",
         lua.create_function(move |_, ()| Ok(dapi_io.clone()))?,
     )?;
-    
+
     preload.set(
         "dapi_os",
         lua.create_function(move |_, ()| Ok(dapi_os.clone()))?,
@@ -250,4 +253,3 @@ fn zip_dir(src_dir: &str, zip_path: &str) -> io::Result<()> {
     zip.finish()?;
     Ok(())
 }
-
