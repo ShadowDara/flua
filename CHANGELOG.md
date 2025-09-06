@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.1.7
+- added Function to create a directory
+- to create files
+- to write to files
+- added help output
+
 ## 0.1.6
 - added OS and Version Info
 - added Lua Test File

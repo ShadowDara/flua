@@ -14,7 +14,7 @@ use zip::write::FileOptions;
 use std::process::Command;
 use open;
 
-pub const VERSION: &str = "v0.1.7";
+use crate::VERSION;
 
 // Execute an Lua Script
 pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
@@ -104,9 +104,31 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
             .map_err(|e| mlua::Error::external(format!("Unzip error: {}", e)))
     })?;
 
+    // Create Directory
+    let create_dir = lua.create_function(|_, dir: String| {
+        fs::create_dir_all(&dir).map_err(|e| mlua::Error::external(format!("Create dir error: {}", e)))
+    })?;
+
+    // Create File
+    let create_file = lua.create_function(|_, file: String| {
+        fs::File::create(&file)
+            .map(|_| ())
+            .map_err(|e| mlua::Error::external(format!("Create file error: {}", e)))
+    })?;
+
+    // Write to File
+    let write_file = lua.create_function(|_, (file, content): (String, String)| {
+        fs::write(&file, &content)
+            .map(|_| ())
+            .map_err(|e| mlua::Error::external(format!("Write file error: {}", e)))
+    })?;
+
     // Register IO Functions
     dapi_io.set("zip", zip)?;
     dapi_io.set("unzip", unzip)?;
+    dapi_io.set("create_dir", create_dir)?;
+    dapi_io.set("create_file", create_file)?;
+    dapi_io.set("write_file", write_file)?;
 
     //
     //

@@ -1,6 +1,7 @@
 -- Import the API
 local dapi = require("dapi")
 local dapi_os = require("dapi_os")
+local dapi_io = require("dapi_io")
 
 -- TEST Dapi
 dapi.greet("ne")
@@ -23,7 +24,7 @@ print("CPU cores:", info.cpu_num)
 print("Total RAM (KB):", info.mem_total)
 
 -- Download
-dapi_os.open_link("https://github.com/ShadowDara/LuaAPI-Rust/releases/")
+-- dapi_os.open_link("https://github.com/ShadowDara/LuaAPI-Rust/releases/")
 
 print("\n---\n")
 
@@ -33,3 +34,7 @@ print("Exit code:", result.status)
 print("STDOUT:", result.stdout)
 print("STDERR:", result.stderr)
 
+-- Create Directory
+dapi_io.create_dir("test_dir")
+dapi_io.create_file("test_dir/test_file.exe")
+dapi_io.write_file("test_dir/test_file.exe", "Hello World!\nThis is a test file.")

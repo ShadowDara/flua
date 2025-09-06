@@ -1,3 +1,4 @@
 # Rust Build Folder
 target
 
+*.exe
