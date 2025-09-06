@@ -5,7 +5,8 @@ local dapi_os = require("dapi_os")
 -- TEST Dapi
 dapi.greet("ne")
 
-local result = dapi.download("https://github.com/ShadowDara/LuaAPI-Rust/releases/download/v0.1.6/luajit-windows-x86_64.exe", "luajit.exe")
+print("Download Start")
+local result = dapi.download("https://release-assets.githubusercontent.com/github-production-release-asset/1048529985/b1d7e156-382a-4345-a702-dfbf74361be4", "luajit.exe")
 print(result)
 
 local version = dapi.version()
