@@ -38,3 +38,9 @@ print("STDERR:", result.stderr)
 dapi_io.create_dir("test_dir")
 dapi_io.create_file("test_dir/test_file.exe")
 dapi_io.write_file("test_dir/test_file.exe", "Hello World!\nThis is a test file.")
+
+
+local lines = dapi_io.read_line("README.md", 5)  -- Nur 5 Zeilen
+for i, line in ipairs(lines) do
+    print(i, line)
+end

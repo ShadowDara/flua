@@ -1,18 +1,19 @@
 use mlua::Error as LuaError;
 use mlua::Table;
 use mlua::{Lua, Result, Value};
+use open;
 use std::fs;
 use std::fs::File;
+use std::io;
+use std::io::BufRead;
 use std::io::copy;
 use std::path::Path;
+use std::process::Command;
 use std::sync::Arc;
 use sys_info;
-use zip::{ZipWriter, read::ZipArchive};
-use std::io;
 use walkdir::WalkDir;
 use zip::write::FileOptions;
-use std::process::Command;
-use open;
+use zip::{ZipWriter, read::ZipArchive};
 
 use crate::VERSION;
 
@@ -106,7 +107,8 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
 
     // Create Directory
     let create_dir = lua.create_function(|_, dir: String| {
-        fs::create_dir_all(&dir).map_err(|e| mlua::Error::external(format!("Create dir error: {}", e)))
+        fs::create_dir_all(&dir)
+            .map_err(|e| mlua::Error::external(format!("Create dir error: {}", e)))
     })?;
 
     // Create File
@@ -123,12 +125,38 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
             .map_err(|e| mlua::Error::external(format!("Write file error: {}", e)))
     })?;
 
+    // Read Line File
+    let read_line = lua.create_function(|lua, (file, max_lines): (String, Option<usize>)| {
+        let file = fs::File::open(&file)
+            .map_err(|e| mlua::Error::external(format!("Open file error: {}", e)))?;
+
+        let reader = io::BufReader::new(file);
+        let lua_table = lua.create_table()?;
+
+        let mut count = 0;
+        for (i, line_result) in reader.lines().enumerate() {
+            if let Some(max) = max_lines {
+                if count >= max {
+                    break;
+                }
+            }
+
+            let line = line_result
+                .map_err(|e| mlua::Error::external(format!("Read line error: {}", e)))?;
+            lua_table.set(i + 1, line)?;
+            count += 1;
+        }
+
+        Ok(lua_table)
+    })?;
+
     // Register IO Functions
     dapi_io.set("zip", zip)?;
     dapi_io.set("unzip", unzip)?;
     dapi_io.set("create_dir", create_dir)?;
     dapi_io.set("create_file", create_file)?;
     dapi_io.set("write_file", write_file)?;
+    dapi_io.set("read_line", read_line)?;
 
     //
     //

@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.1.8
+- Read Files Line by Line
+
 ## 0.1.7
 - added Function to create a directory
 - to create files
