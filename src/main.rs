@@ -1,11 +1,13 @@
 use std::env;
 
-mod lua_api;
+mod api;
+mod script;
+mod update;
+mod utils;
 
-pub const VERSION: &str = "v0.1.7";
+pub const VERSION: &str = "1.0.0";
 
-fn main() /* -> Result<(), e> */{
-    // get Run Arguments
+fn main() {
     let args: Vec<String> = env::args().collect();
 
     // Check if filename
@@ -20,19 +22,29 @@ fn main() /* -> Result<(), e> */{
         println!(" -safe: Run in safe mode (limited API, no OS access)");
         return;
     }
-    
+
     let mut safe = false;
 
     if args.len() >= 3 {
         if args[2] == "-safe" {
             safe = true;
+        } else {
+            if args[1] == "run" {
+                // Update
+                if args[2] == "update" {
+                    if let Err(e) = update::update() {
+                        eprintln!("Update error: {}", e);
+                    }
+                }
+
+                return;
+            }
         }
     }
 
     let path = &args[1];
 
-    match lua_api::execute_script(&path, &safe) {
-        Ok(()) => {println!("-- Script executed!")},
-        Err(e) => {eprintln!("Error: {}", e)}
+    if let Err(e) = script::execute_script(path, &safe) {
+        eprintln!("Script error: {}", e);
     }
 }
