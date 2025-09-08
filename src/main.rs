@@ -8,6 +8,9 @@ mod utils;
 pub const VERSION: &str = "1.0.0";
 
 fn main() {
+    #[cfg(windows)]
+    windows_utf8::enable_utf8();
+
     let args: Vec<String> = env::args().collect();
 
     // Check if filename
@@ -35,8 +38,12 @@ fn main() {
                     if let Err(e) = update::update() {
                         eprintln!("Update error: {}", e);
                     }
+                } else if args[2] == "install" {
+                    if let Err(e) = update::install() {
+                        eprintln!("Installation error: {}", e);
+                    }
                 }
-
+                
                 return;
             }
         }
