@@ -2,6 +2,7 @@
 
 ## 0.1.8
 - Read Files Line by Line
+- Restructering the whole Code
 
 ## 0.1.7
 - added Function to create a directory
