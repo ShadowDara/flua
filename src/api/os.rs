@@ -4,6 +4,7 @@ use std::process::Command;
 pub fn register(lua: &Lua) -> Result<mlua::Table> {
     let table = lua.create_table()?;
 
+    // Function to get OS Type, OS Release, Hostname, CPU Number and Total Memory
     let get_os_info = lua.create_function(|lua, ()| {
         let table = lua.create_table()?;
         table.set("os_type", sys_info::os_type().unwrap_or("Unknown".into()))?;
@@ -17,11 +18,13 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         Ok(table)
     })?;
 
+    // Function to open a URL in the default Opener
     let open_link = lua.create_function(|_, url: String| {
         open::that(url).map_err(|e| mlua::Error::external(format!("Cannot open URL: {}", e)))?;
         Ok(())
     })?;
 
+    // Function to run a command in the commandline
     let run = lua.create_function(|lua, command: String| {
         #[cfg(target_os = "windows")]
         let output = Command::new("cmd").arg("/C").arg(&command).output()?;

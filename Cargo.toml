@@ -10,11 +10,12 @@ zip = "0.6"
 walkdir = "2"
 sys-info = "0.9.1"
 open = "3"
+tokio = { version = "1", features = ["full"] }
+warp = "0.3"
 
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3", features = ["consoleapi", "wincon"] }
-windows = { version = "0.61.3", features = ["Win32_System_Console"] }
+windows = { version = "0.62.1", features = ["Win32_System_Console"] }
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1"
-

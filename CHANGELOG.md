@@ -3,6 +3,10 @@
 ## 0.1.8
 - Read Files Line by Line
 - Restructering the whole Code
+- added return Value to `dapi.download` function
+- added Version check
+- add static HTTP Server which is not async yet which means the Server blocks the script! Server can be stopped by just pressing enter
+- open with now works on windows
 
 ## 0.1.7
 - added Function to create a directory
