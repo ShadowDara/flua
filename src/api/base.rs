@@ -34,7 +34,12 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         let warning = warning_opt.unwrap_or(true);
 
         let result = match version == VERSION {
-            true => Ok(true),
+            true => {
+                if warning {
+                    println!("[INFO] Using the right Version for LUAJIT!");
+                }
+                Ok(true)
+            },
             false => {
                 if warning {
                     println!("[WARNING] Not the right version for luajit is used!");

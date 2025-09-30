@@ -88,15 +88,15 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
             fn list_files_direct<P: AsRef<Path>>(path: P) {
                 if let Ok(entries) = fs::read_dir(path) {
                     for entry in entries.flatten() {
-                        println!("{}", entry.path().display());
+                        print!("{}\t", entry.path().display());
                     }
                 } else {
-                    println!("Verzeichnis konnte nicht gelesen werden.");
+                    println!("Could not read the directory!");
                 }
             }
 
             // Debug to Check to Directory Content
-            println!("Inhalt von '{}':", dir);
+            println!("Content from '{}':", dir);
             list_files_direct(&dir);
 
             std::thread::spawn(move || {
@@ -116,7 +116,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
                         }));
 
                     println!(
-                        "Static server läuft auf http://0.0.0.0:{} und dient Verzeichnis '{}'",
+                        "Static http server runs on http://0.0.0.0:{} and runs on directory '{}'",
                         port, dir
                     );
 
