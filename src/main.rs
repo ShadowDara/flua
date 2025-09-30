@@ -5,6 +5,7 @@ mod script;
 mod update;
 mod utils;
 
+#[cfg(windows)]
 mod windows_utf8;
 
 pub const VERSION: &str = "0.1.8";
