@@ -30,7 +30,9 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // Check if the right Version is used
     // Returns a Boolean and a warning message when the correct version is not used
-    let check_version = lua.create_function(|_, (version, warning): (String, bool)| {
+    let check_version = lua.create_function(|_, (version, warning_opt): (String, Option<bool>)| {
+        let warning = warning_opt.unwrap_or(true);
+
         let result = match version == VERSION {
             true => Ok(true),
             false => {

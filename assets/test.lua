@@ -45,7 +45,3 @@ local lines = dapi_io.read_line("README.md", 5)  -- Nur 5 Zeilen
 for i, line in ipairs(lines) do
     print(i, line)
 end
-
-print("Starting HTTP Server")
-local server = dapi_http.start_static_server("/", 8080)
-print("Server started")
