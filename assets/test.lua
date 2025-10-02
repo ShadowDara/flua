@@ -7,6 +7,9 @@ local dapi_http = require("dapi_http")
 -- TEST Dapi
 dapi.greet("ne")
 
+dapi.check_version("0.1.8", true)
+dapi.check_version("0.1.8")
+
 print("Download Start")
 local result = dapi.download("https://release-assets.githubusercontent.com/github-production-release-asset/1048529985/b1d7e156-382a-4345-a702-dfbf74361be4", "luajit.exe")
 print(result)

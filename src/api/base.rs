@@ -5,22 +5,34 @@ use std::sync::Arc;
 
 use mlua::Error as LuaError;
 
-use crate::VERSION;
 use crate::deprecated;
+
+use crate::VERSION;
+
+use crate::helper::print::{
+    END,
+    RED,
+    GREEN,
+    YELLOW,
+    BLUE,
+    PURPLE,
+    CYAN,
+    WHITE
+};
 
 pub fn register(lua: &Lua) -> Result<mlua::Table> {
     let table = lua.create_table()?;
 
     // a Simple greet function which will be removed soon!
     let greet = lua.create_function(|_, name: String| {
-        deprecated("dapi.greet", "0.1.8");
+        deprecated!("dapi.greet", "0.1.8", "Why do you even want to use it?");
         println!("Hello from Rust, {}!", name);
         Ok(())
     })?;
 
     // a Simple add fucntion which will be removed probably soon
     let add = lua.create_function(|_, (a, b): (i64, i64)| {
-        deprecated("dapi.add", "0.1.8");
+        deprecated!("dapi.add", "0.1.8", "Its completely useless bro");
         Ok(a + b)
     })?;
 
@@ -42,8 +54,8 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
             },
             false => {
                 if warning {
-                    println!("[WARNING] Not the right version for luajit is used!");
-                    println!("[WARNING] Use Version: {}", VERSION);
+                    println!("{}[WARNING] Not the right version for luajit is used!{}", YELLOW, END);
+                    println!("{}[WARNING] Use Version: {}{}", YELLOW, VERSION, END);
                 }
                 Ok(false)
             }
@@ -69,11 +81,27 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         }
     })?;
 
+    // Function to getthe ANSI Color Codes to print colored Text
+    let get_colors = lua.create_function(|lua, ()| {
+        let table = lua.create_table()?;
+        table.set("end", END)?;
+
+        table.set("red", RED)?;
+        table.set("green", GREEN)?;
+        table.set("yellow", YELLOW)?;
+        table.set("blue", BLUE)?;
+        table.set("purple", PURPLE)?;
+        table.set("cyan", CYAN)?;
+        table.set("white", WHITE)?;
+        Ok(table)
+    })?;
+
     table.set("greet", greet)?;
     table.set("add", add)?;
     table.set("version", version)?;
     table.set("check_version", check_version)?;
     table.set("download", download)?;
+    table.set("get_colors", get_colors)?;
 
     Ok(table)
 }

@@ -98,6 +98,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
             // Debug to Check to Directory Content
             println!("Content from '{}':", dir);
             list_files_direct(&dir);
+            println!("");
 
             std::thread::spawn(move || {
                 let rt = tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime");

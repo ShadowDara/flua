@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.1.9
+- made the deprecated warning yellow
+- reorganisized some code
+- added ANSI Colorcodes
+- added Lua Function to get the colorcodes
+- started Docs
+
 ## 0.1.8
 - Read Files Line by Line
 - Restructering the whole Code
