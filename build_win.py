@@ -17,6 +17,12 @@ def get_version(file):
 if __name__ == "__main__":
     print("LuajitBuilt for Windows")
     
+    # Build Mkdocs
+    print("Build Mkdocs")
+    subprocess.run("mkdocs build", shell=True, capture_output=True, text=True)
+    shutil.copytree("site/", "windows_builds/docs/", dirs_exist_ok=True)
+    shutil.copytree("installer/win", "windows_builds/", dirs_exist_ok=True)
+    
     print("Run cargo Built")
     subprocess.run("cargo build --release", shell=True, capture_output=True, text=True)
 
@@ -30,8 +36,9 @@ if __name__ == "__main__":
     subprocess.run("makensis installer.nsi", shell=True, capture_output=True, text=True)
     shutil.copy("LuajitSetup_Admin.exe", "../../windows_builds")
     
-    # Get the Version for Luajit
     os.chdir('../..')
+    
+    # Get the Version for Luajit
     version = get_version("Cargo.toml")
     
     os.chdir('windows_builds')

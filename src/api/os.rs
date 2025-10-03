@@ -1,5 +1,6 @@
 use mlua::{Lua, Result, Value};
 use std::process::Command;
+use sys_info::LinuxOSReleaseInfo;
 
 pub fn register(lua: &Lua) -> Result<mlua::Table> {
     let table = lua.create_table()?;
@@ -8,13 +9,33 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     let get_os_info = lua.create_function(|lua, ()| {
         let table = lua.create_table()?;
         table.set("os_type", sys_info::os_type().unwrap_or("Unknown".into()))?;
-        table.set("os_release", sys_info::os_release().unwrap_or("Unknown".into()))?;
+        table.set(
+            "os_release",
+            sys_info::os_release().unwrap_or("Unknown".into()),
+        )?;
         table.set("hostname", sys_info::hostname().unwrap_or("Unknown".into()))?;
         table.set("cpu_num", sys_info::cpu_num().unwrap_or(0))?;
         table.set(
             "mem_total",
             sys_info::mem_info().map(|m| m.total).unwrap_or(0),
         )?;
+        Ok(table)
+    })?;
+
+    // Function to check the OS
+    let os = lua.create_function(|lua, ()| {
+        let table = lua.create_table()?;
+
+        let os_type = sys_info::os_type().map_err(|e| mlua::Error::external(e.to_string()))?; // Einmal abfragen
+
+        let windows = os_type == "Windows";
+        let linux = os_type == "Linux";
+        let macos = os_type == "Darwin";
+
+        table.set("windows", windows)?;
+        table.set("linux", linux)?;
+        table.set("macos", macos)?;
+
         Ok(table)
     })?;
 
@@ -48,6 +69,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     })?;
 
     table.set("get_os_info", get_os_info)?;
+    table.set("os", os)?;
     table.set("open_link", open_link)?;
     table.set("run", run)?;
 

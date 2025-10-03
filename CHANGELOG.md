@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.10
+- added Function to Check the OS Type to make code in the script which runs only
+on a particular OS
+
 ## 0.1.9
 - made the deprecated warning yellow
 - reorganisized some code
@@ -14,7 +18,8 @@
 - Restructering the whole Code
 - added return Value to `dapi.download` function
 - added Version check
-- add static HTTP Server which is not async yet which means the Server blocks the script! Server can be stopped by just pressing enter
+- add static HTTP Server which is not async yet which means the Server blocks the
+script! Server can be stopped by just pressing enter
 - open with now works on windows
 
 ## 0.1.7
