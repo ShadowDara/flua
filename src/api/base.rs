@@ -11,13 +11,52 @@ use crate::VERSION;
 
 use crate::helper::print::{
     END,
+    BOLD,
+
+    ITALIC,
+    UNDERLINED,
+
+    REVERSE_TEXT,
+
+    NOT_UNDERLINED,
+
+    POSITIVE_TEXT,
+
+    BLACK,
     RED,
     GREEN,
     YELLOW,
     BLUE,
     PURPLE,
     CYAN,
-    WHITE
+    WHITE,
+
+    BG_BLACK,
+    BG_RED,
+    BG_GREEN,
+    BG_YELLOW,
+    BG_BLUE,
+    BG_PURPLE,
+    BG_CYAN,
+    BG_WHITE,
+
+    BRIGHT_BLACK,
+    BRIGHT_RED,
+    BRIGHT_GREEN,
+    BRIGHT_YELLOW,
+    BRIGHT_BLUE,
+    BRIGHT_PURLPE,
+    BRIGHT_CYAN,
+    BRIGHT_WHITE,
+
+    BG_BRIGHT_BLACK,
+    BG_BRIGHT_RED,
+    BG_BRIGHT_GREEN,
+    BG_BRIGHT_YELLOW,
+    BG_BRIGHT_BLUE,
+    BG_BRIGHT_PURLPE,
+    BG_BRIGHT_CYAN,
+    BG_BRIGHT_WHITE,
 };
 
 pub fn register(lua: &Lua) -> Result<mlua::Table> {
@@ -81,11 +120,23 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         }
     })?;
 
-    // Function to getthe ANSI Color Codes to print colored Text
+    // Function to get the ANSI Color Codes to print colored Text
+    // Returns a Lua Table
     let get_colors = lua.create_function(|lua, ()| {
         let table = lua.create_table()?;
         table.set("end", END)?;
+        table.set("bold", BOLD)?;
 
+        table.set("italic", ITALIC)?;
+        table.set("underlined", UNDERLINED)?;
+
+        table.set("reverse_text", REVERSE_TEXT)?;
+
+        table.set("not_underlined", NOT_UNDERLINED)?;
+
+        table.set("positive_text", POSITIVE_TEXT)?;
+
+        table.set("black", BLACK)?;
         table.set("red", RED)?;
         table.set("green", GREEN)?;
         table.set("yellow", YELLOW)?;
@@ -93,6 +144,35 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         table.set("purple", PURPLE)?;
         table.set("cyan", CYAN)?;
         table.set("white", WHITE)?;
+
+        table.set("bg_black", BG_BLACK)?;
+        table.set("bg_red", BG_RED)?;
+        table.set("gb_green", BG_GREEN)?;
+        table.set("bg_yellow", BG_YELLOW)?;
+        table.set("bg_blue", BG_BLUE)?;
+        table.set("bg_purple", BG_PURPLE)?;
+        table.set("bg_cyan", BG_CYAN)?;
+        table.set("bg_white", BG_WHITE)?;
+
+        table.set("bright_black", BRIGHT_BLACK)?;
+        table.set("bright_red", BRIGHT_RED)?;
+        table.set("bright_green", BRIGHT_GREEN)?;
+        table.set("bright_yellow", BRIGHT_YELLOW)?;
+        table.set("bright_blue", BRIGHT_BLUE)?;
+        table.set("bright_purple", BRIGHT_PURLPE)?;
+        table.set("bright_cyan", BRIGHT_CYAN)?;
+        table.set("bright_white", BRIGHT_WHITE)?;
+
+        
+        table.set("bg_bright_black", BG_BRIGHT_BLACK)?;
+        table.set("bg_bright_red", BG_BRIGHT_RED)?;
+        table.set("bg_bright_green", BG_BRIGHT_GREEN)?;
+        table.set("bg_bright_yellow", BG_BRIGHT_YELLOW)?;
+        table.set("bg_bright_blue", BG_BRIGHT_BLUE)?;
+        table.set("bg_bright_purple", BG_BRIGHT_PURLPE)?;
+        table.set("bg_bright_cyan", BG_BRIGHT_CYAN)?;
+        table.set("bg_bright_white", BG_BRIGHT_WHITE)?;
+
         Ok(table)
     })?;
 

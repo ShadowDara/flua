@@ -80,6 +80,4 @@ fn main() {
     }
 
     println!("{}[LUAJIT-INFO] finished script executing: {}{}", GREEN, path, END);
-
-    helper::print::print();
 }

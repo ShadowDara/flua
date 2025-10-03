@@ -1,3 +1,36 @@
+## import
+to start, you need to import the api in your script, you can do it with
+```lua
+local dapi = require("dapi")
+```
+
+## version
+a function which returns the current running version of luajit as a string
+```lua
+print(dapi.version())
+```
+
+## check_version
+a function to check if the correct version of Luajit is used, first parameter
+is the correct Version and second parameter is a Boolean for showing a warning
+or info message
+```
+dapi.check_version("0.1.9", true)
+```
+
+## get_colors
+a function which returns a Lua Table containing a lot of usable
+ANSI Color Codes for colored output
+
+### Usage
+```lua
+colors = dapi.get_colors()
+print(colors.red + "Hallo" + colors.end)
+```
+
+### Different Color Codes
+**IMPORANT: Dont use the Color names in UPPERCASES, use lowercase letters instead !!!**
+```rust
 // Color codes for Colorful printing with Ansi Colorcodes
 // Credit to for colorcodes
 // https://ss64.com/nt/syntax-ansi.html
@@ -48,3 +81,4 @@ pub const BG_BRIGHT_BLUE: &str = "\x1b[104m";
 pub const BG_BRIGHT_PURLPE: &str = "\x1b[105m";
 pub const BG_BRIGHT_CYAN: &str = "\x1b[106m";
 pub const BG_BRIGHT_WHITE: &str = "\x1b[107m";
+```
