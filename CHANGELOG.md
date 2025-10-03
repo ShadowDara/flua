@@ -6,6 +6,8 @@
 - added ANSI Colorcodes
 - added Lua Function to get the colorcodes
 - started Docs
+- updated check version message
+- add NSIS Installer for windows
 
 ## 0.1.8
 - Read Files Line by Line

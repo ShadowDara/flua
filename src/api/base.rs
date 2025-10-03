@@ -94,7 +94,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
             false => {
                 if warning {
                     println!("{}[WARNING] Not the right version for luajit is used!{}", YELLOW, END);
-                    println!("{}[WARNING] Use Version: {}{}", YELLOW, VERSION, END);
+                    println!("{}[WARNING] Required Version: {} => Your Version: {}{}", YELLOW, version, VERSION, END);
                 }
                 Ok(false)
             }
@@ -163,7 +163,6 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         table.set("bright_cyan", BRIGHT_CYAN)?;
         table.set("bright_white", BRIGHT_WHITE)?;
 
-        
         table.set("bg_bright_black", BG_BRIGHT_BLACK)?;
         table.set("bg_bright_red", BG_BRIGHT_RED)?;
         table.set("bg_bright_green", BG_BRIGHT_GREEN)?;
