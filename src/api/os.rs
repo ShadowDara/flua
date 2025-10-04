@@ -26,15 +26,15 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     let os = lua.create_function(|lua, ()| {
         let table = lua.create_table()?;
 
-        let os_type = sys_info::os_type().map_err(|e| mlua::Error::external(e.to_string()))?; // Einmal abfragen
+        let os_type = sys_info::os_type().map_err(|e| mlua::Error::external(e.to_string()))?;
 
         let windows = os_type == "Windows";
         let linux = os_type == "Linux";
         let macos = os_type == "Darwin";
 
-        table.set("windows", windows)?;
-        table.set("linux", linux)?;
-        table.set("macos", macos)?;
+        table.set("win", windows)?;
+        table.set("lin", linux)?;
+        table.set("mac", macos)?;
 
         Ok(table)
     })?;
