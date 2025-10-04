@@ -12,7 +12,7 @@ and depending on that, run special Code
 
 ### Usage
 ```lua
-osdata = dapi_os.os()
+local osdata = dapi_os.os()
 
 if osdata.win then
     print("You are using Windows")

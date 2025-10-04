@@ -124,6 +124,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     // Returns a Lua Table
     let get_colors = lua.create_function(|lua, ()| {
         let table = lua.create_table()?;
+
         table.set("end", END)?;
         table.set("bold", BOLD)?;
 

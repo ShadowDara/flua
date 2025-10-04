@@ -24,7 +24,7 @@ ANSI Color Codes for colored output
 
 ### Usage
 ```lua
-colors = dapi.get_colors()
+local colors = dapi.get_colors()
 print(colors.red + "Hallo" + colors.end)
 ```
 

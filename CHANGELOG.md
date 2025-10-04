@@ -3,6 +3,7 @@
 ## 0.1.10
 - added Function to Check the OS Type to make code in the script which runs only
 on a particular OS
+- added Function to get the default dirs
 
 ## 0.1.9
 - made the deprecated warning yellow
