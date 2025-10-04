@@ -1,3 +1,9 @@
+# Requirements
+# cargo
+# mkdocs
+# Inno Setup
+# NSIS
+
 import os
 import shutil
 import subprocess
@@ -18,16 +24,21 @@ if __name__ == "__main__":
     print("LuajitBuilt for Windows")
     
     # Build Mkdocs
-    print("Build Mkdocs")
-    subprocess.run("mkdocs build", shell=True, capture_output=True, text=True)
-    shutil.copytree("site/", "windows_builds/docs/", dirs_exist_ok=True)
-    shutil.copytree("installer/win", "windows_builds/", dirs_exist_ok=True)
+    # print("Build Mkdocs")
+    # subprocess.run("mkdocs build", shell=True, capture_output=True, text=True)
+    # shutil.copytree("site/", "windows_builds/docs/", dirs_exist_ok=True)
+    # shutil.copytree("installer/win", "windows_builds/", dirs_exist_ok=True)
     
     print("Run cargo Built")
     subprocess.run("cargo build --release", shell=True, capture_output=True, text=True)
+    
+    print("Make Inno Setup")
+    os.chdir('installer/inno')
+    subprocess.run("ISCC setup.iss", shell=True, capture_output=True, text=True)
+    shutil.copy("output/LuajitSetupInno.exe", "../../windows_builds")
 
     print("Make UserInstaller")
-    os.chdir('installer/nsis')
+    os.chdir('../nsis')
     subprocess.run("makensis installer.nsi", shell=True, capture_output=True, text=True)
     shutil.copy("LuajitSetup.exe", "../../windows_builds")
     
