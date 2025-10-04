@@ -5,6 +5,7 @@
 on a particular OS
 - added Function to get the default dirs
 - added getcwd and chdir function
+- added JSON Encoding and Decoding
 
 ## 0.1.9
 - made the deprecated warning yellow

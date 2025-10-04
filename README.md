@@ -10,3 +10,10 @@ luajit <your-script.lua>
 to suppress file and os access ad `-safe` at the end
 
 Read the [CHANGELOG](./CHANGELOG.md) or the Docs for more Infos
+
+### 1.0.0 Roadmap
+- [] add full data parsing
+- [] compabilllity with luarocks
+- [] multiversion modules
+- [] module creation like cargo
+- [] Autoupdater / Version Installer / Selector

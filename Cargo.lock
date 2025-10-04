@@ -962,6 +962,8 @@ dependencies = [
  "mlua",
  "open",
  "reqwest",
+ "serde",
+ "serde_json",
  "sys-info",
  "tokio",
  "walkdir",
