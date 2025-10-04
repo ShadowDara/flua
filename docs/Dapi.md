@@ -6,6 +6,8 @@ local dapi = require("dapi")
 
 ## version
 a function which returns the current running version of luajit as a string
+
+### Usage
 ```lua
 print(dapi.version())
 ```
@@ -14,7 +16,9 @@ print(dapi.version())
 a function to check if the correct version of Luajit is used, first parameter
 is the correct Version and second parameter is a Boolean for showing a warning
 or info message
-```
+
+### Usage
+```lua
 dapi.check_version("0.1.9", true)
 ```
 

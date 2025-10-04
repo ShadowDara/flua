@@ -49,7 +49,6 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // Create a directory
     let create_dir = lua.create_function(|_, dir: String| {
-        deprecated!("dapi_io.create_dir", "0.1.10", "The function is although contained in the Lua STD");
         fs::create_dir_all(&dir)
             .map_err(|e| mlua::Error::external(format!("Create dir error: {}", e)))
     })?;

@@ -1,6 +1,5 @@
 use mlua::{Lua, Result, Value};
 use std::process::Command;
-use sys_info::LinuxOSReleaseInfo;
 
 pub fn register(lua: &Lua) -> Result<mlua::Table> {
     let table = lua.create_table()?;
@@ -39,6 +38,18 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         Ok(table)
     })?;
 
+    // function to change the current executing directory
+    let chdir = lua.create_function(|_, path: String| {
+        std::env::set_current_dir(path)?;
+        Ok(())
+    })?;
+
+    // Function which returns the current executiong path as string
+    let getcwd = lua.create_function(|_, ()| {
+        let path = std::env::current_dir()?;
+        Ok(path.to_string_lossy().to_string())
+    })?;
+
     // Function to open a URL in the default Opener
     let open_link = lua.create_function(|_, url: String| {
         open::that(url).map_err(|e| mlua::Error::external(format!("Cannot open URL: {}", e)))?;
@@ -70,6 +81,8 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     table.set("get_os_info", get_os_info)?;
     table.set("os", os)?;
+    table.set("chdir", chdir)?;
+    table.set("getcwd", getcwd)?;
     table.set("open_link", open_link)?;
     table.set("run", run)?;
 

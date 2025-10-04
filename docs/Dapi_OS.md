@@ -23,6 +23,25 @@ elseif osdata.mac then
 end
 ```
 
+## chdir
+a function to change the current execution directory
+
+### Usage
+```lua
+-- create a new directory
+dapi_io.create_dir("wtf")
+
+dapi_os.chdir("wtf")
+```
+
+## getcwd
+a function which returns the current executing directory as a string
+
+### Usage
+```lua
+local cwd = dapi_os.getcwd()
+```
+
 ## open_link
 
 ## run
