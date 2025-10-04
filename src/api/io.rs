@@ -49,12 +49,14 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // Create a directory
     let create_dir = lua.create_function(|_, dir: String| {
+        deprecated!("dapi_io.create_dir", "0.1.10", "The function is although contained in the Lua STD");
         fs::create_dir_all(&dir)
             .map_err(|e| mlua::Error::external(format!("Create dir error: {}", e)))
     })?;
 
     // Create a file
     let create_file = lua.create_function(|_, file: String| {
+        deprecated!("dapi_io.create_file", "0.1.10", "The function is although contained in the Lua STD");
         fs::File::create(&file)
             .map(|_| ())
             .map_err(|e| mlua::Error::external(format!("Create file error: {}", e)))
@@ -62,6 +64,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // Write Data to a file
     let write_file = lua.create_function(|_, (file, content): (String, String)| {
+        deprecated!("dapi_io.write_file", "0.1.10", "The function is although contained in the Lua STD");
         fs::write(&file, &content)
             .map(|_| ())
             .map_err(|e| mlua::Error::external(format!("Write file error: {}", e)))
