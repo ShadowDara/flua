@@ -20,10 +20,10 @@ jobs:
             target: x86_64-unknown-linux-gnu
             ext: ""
 
-          # Linux Arm
-          - os: ubuntu-22.04
-            target: aarch64-unknown-linux-gnu
-            ext: ""
+          # # Linux Arm
+          # - os: ubuntu-22.04
+          #   target: aarch64-unknown-linux-gnu
+          #   ext: ""
           
           # Windows x86_64
           - os: windows-latest
@@ -45,22 +45,22 @@ jobs:
           target: ${{ matrix.target }}
           override: true
       
-      - name: Install dependencies (ARM only)
-        if: matrix.target == 'aarch64-unknown-linux-gnu'
-        run: |
-          sudo dpkg --add-architecture arm64
-          sudo apt-get update
-          sudo apt-get install libssl-dev:arm64 pkg-config gcc-aarch64-linux-gnu
-          sudo apt-get install -y gcc-aarch64-linux-gnu
+      # - name: Install dependencies (ARM only)
+      #   if: matrix.target == 'aarch64-unknown-linux-gnu'
+      #   run: |
+      #     sudo dpkg --add-architecture arm64
+      #     sudo apt-get update
+      #     sudo apt-get install libssl-dev:arm64 pkg-config gcc-aarch64-linux-gnu
+      #     sudo apt-get install -y gcc-aarch64-linux-gnu
       
-      - name: Install cross (for ARM build)
-        if: matrix.target == 'aarch64-unknown-linux-gnu'
-        run: cargo install cross
+      # - name: Install cross (for ARM build)
+      #   if: matrix.target == 'aarch64-unknown-linux-gnu'
+      #   run: cargo install cross
 
-      - name: Build (ARM)
-        if: matrix.target == 'aarch64-unknown-linux-gnu'
-        shell: bash
-        run: cross build --release --target ${{ matrix.target }}
+      # - name: Build (ARM)
+      #   if: matrix.target == 'aarch64-unknown-linux-gnu'
+      #   shell: bash
+      #   run: cross build --release --target ${{ matrix.target }}
 
       - name: Build (non-ARM)
         if: matrix.target != 'aarch64-unknown-linux-gnu'
@@ -82,11 +82,11 @@ jobs:
           name: luajit-x86_64-unknown-linux-gnu
           path: release-assets/linux
       
-      - name: Download Linux ARM64 artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: luajit-aarch64-unknown-linux-gnu
-          path: release-assets/linux-arm64
+      # - name: Download Linux ARM64 artifact
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: luajit-aarch64-unknown-linux-gnu
+      #     path: release-assets/linux-arm64
 
       - name: Download Windows artifact
         uses: actions/download-artifact@v4
@@ -103,7 +103,7 @@ jobs:
       - name: Rename binaries
         run: |
           mv release-assets/linux/luajit release-assets/luajit-linux-x86_64
-          mv release-assets/linux-arm64/luajit release-assets/luajit-linux-aarch64
+          # mv release-assets/linux-arm64/luajit release-assets/luajit-linux-aarch64
           mv release-assets/windows/luajit.exe release-assets/luajit-windows-x86_64.exe
           mv release-assets/macos/luajit release-assets/luajit-macos-x86_64
     
