@@ -57,7 +57,7 @@ Section "Install"
   File "..\..\target\release\luajit.exe"
   File "..\..\README.md"
   File "..\..\CHANGELOG.md"
-  File "..\..\LICENSE.md"
+  File "..\..\LICENSE"
 
   # ---- System-PATH hinzufügen ----
   ReadRegStr $0 HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "Path"

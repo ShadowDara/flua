@@ -1,0 +1,8 @@
+# .desktop file
+~/.local/share/applications/luajit.desktop
+
+# Icon file
+~/.local/share/icons/
+
+# Make Exec
+chmod +x ~/.local/share/applications/dein_programm.desktop
