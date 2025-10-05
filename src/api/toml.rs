@@ -1,9 +1,7 @@
 use mlua::LuaSerdeExt;
-use mlua::serde::Serializer;
 use mlua::{Error, Lua, Result, String as LuaString, Value};
 use serde_json::Value as JsonValue;
 use toml;
-use std::collections::BTreeMap;
 
 use crate::utils::toml_utils::json_to_toml;
 

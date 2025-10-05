@@ -6,6 +6,7 @@ dapi.check_version("0.1.11", true)
 
 function build_windows()
     print("Running Build for Windows")
+    os.execute("python build_win.py")
 end
 
 function build_linux()

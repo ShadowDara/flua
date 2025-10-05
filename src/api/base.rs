@@ -1,9 +1,6 @@
 use mlua::{Lua, Result};
 use std::fs::File;
 use std::io::copy;
-use std::sync::Arc;
-
-use mlua::Error as LuaError;
 
 use crate::deprecated;
 
@@ -87,7 +84,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         let result = match version == VERSION {
             true => {
                 if warning {
-                    println!("[INFO] Using the right Version for LUAJIT!");
+                    println!("{}[INFO] Using the right Version for LUAJIT!{}", GREEN, END);
                 }
                 Ok(true)
             },

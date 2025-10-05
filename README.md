@@ -13,7 +13,7 @@ Read the [CHANGELOG](./CHANGELOG.md) or the Docs for more Infos
 
 **Feel free to open an Issue for a build request or feature request!**
 
-### 1.0.0 Roadmap
+## 1.0.0 Roadmap
 - [ ] add full data parsing
 - [ ] compabilllity with luarocks
 - [ ] multiversion modules
@@ -22,3 +22,6 @@ Read the [CHANGELOG](./CHANGELOG.md) or the Docs for more Infos
 - [ ] Safe Mode
 - [ ] multiversion compabillity and multiversion installer
 - [ ] adding VS-Code support for the functions
+- [ ] UI which can be used directly from lua
+- [ ] ( ??? Windows API Bindings ??? )
+- [ ] gh workflow and script to install Luajit + (Dockerfile)

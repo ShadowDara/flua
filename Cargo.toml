@@ -16,6 +16,7 @@ dirs-next = "2.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 toml = "0.8"
+dotenv = "0.15" # oder neuere Version
 
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3", features = ["consoleapi", "wincon"] }
