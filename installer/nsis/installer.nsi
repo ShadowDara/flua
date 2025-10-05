@@ -127,6 +127,20 @@ Section "Install"
   File "..\..\CHANGELOG.md"
   File "..\..\LICENSE"
 
+  # Nutzer fragen, ob .lua-Dateien damit verknüpft werden sollen
+  MessageBox MB_YESNO "Do you want to use luajit as the standard program for .lua files?" IDNO skip_assoc
+
+  # Dateityp- und ProgID-Verknüpfung setzen
+  WriteRegStr HKCR ".lua" "" "MyLuaFile"
+  WriteRegStr HKCR "MyLuaFile" "" "Lua-Skript"
+  WriteRegStr HKCR "MyLuaFile\DefaultIcon" "" "$INSTDIR\MyLuaApp.exe,0"
+  WriteRegStr HKCR "MyLuaFile\shell\open\command" "" '"$INSTDIR\MyLuaApp.exe" "%1"'
+
+  # Info für Windows 10/11 Standardprogramme-UI (nur teilweise effektiv)
+  # Optional: ApplicationCapabilities setzen (mehr Aufwand)
+
+skip_assoc:
+
   # ---- PATH hinzufügen ----
   ReadRegStr $0 HKCU "Environment" "Path"
   StrCpy $1 "$INSTDIR"
