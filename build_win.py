@@ -40,22 +40,12 @@ if __name__ == "__main__":
     print("Run cargo build --release")
     subprocess.run("cargo build --release", shell=True, capture_output=True, text=True)
     
-    # print("Make Inno Setup")
-    # os.chdir('installer/inno')
-    # subprocess.run("ISCC setup.iss", shell=True, capture_output=True, text=True)
-    # shutil.copy("output/LuajitSetupInno.exe", "../../windows_builds")
-    
     os.chdir('installer/nsis')
 
     print("Make UserInstaller")
     os.chdir('../nsis')
     subprocess.run("makensis installer.nsi", shell=True, capture_output=True, text=True)
     shutil.copy("LuajitSetup.exe", "../../windows_builds")
-    
-    print("Make AdminInstaller")
-    os.chdir('../nsis-admin')
-    subprocess.run("makensis installer.nsi", shell=True, capture_output=True, text=True)
-    shutil.copy("LuajitSetup_Admin.exe", "../../windows_builds")
     
     os.chdir('../..')
     
@@ -64,8 +54,6 @@ if __name__ == "__main__":
     
     os.chdir('windows_builds')
     oldname1 = "LuajitSetup"
-    oldname2 = "LuajitSetup_Admin"
     os.rename(oldname1 + ".exe", str(oldname1) + "_v" + str(version) + ".exe")
-    os.rename(oldname2 + ".exe", str(oldname2) + "_v" + str(version) + ".exe")
     
     print("Finished")
