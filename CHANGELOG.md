@@ -4,6 +4,7 @@
 - added yaml parser
 - updated install script
 - delered NSIS Admin Installer
+- added function to wait for a certain period of time
 
 ## 0.1.11 - 05.10.2025
 - added Function to delete a directory

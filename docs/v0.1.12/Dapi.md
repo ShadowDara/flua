@@ -26,7 +26,33 @@ or info message
 dapi.check_version("0.1.9", true)
 ```
 
-## `download()`
+## download
+`download(url: string, destination: string) -> bool`
+
+Downloads a file from a URL and saves it to the given destination path.
+
+**Usage**
+```lua
+local ok = dapi.download("https://example.com/file.zip", "/tmp/file.zip")
+if ok then
+  print("Success!")
+else
+  print("Failed.")
+end
+```
+
+**IMPORTANT**
+
+Returns `false` on any error (network, file I/O, write failure).
+
+## wait
+function to work for certain amount of time, does not work with negative numbers!
+
+**Usage**
+```lua
+dapi.wait(1000)
+```
+The Programm will wait 1000 milliseconds (1 seconds) in this Example
 
 ## get_colors
 a function which returns a Lua Table containing a lot of usable

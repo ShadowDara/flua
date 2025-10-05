@@ -26,7 +26,24 @@ or info message
 dapi.check_version("0.1.9", true)
 ```
 
-## `download()`
+## download
+`download(url: string, destination: string) -> bool`
+
+Downloads a file from a URL and saves it to the given destination path.
+
+**Usage**
+```lua
+local ok = dapi.download("https://example.com/file.zip", "/tmp/file.zip")
+if ok then
+  print("Success!")
+else
+  print("Failed.")
+end
+```
+
+**IMPORTANT**
+
+Returns `false` on any error (network, file I/O, write failure).
 
 ## get_colors
 a function which returns a Lua Table containing a lot of usable

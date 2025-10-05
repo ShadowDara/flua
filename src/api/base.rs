@@ -1,6 +1,8 @@
 use mlua::{Lua, Result};
 use std::fs::File;
 use std::io::copy;
+use std::time::Duration;
+use std::thread;
 
 use crate::deprecated;
 
@@ -99,6 +101,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         result
     })?;
 
+    // Function to download a file
     let download = lua.create_function(|_, (url, destination): (String, String)| {
         match reqwest::blocking::get(&url) {
             Ok(mut resp) => {
@@ -115,6 +118,13 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
             }
             Err(_) => Ok(false), // Fehler beim HTTP-GET
         }
+    })?;
+
+    // Function to pause the programm for a certain amount of time
+    // Does not work with negative Numbers!
+    let wait = lua.create_function(|_, time: u64| {
+        thread::sleep(Duration::from_millis(time));
+        Ok(())
     })?;
 
     // Function to get the ANSI Color Codes to print colored Text
@@ -178,6 +188,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     table.set("version", version)?;
     table.set("check_version", check_version)?;
     table.set("download", download)?;
+    table.set("wait", wait)?;
     table.set("get_colors", get_colors)?;
 
     Ok(table)
