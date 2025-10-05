@@ -8,3 +8,6 @@
 - added OS and Version Info
 - added Lua Test File
 - added Icon for Windows
+
+## Info
+Documentation is missing and will be probably not added because the version is deprecated

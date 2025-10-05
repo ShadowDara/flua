@@ -6,3 +6,6 @@
 
 ## Changelog
 - added Zipping and Unzipping Features
+
+## Info
+Documentation is missing and will be probably not added because the version is deprecated

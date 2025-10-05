@@ -12,3 +12,6 @@
 - started Docs
 - updated check version message
 - add NSIS Installer for windows
+
+## Info
+Documentation is missing and will be probably not added because the version is deprecated

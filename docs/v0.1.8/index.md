@@ -12,3 +12,6 @@
 - add static HTTP Server which is not async yet which means the Server blocks the
 script! Server can be stopped by just pressing enter
 - open with now works on windows
+
+## Info
+Documentation is missing and will be probably not added because the version is deprecated

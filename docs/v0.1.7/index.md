@@ -9,3 +9,6 @@
 - to create files
 - to write to files
 - added help output
+
+## Info
+Documentation is missing and will be probably not added because the version is deprecated

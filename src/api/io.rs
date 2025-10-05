@@ -3,12 +3,11 @@ use std::fs;
 use std::io::{self, BufRead};
 
 use dirs_next::{
-    home_dir, desktop_dir, document_dir, download_dir, 
-    audio_dir, video_dir, picture_dir, config_dir, data_dir,
-    data_local_dir, cache_dir
+    audio_dir, cache_dir, config_dir, data_dir, data_local_dir, desktop_dir, document_dir,
+    download_dir, home_dir, picture_dir, video_dir,
 };
 
-use crate::utils::zip_utils::{zip_dir, unzip_file};
+use crate::utils::zip_utils::{unzip_file, zip_dir};
 
 use crate::deprecated;
 
@@ -17,13 +16,21 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // Function to ZIP a directory, do not use it yet!
     let zip = lua.create_function(|_, (src, dest): (String, String)| {
-        deprecated!("dapi_io.zip", "0.1.10", "The function could go horribly wrong, use at your own risk!");
+        deprecated!(
+            "dapi_io.zip",
+            "0.1.10",
+            "The function could go horribly wrong, use at your own risk!"
+        );
         zip_dir(&src, &dest).map_err(|e| mlua::Error::external(format!("Zip error: {}", e)))
     })?;
 
     // Function to unZIP a directory, do not use it yet!
     let unzip = lua.create_function(|_, (zip, dest): (String, String)| {
-        deprecated!("dapi_io.unzip", "0.1.10", "The function could go horribly wrong, use at your own risk!");
+        deprecated!(
+            "dapi_io.unzip",
+            "0.1.10",
+            "The function could go horribly wrong, use at your own risk!"
+        );
         unzip_file(&zip, &dest).map_err(|e| mlua::Error::external(format!("Unzip error: {}", e)))
     })?;
 
@@ -53,9 +60,22 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
             .map_err(|e| mlua::Error::external(format!("Create dir error: {}", e)))
     })?;
 
+    // Delete a directory recursively
+    let delete_dir = lua.create_function(|_, dir: String| {
+        fs::remove_dir_all(&dir)
+            .map_err(|e| mlua::Error::external(format!("Delete dir error: {}", e)))
+    })?;
+
+    // TODO
+    // Copy File
+
     // Create a file
     let create_file = lua.create_function(|_, file: String| {
-        deprecated!("dapi_io.create_file", "0.1.10", "The function is although contained in the Lua STD");
+        deprecated!(
+            "dapi_io.create_file",
+            "0.1.10",
+            "The function is although contained in the Lua STD"
+        );
         fs::File::create(&file)
             .map(|_| ())
             .map_err(|e| mlua::Error::external(format!("Create file error: {}", e)))
@@ -63,7 +83,11 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // Write Data to a file
     let write_file = lua.create_function(|_, (file, content): (String, String)| {
-        deprecated!("dapi_io.write_file", "0.1.10", "The function is although contained in the Lua STD");
+        deprecated!(
+            "dapi_io.write_file",
+            "0.1.10",
+            "The function is although contained in the Lua STD"
+        );
         fs::write(&file, &content)
             .map(|_| ())
             .map_err(|e| mlua::Error::external(format!("Write file error: {}", e)))
@@ -94,6 +118,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     table.set("unzip", unzip)?;
     table.set("get_default_directories", get_default_directories)?;
     table.set("create_dir", create_dir)?;
+    table.set("delete_dir", delete_dir)?;
     table.set("create_file", create_file)?;
     table.set("write_file", write_file)?;
     table.set("read_line", read_line)?;
