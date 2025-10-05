@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Dein Programm
+Exec=/voller/pfad/zu/target/release/dein_programm
+Icon=/voller/pfad/zu/icon.png
+Terminal=true
+Type=Application
+Categories=Utility;
