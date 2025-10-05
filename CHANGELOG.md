@@ -4,6 +4,7 @@
 - added Function to delete a directory
 - added default script option to the Installer
 - added Copy File Function
+- add Built for Linux aarch 64
 
 ## 0.1.10 - 05.10.2025
 - added Function to Check the OS Type to make code in the script which runs only

@@ -15,12 +15,22 @@ jobs:
     strategy:
       matrix:
         include:
+          # Linux x86_64
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             ext: ""
+
+          # Linux Arm
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            ext: ""
+          
+          # Windows x86_64
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             ext: ".exe"
+          
+          # MacOS x86_64
           - os: macos-latest
             target: x86_64-apple-darwin
             ext: ""
@@ -34,6 +44,10 @@ jobs:
           toolchain: stable
           target: ${{ matrix.target }}
           override: true
+      
+      - name: Install dependencies (ARM only)
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: sudo apt-get update && sudo apt-get install -y gcc-aarch64-linux-gnu
 
       - name: Build release binary
         run: cargo build --release --target ${{ matrix.target }}
@@ -53,6 +67,12 @@ jobs:
         with:
           name: luajit-x86_64-unknown-linux-gnu
           path: release-assets/linux
+      
+      - name: Download Linux ARM64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: luajit-aarch64-unknown-linux-gnu
+          path: release-assets/linux-arm64
 
       - name: Download Windows artifact
         uses: actions/download-artifact@v4
@@ -69,10 +89,11 @@ jobs:
       - name: Rename binaries
         run: |
           mv release-assets/linux/luajit release-assets/luajit-linux-x86_64
+          mv release-assets/linux-arm64/luajit release-assets/luajit-linux-aarch64
           mv release-assets/windows/luajit.exe release-assets/luajit-windows-x86_64.exe
           mv release-assets/macos/luajit release-assets/luajit-macos-x86_64
     
-      - name: Debug – zeige heruntergeladene Dateien
+      - name: Debug - zeige heruntergeladene Dateien
         run: ls -R release-assets
       
       - name: Flatten artifact directory
