@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Skript to start the Luajit Docs
+
+luajit luajitdocs.lua
