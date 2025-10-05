@@ -46,10 +46,34 @@ fi
 
 # Check if $INSTALL_DIR is in PATH
 if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
-    echo "Warning: $INSTALL_DIR is not in your PATH."
-    echo "To add it, run:"
-    echo "  export PATH=\"\$HOME/.local/bin:\$PATH\""
-    echo "And consider adding that line to your shell profile (~/.bashrc, ~/.zshrc, etc.)"
+    echo "Adding $INSTALL_DIR to PATH..."
+
+    # Detect shell config file
+    SHELL_NAME=$(basename "$SHELL")
+    case "$SHELL_NAME" in
+        bash)
+            PROFILE_FILE="$HOME/.bashrc"
+            ;;
+        zsh)
+            PROFILE_FILE="$HOME/.zshrc"
+            ;;
+        *)
+            PROFILE_FILE="$HOME/.profile"
+            ;;
+    esac
+
+    # Add export only if not already present
+    if ! grep -Fxq "export PATH=\"\$HOME/.local/bin:\$PATH\"" "$PROFILE_FILE"; then
+        echo "" >> "$PROFILE_FILE"
+        echo "# Added by LuaJIT installer" >> "$PROFILE_FILE"
+        echo "export PATH=\"\$HOME/.local/bin:\$PATH\"" >> "$PROFILE_FILE"
+        echo "Updated $PROFILE_FILE to include $INSTALL_DIR in PATH."
+    else
+        echo "$INSTALL_DIR is already set in $PROFILE_FILE"
+    fi
+
+    echo "To apply the changes now, run:"
+    echo "  source $PROFILE_FILE"
 else
     echo "$INSTALL_DIR is already in your PATH."
 fi

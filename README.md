@@ -15,6 +15,10 @@ Read the [CHANGELOG](./CHANGELOG.md) or the Docs for more Infos
 
 ## Install
 
+> [!IMPORTANT]
+> Building, installing, and using the workflow on **Linux** (especially ARM64/aarch64) and **macOS** may currently require manual setup or additional dependencies.  
+> If you're running into issues, you're **not alone** — improvements are planned, but help is appreciated.
+
 ### Linux
 
 ```sh
