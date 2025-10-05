@@ -1,6 +1,8 @@
 use mlua::{Lua, Result, Value};
 use serde_json::Value as JsonValue;
 
+// TODO
+// Probably fix this
 // JSON Parsing
 pub fn json_to_lua(lua: &Lua, json: &serde_json::Value) -> Result<mlua::Value> {
     match json {
@@ -33,6 +35,8 @@ pub fn json_to_lua(lua: &Lua, json: &serde_json::Value) -> Result<mlua::Value> {
     }
 }
 
+// TODO
+// Probably fix this
 pub fn lua_to_json(value: &Value) -> Result<JsonValue> {
     match value {
         Value::Nil => Ok(JsonValue::Null),

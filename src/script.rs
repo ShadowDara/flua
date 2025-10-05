@@ -2,7 +2,7 @@ use mlua::{Lua, Result, Table};
 use std::fs;
 use std::path::Path;
 
-use crate::api::{base, io as api_io, os as api_os, http as api_http, json as api_json};
+use crate::api::{base, io as api_io, os as api_os, http as api_http, json as api_json, toml as api_toml};
 
 pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
     if !Path::new(file).exists() {
@@ -25,6 +25,7 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
     let dapi_os = api_os::register(&lua)?;
     let dapi_http = api_http::register(&lua)?;
     let dapi_json = api_json::register(&lua)?;
+    let dapi_toml = api_toml::register(&lua)?;
 
     let globals = lua.globals();
     let package: Table = globals.get("package")?;
@@ -35,6 +36,7 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
     preload.set("dapi_os", lua.create_function(move |_, ()| Ok(dapi_os.clone()))?)?;
     preload.set("dapi_http", lua.create_function(move |_, ()| Ok(dapi_http.clone()))?)?;
     preload.set("dapi_json", lua.create_function(move |_, ()| Ok(dapi_json.clone()))?)?;
+    preload.set("dapi_toml", lua.create_function(move |_, ()| Ok(dapi_toml.clone()))?)?;
 
     lua.load(&script).exec()?;
     Ok(())

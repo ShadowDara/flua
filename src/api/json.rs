@@ -3,6 +3,8 @@ use serde_json;
 
 use crate::utils::json_utils;
 
+// TODO
+// Probably fix this
 pub fn register(lua: &Lua) -> Result<mlua::Table> {
     let table = lua.create_table()?; // JSON-Tabelle
 

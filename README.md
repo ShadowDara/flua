@@ -3,7 +3,7 @@
 a Lua API written in Rust to make scripting much easier!
 
 Run a script with
-```
+```sh
 luajit <your-script.lua>
 ```
 
@@ -17,3 +17,4 @@ Read the [CHANGELOG](./CHANGELOG.md) or the Docs for more Infos
 - [] multiversion modules
 - [] module creation like cargo
 - [] Autoupdater / Version Installer / Selector
+- [] Safe Mode
