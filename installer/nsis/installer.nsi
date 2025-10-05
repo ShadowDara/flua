@@ -32,11 +32,16 @@ Section "Uninstall"
   Delete "$INSTDIR\README.md"
   Delete "$INSTDIR\CHANGELOG.md"
   Delete "$INSTDIR\LICENSE"
+  Delete "$INSTDIR\Uninstall.exe"
 
   # Verzeichnis löschen
   RMDir "$INSTDIR"
 
+  # Delete Both Directories
+  RMDir "$LOCALAPPDATA\@shadowdara"
+
   Delete "$SMPROGRAMS\Luajit\Uninstall.lnk"
+  Delete "$SMPROGRAMS\Luajit\luajit.lnk"
   RMDir "$SMPROGRAMS\Luajit"
 
   ; Read current PATH from registry
@@ -129,7 +134,11 @@ Section "Install"
   Push $1
   Call AddToPath
 
-  # Uninstaller Shortcut
+  # Create Startmenu Directory
+  CreateDirectory "$SMPROGRAMS\Luajit"
+
+  # Shortcuts
+  CreateShortCut "$SMPROGRAMS\Luajit\luajit.lnk" "$INSTDIR\luajit.exe"
   CreateShortCut "$SMPROGRAMS\Luajit\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
 
   # ---- Uninstaller schreiben ----
