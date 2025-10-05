@@ -2,6 +2,9 @@
 
 a Lua API written in Rust to make scripting much easier!
 
+> [!TIP]
+> You this for scripting prevent the need install one extra library for every new script you want to make
+
 Run a script with
 ```sh
 luajit <your-script.lua>
