@@ -1,9 +1,13 @@
-# Import
-!include LogicLib.nsh
-!include StrFunc.nsh
-${StrStr}
-${StrRep}
-${UnStrStr}
+!include "LogicLib.nsh"
+!include "StrFunc.nsh"
+
+${Using:StrFunc} StrStr
+!insertmacro STRFUNC_MAKEFUNC StrStr "un."
+!insertmacro STRFUNC_MAKEFUNC StrRep "un."
+
+; Danach in Funktionen kannst du:
+; Call un.StrStr
+; Call un.StrRep
 
 # Name des Installers
 Outfile "LuajitSetup.exe"
@@ -11,7 +15,8 @@ Outfile "LuajitSetup.exe"
 # Verzeichnis, in das installiert wird
 InstallDir "$LOCALAPPDATA\@shadowdara\luajit"
 
-RequestExecutionLevel user   ; <<< Wichtig! Kein Admin
+# NO ADMIN
+RequestExecutionLevel user
 
 # Standardseite für Benutzer
 Page directory
@@ -34,13 +39,36 @@ Section "Uninstall"
   Delete "$SMPROGRAMS\Luajit\Uninstall.lnk"
   RMDir "$SMPROGRAMS\Luajit"
 
-  # PATH aus Umgebungsvariablen entfernen
+  ; Read current PATH from registry
   ReadRegStr $0 HKCU "Environment" "Path"
-  ${UnStrStr} $1 $0 "$INSTDIR"
+
+  ; Call un.StrStr to check if $INSTDIR is in PATH
+  Push "$INSTDIR"
+  Push $0
+  Call un.StrStr
+  Pop $1 ; $1 = result of un.StrStr (position or empty)
+
   ${If} $1 != ""
-    ${StrRep} $2 $0 "$INSTDIR;" ""
-    ${StrRep} $2 $2 ";$INSTDIR" ""
-    ${StrRep} $2 $2 "$INSTDIR" ""
+    ; Remove $INSTDIR from PATH with un.StrRep
+
+    Push ""             ; replacement string (empty)
+    Push "$INSTDIR;"    ; string to remove with trailing semicolon
+    Push $0             ; original PATH
+    Call un.StrRep
+    Pop $2              ; first replacement result
+
+    Push ""             ; replacement string (empty)
+    Push ";$INSTDIR"    ; string to remove with leading semicolon
+    Push $2             ; previous result
+    Call un.StrRep
+    Pop $2              ; second replacement result
+
+    Push ""             ; replacement string (empty)
+    Push "$INSTDIR"     ; string to remove (no semicolon)
+    Push $2             ; previous result
+    Call un.StrRep
+    Pop $2              ; final result
+
     WriteRegExpandStr HKCU "Environment" "Path" "$2"
     System::Call 'user32::SendMessageTimeoutA(i 0xffff, i 0x1A, i 0, t "Environment", i 0, i 1000, *i .r0)'
   ${EndIf}
