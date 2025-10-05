@@ -1,4 +1,4 @@
-name: Build & Release Rust
+name: Build & Release Luajit
 
 on:
   push:
