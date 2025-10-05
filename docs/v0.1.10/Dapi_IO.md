@@ -7,13 +7,13 @@ local dapi_io = require("dapi_io")
 ## get_dafault_directories
 a function which returns a lua table containing a lot of dafault directories
 
-### Usage
+**Usage**
 ```lua
 local dir = dapi_io.get_default_directories()
 print(dir.home)
 ```
 
-### Path Overview
+**Path Overview**
 <table>
     <thead>
         <tr>

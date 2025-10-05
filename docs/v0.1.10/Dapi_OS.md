@@ -10,7 +10,7 @@ local dapi_os = require("dapi_os")
 to function to check if the current used os is windows, linux or macos
 and depending on that, run special Code
 
-### Usage
+**Usage**
 ```lua
 local osdata = dapi_os.os()
 
@@ -26,7 +26,7 @@ end
 ## chdir
 a function to change the current execution directory
 
-### Usage
+**Usage**
 ```lua
 -- create a new directory
 dapi_io.create_dir("wtf")
@@ -37,7 +37,7 @@ dapi_os.chdir("wtf")
 ## getcwd
 a function which returns the current executing directory as a string
 
-### Usage
+**Usage**
 ```lua
 local cwd = dapi_os.getcwd()
 ```

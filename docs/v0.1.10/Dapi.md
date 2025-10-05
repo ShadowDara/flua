@@ -7,7 +7,7 @@ local dapi = require("dapi")
 ## version
 a function which returns the current running version of luajit as a string
 
-### Usage
+**Usage**
 ```lua
 print(dapi.version())
 ```
@@ -17,7 +17,7 @@ a function to check if the correct version of Luajit is used, first parameter
 is the correct Version and second parameter is a Boolean for showing a warning
 or info message
 
-### Usage
+**Usage**
 ```lua
 dapi.check_version("0.1.9", true)
 ```
@@ -26,13 +26,13 @@ dapi.check_version("0.1.9", true)
 a function which returns a Lua Table containing a lot of usable
 ANSI Color Codes for colored output
 
-### Usage
+**Usage**
 ```lua
 local colors = dapi.get_colors()
 print(colors.red + "Hallo" + colors.end)
 ```
 
-### Different Color Codes
+**Different Color Codes**
 **IMPORANT: Dont use the Color names in UPPERCASES, use lowercase letters instead !!!**
 ```rust
 // Color codes for Colorful printing with Ansi Colorcodes

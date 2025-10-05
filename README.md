@@ -11,6 +11,8 @@ to suppress file and os access ad `-safe` at the end
 
 Read the [CHANGELOG](./CHANGELOG.md) or the Docs for more Infos
 
+**Feel free to open an Issue for a build request or feature request!**
+
 ### 1.0.0 Roadmap
 - [ ] add full data parsing
 - [ ] compabilllity with luarocks
