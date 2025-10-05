@@ -66,8 +66,12 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
             .map_err(|e| mlua::Error::external(format!("Delete dir error: {}", e)))
     })?;
 
-    // TODO
-    // Copy File
+    // Copy a file
+    let copy_file = lua.create_function(|_, (from, to): (String, String)| {
+        fs::copy(&from, &to)
+            .map(|_| ()) // Ignore number of bytes copied
+            .map_err(|e| mlua::Error::external(format!("Copy file error: {}", e)))
+    })?;
 
     // Create a file
     let create_file = lua.create_function(|_, file: String| {
@@ -119,6 +123,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     table.set("get_default_directories", get_default_directories)?;
     table.set("create_dir", create_dir)?;
     table.set("delete_dir", delete_dir)?;
+    table.set("copy_file", copy_file)?;
     table.set("create_file", create_file)?;
     table.set("write_file", write_file)?;
     table.set("read_line", read_line)?;

@@ -133,8 +133,8 @@ Section "Install"
   # Dateityp- und ProgID-Verknüpfung setzen
   WriteRegStr HKCR ".lua" "" "MyLuaFile"
   WriteRegStr HKCR "MyLuaFile" "" "Lua-Skript"
-  WriteRegStr HKCR "MyLuaFile\DefaultIcon" "" "$INSTDIR\MyLuaApp.exe,0"
-  WriteRegStr HKCR "MyLuaFile\shell\open\command" "" '"$INSTDIR\MyLuaApp.exe" "%1"'
+  WriteRegStr HKCR "MyLuaFile\DefaultIcon" "" "$INSTDIR\luajit.exe,0"
+  WriteRegStr HKCR "MyLuaFile\shell\open\command" "" '"$INSTDIR\luajit.exe" "%1"'
 
   # Info für Windows 10/11 Standardprogramme-UI (nur teilweise effektiv)
   # Optional: ApplicationCapabilities setzen (mehr Aufwand)

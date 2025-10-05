@@ -101,6 +101,13 @@ function to delete a directory recursivly
 dapi_io.delete_dir("Wtf")
 ```
 
+## copy_file
+function to copy a file
+
+**Usage**
+```lua
+dapi_io.copy_file("hallo.txt", "wtf/hallo.txt")
+```
 
 ## create_file
 

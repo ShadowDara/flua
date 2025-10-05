@@ -1,12 +1,8 @@
+local dapi = require("dapi")
+local dapi_io = require("dapi_io")
 local dapi_os = require("dapi_os")
-local dapi_os = require("dapi_os")
 
-dapi.check_version("0.1.10", true)
-
--- Copies the Changelog from Repo Root to /docs/
-function copy_changelog()
-
-end
+dapi.check_version("0.1.11", true)
 
 function build_windows()
     print("Running Build for Windows")
@@ -21,9 +17,10 @@ function build_macos()
 end
 
 -- Start the Script
-print("Luajit Build")
+print("Luajit Build Script")
 
-copy_changelog()
+-- Copies the Changelog from Repo Root to /docs/
+dapi_io.copy_file("CHANGELOG.md", "docs/CHANGELOG.md")
 
 local osdata = dapi_os.os()
 if osdata.win then

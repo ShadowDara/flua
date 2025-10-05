@@ -20,3 +20,5 @@ Read the [CHANGELOG](./CHANGELOG.md) or the Docs for more Infos
 - [ ] module creation like cargo
 - [ ] Autoupdater / Version Installer / Selector
 - [ ] Safe Mode
+- [ ] multiversion compabillity and multiversion installer
+- [ ] adding VS-Code support for the functions
