@@ -4,6 +4,10 @@ to start, you need to import the api in your script, you can do it with
 local dapi = require("dapi")
 ```
 
+## greet
+
+## add
+
 ## version
 a function which returns the current running version of luajit as a string
 
@@ -21,6 +25,8 @@ or info message
 ```lua
 dapi.check_version("0.1.9", true)
 ```
+
+## `download()`
 
 ## get_colors
 a function which returns a Lua Table containing a lot of usable

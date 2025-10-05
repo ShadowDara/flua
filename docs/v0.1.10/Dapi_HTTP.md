@@ -5,5 +5,9 @@ local dapi_http = require("dapi_http")
 ```
 
 ## start_static_server
+function to start a static http server from a directory
 
-...
+**Usage**
+```lua
+dapi_http.start_static_server(".", 8080)
+```

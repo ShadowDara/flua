@@ -4,9 +4,48 @@ to start, you need to import the api in your script, you can do it with
 local dapi_os = require("dapi_os")
 ```
 
-## get_os_info
+## `get_os_info()`
 
-## os
+This Lua function returns basic system information such as OS type, version, hostname, CPU count, and total memory.
+
+**Usage**
+
+```lua
+table = dapi_os.get_os_info()
+```
+
+**Return Value**
+
+A Lua `table` with the following fields:
+
+| Key         | Type     | Description                                               |
+|-------------|----------|-----------------------------------------------------------|
+| `os_type`   | `string` | The operating system type (e.g., `"Linux"`, `"Windows"`)  |
+| `os_release`| `string` | OS release/version string                                 |
+| `hostname`  | `string` | The system's hostname                                     |
+| `cpu_num`   | `number` | Number of available CPU cores                             |
+| `mem_total` | `number` | Total physical memory in kilobytes (KB)                   |
+
+**Usage Example (in Lua)**
+
+```lua
+local info = get_os_info()
+
+print("OS Type:   " .. info.os_type)
+print("OS Version:" .. info.os_release)
+print("Hostname:  " .. info.hostname)
+print("CPU Cores: " .. info.cpu_num)
+print("RAM Total: " .. info.mem_total .. " KB")
+```
+
+**Error Handling**
+
+- If any system information is unavailable (e.g., due to permission issues), fallback values are used:
+  - `"Unknown"` for strings
+  - `0` for numbers
+- This ensures the function always returns a valid Lua table without runtime errors.
+
+## `os()`
 to function to check if the current used os is windows, linux or macos
 and depending on that, run special Code
 
@@ -23,7 +62,7 @@ elseif osdata.mac then
 end
 ```
 
-## chdir
+## `chdir()`
 a function to change the current execution directory
 
 **Usage**
@@ -34,7 +73,7 @@ dapi_io.create_dir("wtf")
 dapi_os.chdir("wtf")
 ```
 
-## getcwd
+## `getcwd()`
 a function which returns the current executing directory as a string
 
 **Usage**
@@ -42,6 +81,12 @@ a function which returns the current executing directory as a string
 local cwd = dapi_os.getcwd()
 ```
 
-## open_link
+## `open_link()`
+opens a link in the standard browser of the User
 
-## run
+**Usage**
+```lua
+dapi_os.open_link("https://github.com/shadowdara")
+```
+
+## `run()`
