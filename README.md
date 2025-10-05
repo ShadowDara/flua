@@ -13,11 +13,14 @@ Read the [CHANGELOG](./CHANGELOG.md) or the Docs for more Infos
 
 **Feel free to open an Issue for a build request or feature request!**
 
+> [!CAUTION]
+> The Program is **NOT** guaranteed stable before **1.0.0**
+
 ## Install
 
 > [!IMPORTANT]
 > Building, installing, and using the workflow on **Linux** (especially ARM64/aarch64) and **macOS** may currently require manual setup or additional dependencies.  
-> If you're running into issues, you're **not alone** — improvements are planned, but help is HIGHLY appreciated.
+> If you're running into issues, you're **not alone** — improvements are planned, but help is **HIGHLY** appreciated.
 
 ### Linux
 
@@ -35,6 +38,9 @@ chmod +x LuajitInstall.sh
 ### Windows
 
 Download the NSIS installer [here](https://github.com/ShadowDara/LuaAPI-Rust/releases)
+
+> [!NOTE]
+> Install Script for windows is although planned and hopefully coming soon!
 
 ## 1.0.0 Roadmap
 - [ ] add full data parsing
