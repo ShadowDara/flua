@@ -25,3 +25,10 @@ Read the [CHANGELOG](./CHANGELOG.md) or the Docs for more Infos
 - [ ] UI which can be used directly from lua
 - [ ] ( ??? Windows API Bindings ??? )
 - [ ] gh workflow and script to install Luajit + (Dockerfile)
+
+<!-- ## Stats 0.1.11 -->
+<!--
+
+.\cloc . --md --out=cloc_report.md --exclude-dir=target
+
+-->
