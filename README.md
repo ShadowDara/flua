@@ -45,7 +45,7 @@ curl -L -o "LuajitInstall.sh" "https://raw.githubusercontent.com/ShadowDara/LuaA
 chmod +x LuajitInstall.sh
 
 # Execute the script
-./LuajitInstall.sh
+./LuajitInstall.sh "v0.1.11"
 ```
 
 ### Windows
