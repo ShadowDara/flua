@@ -21,7 +21,13 @@ def get_version(file):
                     return val
 
 if __name__ == "__main__":
+    windows_export_folder = "windows_builds"
+    
     print("LuajitBuilt for Windows")
+    
+    print("Clear Build")
+    try: shutil.rmtree("windows_builds")
+    except: pass
     
     # Build Mkdocs
     # print("Build Mkdocs")
@@ -29,13 +35,17 @@ if __name__ == "__main__":
     # shutil.copytree("site/", "windows_builds/docs/", dirs_exist_ok=True)
     # shutil.copytree("installer/win", "windows_builds/", dirs_exist_ok=True)
     
-    print("Run cargo Built")
+    os.makedirs("windows_builds", exist_ok=True)
+    
+    print("Run cargo build --release")
     subprocess.run("cargo build --release", shell=True, capture_output=True, text=True)
     
-    print("Make Inno Setup")
-    os.chdir('installer/inno')
-    subprocess.run("ISCC setup.iss", shell=True, capture_output=True, text=True)
-    shutil.copy("output/LuajitSetupInno.exe", "../../windows_builds")
+    # print("Make Inno Setup")
+    # os.chdir('installer/inno')
+    # subprocess.run("ISCC setup.iss", shell=True, capture_output=True, text=True)
+    # shutil.copy("output/LuajitSetupInno.exe", "../../windows_builds")
+    
+    os.chdir('installer/nsis')
 
     print("Make UserInstaller")
     os.chdir('../nsis')
