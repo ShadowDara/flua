@@ -120,3 +120,47 @@ is not thread-safe across all platforms.
 
 **Errors**
 Returns a Lua error if key or value contain null bytes (`\0`), which are invalid.
+
+## Yaml
+
+### import
+```lua
+local dapi_yaml = require("dapi_yaml")
+```
+
+### `yaml.encode` and `yaml.decode`
+
+Lua bindings for serializing and deserializing YAML using Rust + `mlua`.
+
+**Lua Usage**
+
+```lua
+local data = yaml.decode([[
+name: ChatGPT
+version: 4
+features:
+  - mlua
+  - yaml
+]])
+
+print(data.name)           --> "ChatGPT"
+print(data.features[1])    --> "mlua"
+
+local yaml_str = yaml.encode(data)
+print(yaml_str)
+```
+
+**Functions**
+
+`yaml.decode(yaml_str: string) → table`
+
+Parses a YAML string and returns a Lua table.
+
+`yaml.encode(table: table) → string`
+
+Serializes a Lua table into a YAML string.
+
+**Error Handling**
+
+- Errors are thrown as Lua exceptions if parsing or serialization fails.
+- Invalid Lua types (e.g. userdata, functions) cannot be encoded.

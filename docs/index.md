@@ -4,9 +4,10 @@ Luajit is a simple scripting envirment with Lua via an custom Lua API
 made in Rust
 
 ## Download
-- [Latest Release - v0.1.11](https://github.com/ShadowDara/LuaAPI-Rust/releases/tag/v0.1.11)
+- [Latest Release - v0.1.12](https://github.com/ShadowDara/LuaAPI-Rust/releases)
 
 ## Versions
+- [v0.1.12](./v0.1.12/)
 - [v0.1.11](./v0.1.11/)
 - [v0.1.10](./v0.1.10/)
 - [v0.1.9](./v0.1.9/) @Deprecated
@@ -21,6 +22,7 @@ made in Rust
 - [Source](https://github.com/ShadowDara/LuaAPI-Rust)
 
 ## Releases
+- [v0.1.12](https://github.com/ShadowDara/LuaAPI-Rust/releases/tag/v0.1.12)
 - [v0.1.11](https://github.com/ShadowDara/LuaAPI-Rust/releases/tag/v0.1.11)
 - [v0.1.10](https://github.com/ShadowDara/LuaAPI-Rust/releases/tag/v0.1.10)
 - [v0.1.9](https://github.com/ShadowDara/LuaAPI-Rust/releases/tag/v0.1.9)

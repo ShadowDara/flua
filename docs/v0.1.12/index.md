@@ -1,8 +1,8 @@
-# Version 0.1.11
-- Release Date: 05.10.2025
+# Version 0.1.12
+- Release Date: XX.XX.XXXX
 
 ## Download
-- [v0.1.11](https://github.com/ShadowDara/LuaAPI-Rust/releases/tag/v0.1.11)
+- [v0.1.12](https://github.com/ShadowDara/LuaAPI-Rust/releases/tag/v0.1.12)
 
 ## Changelog
 - added Function to Check the OS Type to make code in the script which runs only

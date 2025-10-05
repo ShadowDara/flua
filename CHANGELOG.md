@@ -1,6 +1,11 @@
 # CHANGELOG
 
-## 0.1.11
+## 0.1.12
+- added yaml parser
+- updated install script
+- delered NSIS Admin Installer
+
+## 0.1.11 - 05.10.2025
 - added Function to delete a directory
 - added default script option to the Installer
 - added Copy File Function

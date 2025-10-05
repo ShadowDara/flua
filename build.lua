@@ -31,3 +31,5 @@ elseif osdata.lin then
 elseif osdata.mac then
     build_macos()
 end
+
+print("Finished Build")

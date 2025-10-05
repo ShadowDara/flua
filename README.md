@@ -45,6 +45,13 @@ Download the NSIS installer [here](https://github.com/ShadowDara/LuaAPI-Rust/rel
 > [!NOTE]
 > Install Script for windows is although planned and hopefully coming soon!
 
+## Feature Overview
+### Data Parsing
+- JSON
+- Toml
+- .env
+- Yaml
+
 ## 1.0.0 Roadmap
 - [ ] add full data parsing
 - [ ] compabilllity with luarocks
