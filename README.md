@@ -32,3 +32,22 @@ Read the [CHANGELOG](./CHANGELOG.md) or the Docs for more Infos
 .\cloc . --md --out=cloc_report.md --exclude-dir=target
 
 -->
+
+## Install
+
+### Linux
+
+```sh
+# Download the script
+curl -L -o "LuajitInstall.sh" "https://raw.githubusercontent.com/ShadowDara/LuaAPI-Rust/refs/heads/main/installer/install.sh"
+
+# Make it executable
+chmod +x LuajitInstall.sh
+
+# Execute the script
+./LuajitInstall.sh
+```
+
+### Windows
+
+Download the NSIS installer [here](https://github.com/ShadowDara/LuaAPI-Rust/releases)
