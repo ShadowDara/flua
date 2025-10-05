@@ -8,7 +8,7 @@
     "ghcr.io/devcontainers/features/git:1": {}
   },
 
-  "postCreateCommand": "rustup component add rustfmt clippy",
+  "postCreateCommand": "rustup component add rustfmt clippy ; cargo build",
 
   "customizations": {
     "vscode": {

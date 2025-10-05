@@ -1,8 +1,5 @@
 # To start the site
-# pip install mkdocs
-# pip install mkdocs-material
 # mkdocs serve --dev-addr 0.0.0.0:9000
-
 site_name: Luajit Rust
 theme:
   name: material
