@@ -125,6 +125,13 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
             .map_err(|e| mlua::Error::external(format!("Write file error: {}", e)))
     })?;
 
+    // Function to get the size of an file
+    let get_file_size = lua.create_function(|_, path: String| {
+        fs::metadata(&path)
+            .map(|metadata| metadata.len())
+            .map_err(|e| mlua::Error::external(format!("Failed to get file size: {}", e)))
+    })?;
+
     // Function to read a file line by line
     let read_line = lua.create_function(|lua, (file, max_lines): (String, Option<usize>)| {
         let file = fs::File::open(&file)
@@ -152,8 +159,10 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     table.set("create_dir", create_dir)?;
     table.set("delete_dir", delete_dir)?;
     table.set("copy_file", copy_file)?;
+    table.set("copy_dir", copy_dir)?;
     table.set("create_file", create_file)?;
     table.set("write_file", write_file)?;
+    table.set("get_file_size", get_file_size)?;
     table.set("read_line", read_line)?;
 
     Ok(table)

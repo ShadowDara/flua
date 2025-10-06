@@ -4,11 +4,12 @@
 - added yaml parser
 - updated install script
 - delered NSIS Admin Installer
-- added function to wait for a certain period of time
+- added a function to wait for a certain period of time
 - added Ini Parser
 - added Data Tests
 - added Base64 Encoding
-- added function to copy a dir recursivly
+- added a function to copy a dir recursivly
+- added a function to get the file size
 
 ## 0.1.11 - 05.10.2025
 - added Function to delete a directory

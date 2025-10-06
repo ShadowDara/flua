@@ -121,6 +121,16 @@ dapi_io.copy_dir("/dir", "/dir2")
 
 ## write_file
 
+## get_file_size
+a function to get the size of an file
+
+**Usage**
+```lua
+dapi_os.write_file("wtf.txt")
+local size = dapi_os.get_file_size("wtf.txt")
+print(size)
+```
+
 ## `read_line()`
 Reads a text file and returns its contents as a Lua table, line by line. Optionally, a maximum number of lines can be specified.
 
