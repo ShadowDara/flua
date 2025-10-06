@@ -990,6 +990,7 @@ dependencies = [
 name = "luajit"
 version = "0.1.12"
 dependencies = [
+ "base64 0.21.7",
  "dirs-next",
  "dotenv",
  "ini",

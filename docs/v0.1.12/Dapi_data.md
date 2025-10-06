@@ -215,3 +215,27 @@ This function takes a Lua Table and returns an INI File as a String
 local ini_b = dapi_ini.convert(parsed)
 print(ini_b)
 ```
+
+## Base64
+
+### import
+```lua
+dapi_base64 = require("dapi_base64")
+```
+
+## encode
+encodes a Text string to base 64
+
+## decode
+decodes a base64 string back to text
+
+**Usage**
+```lua
+local dapi_base64 = require("dapi_base64")
+
+local encoded = dapi_base64.encode("Hello, Lua!")
+print(encoded) -- "SGVsbG8sIEx1YSE="
+
+local decoded = dapi_base64.decode(encoded)
+print(decoded) -- "Hello, Lua!"
+```

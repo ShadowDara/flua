@@ -8,6 +8,7 @@ local dapi_toml = require("dapi_toml")
 local dapi_dotenv = require("dapi_dotenv")
 local dapi_yaml = require("dapi_yaml")
 local dapi_ini  = require("dapi_ini")
+local dapi_base64 = require("dapi_base64")
 
 -- Helpers
 local function assert_equal(a, b, msg)
@@ -127,6 +128,27 @@ volume = 80
   assert(type(back_to_ini) == "string", "INI convert failed")
 end
 
+-- Base64 Tests
+local function test_base64()
+  print("Testing Base64...")
+
+  local input = "Hallo, Welt!"
+  local expected_encoded = "SGFsbG8sIFdlbHQh"
+
+  local encoded = dapi_base64.encode(input)
+  assert_equal(encoded, expected_encoded, "Base64 encoding mismatch")
+
+  local decoded = dapi_base64.decode(encoded)
+  assert_equal(decoded, input, "Base64 decoding mismatch")
+
+  -- Edge case: empty string
+  local empty_encoded = dapi_base64.encode("")
+  assert_equal(empty_encoded, "", "Base64 empty encode failed")
+
+  local empty_decoded = dapi_base64.decode("")
+  assert_equal(empty_decoded, "", "Base64 empty decode failed")
+end
+
 -- Master runner
 local function run_all_tests()
   print("Running all config format tests...\n")
@@ -135,6 +157,7 @@ local function run_all_tests()
   test_dotenv()
   test_yaml()
   test_ini()
+  test_base64()
   print("\nAll tests passed!")
 end
 

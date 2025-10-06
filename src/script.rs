@@ -3,7 +3,7 @@ use std::fs;
 use std::path::Path;
 
 use crate::api::{
-    base, dotenv as api_dotenv, http as api_http, ini_parser as api_ini, io as api_io,
+    base, base64_api, dotenv as api_dotenv, http as api_http, ini_parser as api_ini, io as api_io,
     json as api_json, os as api_os, toml as api_toml, yaml as api_yaml,
 };
 
@@ -32,6 +32,7 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
     let dapi_dotenv = api_dotenv::register(&lua)?;
     let dapi_yaml = api_yaml::register(&lua)?;
     let dapi_ini = api_ini::register(&lua)?;
+    let dapi_base64 = base64_api::register(&lua)?;
 
     let globals = lua.globals();
     let package: Table = globals.get("package")?;
@@ -69,6 +70,10 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
     preload.set(
         "dapi_ini",
         lua.create_function(move |_, ()| Ok(dapi_ini.clone()))?,
+    )?;
+    preload.set(
+        "dapi_base64",
+        lua.create_function(move |_, ()| Ok(dapi_base64.clone()))?,
     )?;
 
     lua.load(&script).exec()?;

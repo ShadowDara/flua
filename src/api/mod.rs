@@ -1,4 +1,5 @@
 pub mod base;
+pub mod base64_api;
 pub mod dotenv;
 pub mod http;
 pub mod ini_parser;
