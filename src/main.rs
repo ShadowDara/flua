@@ -1,8 +1,8 @@
 use std::env;
 
 mod api;
-mod script;
 mod helper;
+mod script;
 mod utils;
 
 #[cfg(windows)]
@@ -10,11 +10,7 @@ mod windows_utf8;
 
 pub const VERSION: &str = "0.1.12";
 
-use crate::helper::print::{
-    END,
-    RED,
-    GREEN
-};
+use crate::helper::print::{END, GREEN, RED};
 
 fn main() {
     // Must be add the start IMPORTANT
@@ -25,7 +21,10 @@ fn main() {
 
     // Check if filename
     if args.len() < 2 {
-        eprintln!("{}No Path provided! Run with -h or --help for more information.{}", RED, END);
+        eprintln!(
+            "{}No Path provided! Run with -h or --help for more information.{}",
+            RED, END
+        );
         std::thread::sleep(std::time::Duration::from_secs(5));
         return;
     }
@@ -79,5 +78,8 @@ fn main() {
         return;
     }
 
-    println!("{}[LUAJIT-INFO] finished script executing: {}{}", GREEN, path, END);
+    println!(
+        "{}[LUAJIT-INFO] finished script executing: {}{}",
+        GREEN, path, END
+    );
 }

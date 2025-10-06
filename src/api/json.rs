@@ -1,4 +1,4 @@
-use mlua::{Lua, Result, Value, Error};
+use mlua::{Error, Lua, Result, Value};
 use serde_json;
 
 use crate::utils::json_utils;
@@ -18,7 +18,8 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // Decode JSON to a Lua Table
     let json_decode2 = lua.create_function(|lua, json_str: String| {
-        let json_value: serde_json::Value = serde_json::from_str(&json_str).map_err(Error::external)?;
+        let json_value: serde_json::Value =
+            serde_json::from_str(&json_str).map_err(Error::external)?;
         Ok(json_utils::json_to_lua(lua, &json_value))
     })?;
 

@@ -2,7 +2,10 @@ use mlua::{Lua, Result, Table};
 use std::fs;
 use std::path::Path;
 
-use crate::api::{base, io as api_io, os as api_os, http as api_http, json as api_json, toml as api_toml, dotenv as api_dotenv, yaml as api_yaml};
+use crate::api::{
+    base, dotenv as api_dotenv, http as api_http, ini_parser as api_ini, io as api_io,
+    json as api_json, os as api_os, toml as api_toml, yaml as api_yaml,
+};
 
 pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
     if !Path::new(file).exists() {
@@ -28,19 +31,45 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
     let dapi_toml = api_toml::register(&lua)?;
     let dapi_dotenv = api_dotenv::register(&lua)?;
     let dapi_yaml = api_yaml::register(&lua)?;
+    let dapi_ini = api_ini::register(&lua)?;
 
     let globals = lua.globals();
     let package: Table = globals.get("package")?;
     let preload: Table = package.get("preload")?;
 
     preload.set("dapi", lua.create_function(move |_, ()| Ok(dapi.clone()))?)?;
-    preload.set("dapi_io", lua.create_function(move |_, ()| Ok(dapi_io.clone()))?)?;
-    preload.set("dapi_os", lua.create_function(move |_, ()| Ok(dapi_os.clone()))?)?;
-    preload.set("dapi_http", lua.create_function(move |_, ()| Ok(dapi_http.clone()))?)?;
-    preload.set("dapi_json", lua.create_function(move |_, ()| Ok(dapi_json.clone()))?)?;
-    preload.set("dapi_toml", lua.create_function(move |_, ()| Ok(dapi_toml.clone()))?)?;
-    preload.set("dapi_dotenv", lua.create_function(move |_, ()| Ok(dapi_dotenv.clone()))?)?;
-    preload.set("dapi_yaml", lua.create_function(move |_, ()| Ok(dapi_yaml.clone()))?)?;
+    preload.set(
+        "dapi_io",
+        lua.create_function(move |_, ()| Ok(dapi_io.clone()))?,
+    )?;
+    preload.set(
+        "dapi_os",
+        lua.create_function(move |_, ()| Ok(dapi_os.clone()))?,
+    )?;
+    preload.set(
+        "dapi_http",
+        lua.create_function(move |_, ()| Ok(dapi_http.clone()))?,
+    )?;
+    preload.set(
+        "dapi_json",
+        lua.create_function(move |_, ()| Ok(dapi_json.clone()))?,
+    )?;
+    preload.set(
+        "dapi_toml",
+        lua.create_function(move |_, ()| Ok(dapi_toml.clone()))?,
+    )?;
+    preload.set(
+        "dapi_dotenv",
+        lua.create_function(move |_, ()| Ok(dapi_dotenv.clone()))?,
+    )?;
+    preload.set(
+        "dapi_yaml",
+        lua.create_function(move |_, ()| Ok(dapi_yaml.clone()))?,
+    )?;
+    preload.set(
+        "dapi_ini",
+        lua.create_function(move |_, ()| Ok(dapi_ini.clone()))?,
+    )?;
 
     lua.load(&script).exec()?;
     Ok(())

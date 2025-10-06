@@ -42,11 +42,9 @@ pub fn lua_to_json(value: &Value) -> Result<JsonValue> {
         Value::Nil => Ok(JsonValue::Null),
         Value::Boolean(b) => Ok(JsonValue::Bool(*b)),
         Value::Integer(i) => Ok(JsonValue::Number((*i).into())),
-        Value::Number(n) => {
-            serde_json::Number::from_f64(*n)
-                .map(JsonValue::Number)
-                .ok_or_else(|| mlua::Error::external("Invalid f64 number for JSON"))
-        }
+        Value::Number(n) => serde_json::Number::from_f64(*n)
+            .map(JsonValue::Number)
+            .ok_or_else(|| mlua::Error::external("Invalid f64 number for JSON")),
         Value::String(s) => Ok(JsonValue::String(s.to_str()?.to_string())),
         Value::Table(table) => {
             // Lua tables können Array oder Map sein - wir unterscheiden das
@@ -90,13 +88,19 @@ pub fn lua_to_json(value: &Value) -> Result<JsonValue> {
                         Value::Integer(i) => i.to_string(),
                         Value::Number(n) => n.to_string(),
                         Value::Boolean(b) => b.to_string(),
-                        _ => return Err(mlua::Error::external("Unsupported table key type for JSON")),
+                        _ => {
+                            return Err(mlua::Error::external(
+                                "Unsupported table key type for JSON",
+                            ));
+                        }
                     };
                     map.insert(key_str, lua_to_json(&v)?);
                 }
                 Ok(JsonValue::Object(map))
             }
         }
-        _ => Err(mlua::Error::external("Unsupported Lua value type for JSON serialization")),
+        _ => Err(mlua::Error::external(
+            "Unsupported Lua value type for JSON serialization",
+        )),
     }
 }

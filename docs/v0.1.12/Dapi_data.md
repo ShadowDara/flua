@@ -164,3 +164,54 @@ Serializes a Lua table into a YAML string.
 
 - Errors are thrown as Lua exceptions if parsing or serialization fails.
 - Invalid Lua types (e.g. userdata, functions) cannot be encoded.
+
+## INI
+
+This API enables conversion between **INI files** and **Lua tables**. It is exposed through a `register(lua)` function that provides two key functions: `parse` and `convert`.
+
+### import
+```lua
+local dapi_ini = require("dapi_ini")
+```
+
+### `parse(ini_string: string) -> table`
+
+**Description:**  
+Parses a string in INI format and returns a Lua table representing the structure and data.
+
+**Parameters:**
+
+- `ini_string` *(string)*: The contents of an INI file as a string.
+
+**Returns:**
+
+- *(table)*: A Lua table containing sections and key-value pairs from the INI file.
+
+**Example:**
+
+```lua
+local ini = [[
+[general]
+name = Max
+active = true
+
+[settings]
+volume = 80
+]]
+
+local parsed = dapi_ini.parse(ini)
+
+-- Access values:
+print(parsed.general.name)      --> "Max"
+print(parsed.settings.volume)   --> "80"
+```
+
+### convert
+This function takes a Lua Table and returns an INI File as a String
+
+**Usage**
+```lua
+-- Using Value from above
+local ini_b = dapi_ini.convert(parsed)
+print(ini_b)
+```

@@ -1,4 +1,4 @@
-use mlua::{Lua, Result, Error};
+use mlua::{Error, Lua, Result};
 use std::env;
 
 /// Registers the `.env` module in Lua, providing access to environment variables.

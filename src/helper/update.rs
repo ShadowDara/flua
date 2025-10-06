@@ -10,7 +10,7 @@ pub fn update() -> Result<(), Box<dyn std::error::Error>> {
     {
         // Non-Windows update logic can go here
     }
-    
+
     // Placeholder for update logic
     println!("Checking for updates...");
     // Simulate update process
@@ -23,7 +23,6 @@ pub fn install() -> Result<(), Box<dyn std::error::Error>> {
     // Download ZIP from GitHub Releases and extract it
     // to APPDATA Local
 
-
     #[cfg(windows)]
     {
         // Windows-specific installation logic can go here
@@ -33,11 +32,11 @@ pub fn install() -> Result<(), Box<dyn std::error::Error>> {
     {
         // Non-Windows installation logic can go here
     }
-    
+
     // Placeholder for installation logic
     println!("Installing the application...");
     // Simulate installation process
     println!("Installation complete.");
-    
+
     Ok(())
 }

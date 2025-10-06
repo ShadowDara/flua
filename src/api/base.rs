@@ -1,61 +1,20 @@
 use mlua::{Lua, Result};
 use std::fs::File;
 use std::io::copy;
-use std::time::Duration;
 use std::thread;
+use std::time::Duration;
 
 use crate::deprecated;
 
 use crate::VERSION;
 
 use crate::helper::print::{
-    END,
-    BOLD,
-
-    ITALIC,
-    UNDERLINED,
-
-    REVERSE_TEXT,
-
-    NOT_UNDERLINED,
-
-    POSITIVE_TEXT,
-
-    BLACK,
-    RED,
-    GREEN,
+    BG_BLACK, BG_BLUE, BG_BRIGHT_BLACK, BG_BRIGHT_BLUE, BG_BRIGHT_CYAN, BG_BRIGHT_GREEN,
+    BG_BRIGHT_PURLPE, BG_BRIGHT_RED, BG_BRIGHT_WHITE, BG_BRIGHT_YELLOW, BG_CYAN, BG_GREEN,
+    BG_PURPLE, BG_RED, BG_WHITE, BG_YELLOW, BLACK, BLUE, BOLD, BRIGHT_BLACK, BRIGHT_BLUE,
+    BRIGHT_CYAN, BRIGHT_GREEN, BRIGHT_PURLPE, BRIGHT_RED, BRIGHT_WHITE, BRIGHT_YELLOW, CYAN, END,
+    GREEN, ITALIC, NOT_UNDERLINED, POSITIVE_TEXT, PURPLE, RED, REVERSE_TEXT, UNDERLINED, WHITE,
     YELLOW,
-    BLUE,
-    PURPLE,
-    CYAN,
-    WHITE,
-
-    BG_BLACK,
-    BG_RED,
-    BG_GREEN,
-    BG_YELLOW,
-    BG_BLUE,
-    BG_PURPLE,
-    BG_CYAN,
-    BG_WHITE,
-
-    BRIGHT_BLACK,
-    BRIGHT_RED,
-    BRIGHT_GREEN,
-    BRIGHT_YELLOW,
-    BRIGHT_BLUE,
-    BRIGHT_PURLPE,
-    BRIGHT_CYAN,
-    BRIGHT_WHITE,
-
-    BG_BRIGHT_BLACK,
-    BG_BRIGHT_RED,
-    BG_BRIGHT_GREEN,
-    BG_BRIGHT_YELLOW,
-    BG_BRIGHT_BLUE,
-    BG_BRIGHT_PURLPE,
-    BG_BRIGHT_CYAN,
-    BG_BRIGHT_WHITE,
 };
 
 pub fn register(lua: &Lua) -> Result<mlua::Table> {
@@ -80,26 +39,33 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // Check if the right Version is used
     // Returns a Boolean and a warning message when the correct version is not used
-    let check_version = lua.create_function(|_, (version, warning_opt): (String, Option<bool>)| {
-        let warning = warning_opt.unwrap_or(true);
+    let check_version =
+        lua.create_function(|_, (version, warning_opt): (String, Option<bool>)| {
+            let warning = warning_opt.unwrap_or(true);
 
-        let result = match version == VERSION {
-            true => {
-                if warning {
-                    println!("{}[INFO] Using the right Version for LUAJIT!{}", GREEN, END);
+            let result = match version == VERSION {
+                true => {
+                    if warning {
+                        println!("{}[INFO] Using the right Version for LUAJIT!{}", GREEN, END);
+                    }
+                    Ok(true)
                 }
-                Ok(true)
-            },
-            false => {
-                if warning {
-                    println!("{}[WARNING] Not the right version for luajit is used!{}", YELLOW, END);
-                    println!("{}[WARNING] Required Version: {} => Your Version: {}{}", YELLOW, version, VERSION, END);
+                false => {
+                    if warning {
+                        println!(
+                            "{}[WARNING] Not the right version for luajit is used!{}",
+                            YELLOW, END
+                        );
+                        println!(
+                            "{}[WARNING] Required Version: {} => Your Version: {}{}",
+                            YELLOW, version, VERSION, END
+                        );
+                    }
+                    Ok(false)
                 }
-                Ok(false)
-            }
-        };
-        result
-    })?;
+            };
+            result
+        })?;
 
     // Function to download a file
     let download = lua.create_function(|_, (url, destination): (String, String)| {

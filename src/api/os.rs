@@ -60,7 +60,11 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // Function to run a command in the commandline
     let run = lua.create_function(|lua, command: String| {
-        deprecated!("dapi_os.run", "0.1.10", "The function is although contained in the Lua STD");
+        deprecated!(
+            "dapi_os.run",
+            "0.1.10",
+            "The function is although contained in the Lua STD"
+        );
 
         #[cfg(target_os = "windows")]
         let output = Command::new("cmd").arg("/C").arg(&command).output()?;

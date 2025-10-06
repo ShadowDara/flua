@@ -2,7 +2,7 @@ use std::fs;
 use std::io;
 use std::path::Path;
 use walkdir::WalkDir;
-use zip::{write::FileOptions, ZipWriter, read::ZipArchive};
+use zip::{ZipWriter, read::ZipArchive, write::FileOptions};
 
 pub fn unzip_file(zip_path: &str, dest_dir: &str) -> io::Result<()> {
     let file = fs::File::open(zip_path)?;

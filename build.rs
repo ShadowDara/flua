@@ -11,4 +11,3 @@ fn main() {
 fn main() {
     // Nichts tun auf anderen Plattformen
 }
-
