@@ -1,6 +1,7 @@
 use mlua::{Lua, Result};
 use std::fs;
 use std::io::{self, BufRead};
+use std::path::Path;
 
 use dirs_next::{
     audio_dir, cache_dir, config_dir, data_dir, data_local_dir, desktop_dir, document_dir,
@@ -10,6 +11,26 @@ use dirs_next::{
 use crate::utils::zip_utils::{unzip_file, zip_dir};
 
 use crate::deprecated;
+
+// Function to copy a dir recursivly
+fn copy_dir_recursive(from: &Path, to: &Path) -> io::Result<()> {
+    if !to.exists() {
+        fs::create_dir_all(to)?;
+    }
+
+    for entry_result in fs::read_dir(from)? {
+        let entry = entry_result?;
+        let from_path = entry.path();
+        let to_path = to.join(entry.file_name());
+
+        if from_path.is_dir() {
+            copy_dir_recursive(&from_path, &to_path)?;
+        } else {
+            fs::copy(&from_path, &to_path)?;
+        }
+    }
+    Ok(())
+}
 
 pub fn register(lua: &Lua) -> Result<mlua::Table> {
     let table = lua.create_table()?;
@@ -71,6 +92,13 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         fs::copy(&from, &to)
             .map(|_| ()) // Ignore number of bytes copied
             .map_err(|e| mlua::Error::external(format!("Copy file error: {}", e)))
+    })?;
+
+    // Copy Dir
+    let copy_dir = lua.create_function(|_, (from, to): (String, String)| {
+        copy_dir_recursive(Path::new(&from), Path::new(&to))
+            .map_err(|e| mlua::Error::external(format!("Copy directory error: {}", e)))?;
+        Ok(())
     })?;
 
     // Create a file

@@ -8,6 +8,7 @@
 - added Ini Parser
 - added Data Tests
 - added Base64 Encoding
+- added function to copy a dir recursivly
 
 ## 0.1.11 - 05.10.2025
 - added Function to delete a directory

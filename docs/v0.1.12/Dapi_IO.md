@@ -109,6 +109,14 @@ function to copy a file
 dapi_io.copy_file("hallo.txt", "wtf/hallo.txt")
 ```
 
+## copy_dir
+function to copy a directory from one place to another place
+
+**Usage**
+```lua
+dapi_io.copy_dir("/dir", "/dir2")
+```
+
 ## create_file
 
 ## write_file

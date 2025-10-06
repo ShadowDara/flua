@@ -38,39 +38,47 @@ fn main() {
         return;
     }
 
-    let mut safe = false;
-
     if args.len() >= 3 {
+        if args[1] == "run" {
+            // Update
+            if args[2] == "update" {
+                if let Err(e) = helper::update::update() {
+                    eprintln!("Update error: {}", e);
+                }
+            }
+            // Install
+            else if args[2] == "install" {
+                if let Err(e) = helper::update::install() {
+                    eprintln!("Installation error: {}", e);
+                }
+            }
+
+            std::thread::sleep(std::time::Duration::from_secs(5));
+            return;
+        }
+    }
+
+    // Boolean Values
+    let mut safe = false;
+    let mut info = true;
+
+    for arg in &args {
         // Save Mode
-        if args[2] == "-safe" {
+        if arg == "--safe" {
             safe = true;
             eprintln!("{}[ERROR] Safe is not implemnted yet{}", RED, END);
             std::thread::sleep(std::time::Duration::from_secs(5));
             return;
-        } else {
-            if args[1] == "run" {
-                // Update
-                if args[2] == "update" {
-                    if let Err(e) = helper::update::update() {
-                        eprintln!("Update error: {}", e);
-                    }
-                }
-                // Install
-                else if args[2] == "install" {
-                    if let Err(e) = helper::update::install() {
-                        eprintln!("Installation error: {}", e);
-                    }
-                }
-
-                std::thread::sleep(std::time::Duration::from_secs(5));
-                return;
-            }
+        } else if arg == "--no-info" {
+            info = false;
         }
     }
 
     let path = &args[1];
 
-    println!("{}[LUAJIT-INFO] running script: {}{}", GREEN, path, END);
+    if info {
+        println!("{}[LUAJIT-INFO] running script: {}{}", GREEN, path, END);
+    }
 
     if let Err(e) = script::execute_script(path, &safe) {
         eprintln!("{}[LUAJIT-ERROR] Script error: {}{}", RED, e, END);
@@ -78,8 +86,10 @@ fn main() {
         return;
     }
 
-    println!(
-        "{}[LUAJIT-INFO] finished script executing: {}{}",
-        GREEN, path, END
-    );
+    if info {
+        println!(
+            "{}[LUAJIT-INFO] finished script executing: {}{}",
+            GREEN, path, END
+        );
+    }
 }
