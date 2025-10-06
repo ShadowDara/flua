@@ -40,6 +40,7 @@ Section "Uninstall"
   # Delete Both Directories
   RMDir "$LOCALAPPDATA\@shadowdara"
 
+  Delete "$DESKTOP\luajit.lnk"
   Delete "$SMPROGRAMS\Luajit\Uninstall.lnk"
   Delete "$SMPROGRAMS\Luajit\luajit.lnk"
   RMDir "$SMPROGRAMS\Luajit"
@@ -154,6 +155,9 @@ skip_assoc:
   # Shortcuts
   CreateShortCut "$SMPROGRAMS\Luajit\luajit.lnk" "$INSTDIR\luajit.exe"
   CreateShortCut "$SMPROGRAMS\Luajit\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
+
+  ; Desktop Shortcut
+  CreateShortCut "$DESKTOP\luajit.lnk" "$INSTDIR\luajit.exe" "" "$INSTDIR\luajit.ico"
 
   # ---- Uninstaller schreiben ----
   WriteUninstaller "$INSTDIR\Uninstall.exe"
