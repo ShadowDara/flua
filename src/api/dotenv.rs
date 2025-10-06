@@ -25,7 +25,11 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     /// # Returns
     /// - `string`: the value if found
     /// - `nil`: if the variable is not set
-    let get = lua.create_function(|_, key: String| Ok(env::var(&key).ok()))?;
+    let get = lua.create_function(|_, key: String| match env::var(&key) {
+        Ok(val) => Ok(Some(val)),
+        Err(env::VarError::NotPresent) => Ok(None),
+        Err(e) => Err(Error::external(e)),
+    })?;
 
     /// Sets an environment variable (unsafe in multi-threaded contexts).
     ///
@@ -44,15 +48,22 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     ///
     /// # Errors
     /// Returns a Lua error if key or value contain null bytes (`\0`), which are invalid.
-    let set = lua.create_function(|_, (key, value): (String, String)| {
-        // Sanity check (optional, je nach Plattform)
-        if key.contains('\0') || value.contains('\0') {
-            return Err(Error::external("Key or value contains null byte"));
+    let set = lua.create_function(|_, (key, value): (String, Option<String>)| {
+        if key.contains('\0') {
+            return Err(Error::external("Key contains null byte"));
         }
 
-        // Rust 1.77+: set_var ist unsafe, also block drumherum
-        unsafe {
-            env::set_var(&key, &value);
+        if let Some(val) = value {
+            if val.contains('\0') {
+                return Err(Error::external("Value contains null byte"));
+            }
+            unsafe {
+                env::set_var(&key, &val);
+            }
+        } else {
+            unsafe {
+                env::remove_var(&key);
+            }
         }
 
         Ok(())

@@ -1,3 +1,6 @@
+-- Build Script for Luajit
+-- Requires Cargo and Python Path Var
+
 local dapi = require("dapi")
 local dapi_io = require("dapi_io")
 local dapi_os = require("dapi_os")
@@ -22,6 +25,11 @@ print("Luajit Build Script")
 
 -- Copies the Changelog from Repo Root to /docs/
 dapi_io.copy_file("CHANGELOG.md", "docs/CHANGELOG.md")
+
+print("Format Code")
+os.execute("cargo fmt")
+
+-- print("Running Tests")
 
 local osdata = dapi_os.os()
 if osdata.win then

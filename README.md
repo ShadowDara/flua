@@ -71,3 +71,9 @@ Download the NSIS installer [here](https://github.com/ShadowDara/LuaAPI-Rust/rel
 .\cloc . --md --out=cloc_report.md --exclude-dir=target
 
 -->
+
+## Build
+
+```
+cargo run build.lua
+```
