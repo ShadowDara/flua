@@ -74,15 +74,16 @@ end
 
 -- DotENV Tests
 local function test_dotenv()
+  local env_file = "test/test.env"
   print("Testing DotENV...")
-  dapi_dotenv.load("test/test.env")
+  dapi_dotenv.load(env_file)
   dapi_dotenv.set("TEST_KEY", "hello")
   local value = dapi_dotenv.get("TEST_KEY")
   assert_equal(value, "hello", "DotENV get/set mismatch")
 
   -- Optional: Load from file (".env" or "custom.env")
   -- pcall used in case file not present
-  local success, err = pcall(function() dapi_dotenv.load() end)
+  local success, err = pcall(function() dapi_dotenv.load(env_file) end)
   if not success then
     print("No .env file to load (skipping load test).")
   end

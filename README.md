@@ -74,6 +74,13 @@ Download the NSIS installer [here](https://github.com/ShadowDara/LuaAPI-Rust/rel
 
 ## Build
 
-```
+```sh
 cargo run build.lua
+```
+
+## Testing
+
+```sh
+cargo run test/main.lua
+cargo run test/data.lua
 ```
