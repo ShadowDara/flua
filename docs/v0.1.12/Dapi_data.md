@@ -223,10 +223,10 @@ print(ini_b)
 dapi_base64 = require("dapi_base64")
 ```
 
-## encode
+### encode
 encodes a Text string to base 64
 
-## decode
+### decode
 decodes a base64 string back to text
 
 **Usage**

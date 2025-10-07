@@ -5,6 +5,8 @@ mod helper;
 mod lua_script;
 mod utils;
 
+mod dlm13;
+
 #[cfg(windows)]
 mod windows_utf8;
 
@@ -29,40 +31,43 @@ fn main() {
         return;
     }
 
-    // Help
+    // Help Message
     if args[1] == "-h" || args[1] == "--help" {
-        println!("LuaAPI-Rust {}", VERSION);
-        println!("Usage: <luajit> <TASK> [OPTIONS]");
-        println!("\n[TASK]");
-        println!("  A file ending .lua to execute it");
-        println!(
-            "  Every Task which is NOT listened above this and is not ending .lua will although executed as a .lua file"
-        );
+        println!("Luajit v{}", VERSION);
+        println!("\nUsage for scripts: <luajit> <script.lua> [OPTIONS]");
         println!("\n[OPTIONS]");
         println!("  --safe:     Run in safe mode (limited API, no OS access)");
         println!("  --no-info:  Run a script and dont the start and end INFO message from luajit");
+        println!("\nUsage for Modules: <luajit> run <path>");
+        println!(
+            "  <path>:     Directory where the module is located but the argument is optional"
+        );
         println!("\nFor more Infos about the Lua API open the docs here");
         println!("https://github.com/ShadowDara/LuaAPI-Rust");
         return;
     }
 
-    if args.len() >= 3 {
-        if args[1] == "run" {
-            // Update
-            if args[2] == "update" {
-                if let Err(e) = helper::update::update() {
-                    eprintln!("Update error: {}", e);
+    if let (Some(cmd), Some(action)) = (args.get(1), args.get(2)) {
+        if cmd == "run" {
+            match action.as_str() {
+                "update" => {
+                    if let Err(e) = helper::update::update() {
+                        eprintln!("Update error: {}", e);
+                        std::thread::sleep(std::time::Duration::from_secs(5));
+                        return;
+                    }
+                }
+                "install" => {
+                    if let Err(e) = helper::update::install() {
+                        eprintln!("Installation error: {}", e);
+                        std::thread::sleep(std::time::Duration::from_secs(5));
+                        return;
+                    }
+                }
+                _ => {
+                    // println!("run");
                 }
             }
-            // Install
-            else if args[2] == "install" {
-                if let Err(e) = helper::update::install() {
-                    eprintln!("Installation error: {}", e);
-                }
-            }
-
-            std::thread::sleep(std::time::Duration::from_secs(5));
-            return;
         }
     }
 
@@ -84,20 +89,32 @@ fn main() {
 
     let path = &args[1];
 
-    if info {
-        println!("{}[LUAJIT-INFO] running script: {}{}", GREEN, path, END);
-    }
+    if path == "run" {
+        // Execute the Module
 
-    if let Err(e) = lua_script::execute_script(path, &safe) {
-        eprintln!("{}[LUAJIT-ERROR] Script error: {}{}", RED, e, END);
-        std::thread::sleep(std::time::Duration::from_secs(5));
-        return;
-    }
+        // TODO
+        // Parse the mainfile of the Module and read the data of it
 
-    if info {
-        println!(
-            "{}[LUAJIT-INFO] finished script executing: {}{}",
-            GREEN, path, END
-        );
+        println!("Starting Module");
+
+        dlm13::start();
+    } else {
+        // Execute the Lua Script
+        if info {
+            println!("{}[LUAJIT-INFO] running script: {}{}", GREEN, path, END);
+        }
+
+        if let Err(e) = lua_script::execute_script(path, &safe) {
+            eprintln!("{}[LUAJIT-ERROR] Script error: {}{}", RED, e, END);
+            std::thread::sleep(std::time::Duration::from_secs(5));
+            return;
+        }
+
+        if info {
+            println!(
+                "{}[LUAJIT-INFO] finished script executing: {}{}",
+                GREEN, path, END
+            );
+        }
     }
 }

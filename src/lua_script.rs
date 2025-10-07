@@ -8,6 +8,11 @@ use crate::api::{
 };
 
 pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
+    if *safe_mode {
+        println!("Safe mode not yet implemented.");
+        return Ok(());
+    }
+
     if !Path::new(file).exists() {
         eprintln!("Error: File '{}' not found!", file);
         return Ok(());
@@ -17,11 +22,6 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
         .map_err(|e| mlua::Error::external(format!("Error while reading: {}", e)))?;
 
     let lua = Lua::new();
-
-    if *safe_mode {
-        println!("Safe mode not yet implemented.");
-        return Ok(());
-    }
 
     let dapi = base::register(&lua)?;
     let dapi_io = api_io::register(&lua)?;
