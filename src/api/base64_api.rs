@@ -1,5 +1,5 @@
 use base64::{Engine as _, engine::general_purpose};
-use mlua::{Error, Lua, Result, Value};
+use mlua::{Error, Lua, Result};
 
 pub fn register(lua: &Lua) -> Result<mlua::Table> {
     let table = lua.create_table()?; // base64-Tabelle

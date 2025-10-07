@@ -9,6 +9,16 @@ local dapi_dotenv = require("dapi_dotenv")
 local dapi_yaml = require("dapi_yaml")
 local dapi_ini  = require("dapi_ini")
 local dapi_base64 = require("dapi_base64")
+local dapi_xml = require("dapi_xml")
+
+-- Hilfsfunktion, um value immer als Array zu behandeln
+local function as_array(val)
+  if type(val) == "table" then
+    return val
+  else
+    return { val }
+  end
+end
 
 -- Helpers
 local function assert_equal(a, b, msg)
@@ -149,6 +159,53 @@ local function test_base64()
   assert_equal(empty_decoded, "", "Base64 empty decode failed")
 end
 
+-- XML Tests
+local function test_xml()
+  print("Testing XML...")
+
+  local xml_str = [[
+<root>
+  <name>ChatGPT</name>
+  <version>4</version>
+  <features>
+    <feature>mlua</feature>
+    <feature>xml</feature>
+  </features>
+</root>
+]]
+
+  local data = dapi_xml.decode(xml_str)
+  assert_equal(data.name, "ChatGPT", "XML name mismatch")
+  assert_equal(tonumber(data.version), 4, "XML version mismatch")
+
+  local features = as_array(data.features.feature)
+  assert_equal(type(features), "table", "XML features.feature should be a table")
+  assert_equal(features[1], "mlua", "XML features.feature[1] mismatch")
+  assert_equal(features[2], "xml", "XML features.feature[2] mismatch")
+
+  local re_encoded = dapi_xml.encode(data)
+  assert(type(re_encoded) == "string", "XML encoding failed")
+
+  local data2 = dapi_xml.decode(re_encoded)
+  local features2 = as_array(data2.features.feature)
+  -- assert_equal(features2[1], features[1], "XML re-decode feature mismatch")
+
+  -- Extra Tests
+  local re_encoded = dapi_xml.encode(data)
+  assert(type(re_encoded) == "string", "XML encoding failed")
+
+  local data2 = dapi_xml.decode(re_encoded)
+
+  -- Debug-Ausgabe
+  print("data2.features:", data2.features)
+  print("data2.features.feature:", data2.features and data2.features.feature)
+  print("type(data2.features.feature):", type(data2.features and data2.features.feature))
+
+  local features2 = as_array(data2.features and data2.features.feature)
+  assert_equal(features2[1], "mlua", "XML re-decode feature[1] mismatch")
+  assert_equal(features2[2], "xml",  "XML re-decode feature[2] mismatch")
+end
+
 -- Master runner
 local function run_all_tests()
   print("Running all config format tests...\n")
@@ -158,6 +215,7 @@ local function run_all_tests()
   test_yaml()
   test_ini()
   test_base64()
+  test_xml()
   print("\nAll tests passed!")
 end
 

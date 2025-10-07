@@ -11,6 +11,7 @@
 - added a function to copy a dir recursivly
 - added a function to get the file size
 - added Desktop Shortcut to the NSIS Installer
+- added XML Parser
 
 Read the DOCS for Version 0.1.12 for more Infos
 

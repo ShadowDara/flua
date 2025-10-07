@@ -10,6 +10,10 @@
 - added Base64 Encoding
 - added a function to copy a dir recursivly
 - added a function to get the file size
+- added Desktop Shortcut to the NSIS Installer
+- added XML Parser
+
+Read the DOCS for Version 0.1.12 for more Infos
 
 ## 0.1.11 - 05.10.2025
 - added Function to delete a directory
@@ -19,6 +23,8 @@
 - added dotenv parsing
 - added Download Shell Script
 
+Read the DOCS for Version 0.1.11 for more Infos
+
 ## 0.1.10 - 05.10.2025
 - added Function to Check the OS Type to make code in the script which runs only
 on a particular OS
@@ -26,6 +32,8 @@ on a particular OS
 - added getcwd and chdir function
 - added JSON Encoding and Decoding
 - added TOML Parsing
+
+Read the DOCS for Version 0.1.10 for more Infos
 
 ## 0.1.9 - 04.10.2025
 - made the deprecated warning yellow

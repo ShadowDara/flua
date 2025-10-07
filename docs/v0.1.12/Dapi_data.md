@@ -239,3 +239,11 @@ print(encoded) -- "SGVsbG8sIEx1YSE="
 local decoded = dapi_base64.decode(encoded)
 print(decoded) -- "Hello, Lua!"
 ```
+
+## XML
+
+### import
+```lua
+local dapi_xml = require("dapi_xml")
+```
+

@@ -7,4 +7,5 @@ pub mod io;
 pub mod json;
 pub mod os;
 pub mod toml;
+pub mod xml;
 pub mod yaml;
