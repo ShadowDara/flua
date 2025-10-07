@@ -19,6 +19,12 @@ Read the [CHANGELOG](./CHANGELOG.md) or the Docs for more Infos
 > [!CAUTION]
 > The Program is **NOT** guaranteed stable before **1.0.0**
 
+## Running
+For Infos or help run:
+```sh
+luajit --help
+```
+
 ## Install
 
 > [!IMPORTANT]

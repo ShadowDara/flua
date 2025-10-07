@@ -12,6 +12,7 @@
 - added a function to get the file size
 - added Desktop Shortcut to the NSIS Installer
 - added XML Parser
+- added better help Message
 
 Read the DOCS for Version 0.1.12 for more Infos
 

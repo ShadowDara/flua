@@ -2,7 +2,7 @@ use std::env;
 
 mod api;
 mod helper;
-mod script;
+mod lua_script;
 mod utils;
 
 #[cfg(windows)]
@@ -32,9 +32,17 @@ fn main() {
     // Help
     if args[1] == "-h" || args[1] == "--help" {
         println!("LuaAPI-Rust {}", VERSION);
-        println!("Usage: luaapi-rust <script.lua> [-safe]");
-        println!(" -safe: Run in safe mode (limited API, no OS access)");
-        std::thread::sleep(std::time::Duration::from_secs(5));
+        println!("Usage: <luajit> <TASK> [OPTIONS]");
+        println!("\n[TASK]");
+        println!("  A file ending .lua to execute it");
+        println!(
+            "  Every Task which is NOT listened above this and is not ending .lua will although executed as a .lua file"
+        );
+        println!("\n[OPTIONS]");
+        println!("  --safe:     Run in safe mode (limited API, no OS access)");
+        println!("  --no-info:  Run a script and dont the start and end INFO message from luajit");
+        println!("\nFor more Infos about the Lua API open the docs here");
+        println!("https://github.com/ShadowDara/LuaAPI-Rust");
         return;
     }
 
@@ -80,7 +88,7 @@ fn main() {
         println!("{}[LUAJIT-INFO] running script: {}{}", GREEN, path, END);
     }
 
-    if let Err(e) = script::execute_script(path, &safe) {
+    if let Err(e) = lua_script::execute_script(path, &safe) {
         eprintln!("{}[LUAJIT-ERROR] Script error: {}{}", RED, e, END);
         std::thread::sleep(std::time::Duration::from_secs(5));
         return;
