@@ -1,6 +1,5 @@
 use mlua::{Error, Lua, Result, Value};
 use serde_json::Value as JsonValue;
-use serde_json::Value::Array;
 use xmltree;
 use xmltree::{Element, XMLNode};
 
@@ -35,7 +34,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 }
 
 // Helper: xmltree::Element from serde_json::Value
-fn value_to_element(name: &str, val: &JsonValue) -> XmlResult<xmltree::Element> {
+fn value_to_element(name: &str, val: &JsonValue) -> XmlResult<Element> {
     let mut elem = Element::new(name);
 
     match val {
@@ -48,8 +47,18 @@ fn value_to_element(name: &str, val: &JsonValue) -> XmlResult<xmltree::Element> 
                     elem.children
                         .push(XMLNode::Text(v.as_str().unwrap_or("").to_string()));
                 } else {
-                    let child = value_to_element(k, v)?;
-                    elem.children.push(XMLNode::Element(child));
+                    match v {
+                        JsonValue::Array(arr) => {
+                            for item in arr {
+                                let child = value_to_element(k, item)?;
+                                elem.children.push(XMLNode::Element(child));
+                            }
+                        }
+                        _ => {
+                            let child = value_to_element(k, v)?;
+                            elem.children.push(XMLNode::Element(child));
+                        }
+                    }
                 }
             }
         }
@@ -79,12 +88,12 @@ fn element_to_value(elem: &xmltree::Element) -> JsonValue {
     use serde_json::json;
     let mut map = serde_json::Map::new();
 
-    // Attribute
+    // Handle attributes: prefixed with @
     for (k, v) in &elem.attributes {
         map.insert(format!("@{}", k), json!(v));
     }
 
-    // Count tag occurrences
+    // Count child element names to detect duplicates
     let mut tag_counts = std::collections::HashMap::new();
     for child in &elem.children {
         if let XMLNode::Element(child_elem) = child {
@@ -92,56 +101,52 @@ fn element_to_value(elem: &xmltree::Element) -> JsonValue {
         }
     }
 
-    // Handle children
+    // Children
     for child in &elem.children {
         if let XMLNode::Element(child_elem) = child {
             let child_value = element_to_value(child_elem);
             let tag = &child_elem.name;
             let count = tag_counts.get(tag).copied().unwrap_or(0);
 
-            match map.get_mut(tag) {
-                Some(existing) => {
-                    if existing.is_array() {
-                        existing.as_array_mut().unwrap().push(child_value);
-                    } else {
-                        *existing = JsonValue::Array(vec![existing.clone(), child_value]);
-                    }
+            if let Some(existing) = map.get_mut(tag) {
+                if existing.is_array() {
+                    existing.as_array_mut().unwrap().push(child_value);
+                } else {
+                    *existing = JsonValue::Array(vec![existing.clone(), child_value]);
                 }
-                None => {
-                    if count > 1 {
-                        map.insert(tag.clone(), JsonValue::Array(vec![child_value]));
-                    } else {
-                        map.insert(tag.clone(), child_value);
-                    }
+            } else {
+                if count > 1 {
+                    map.insert(tag.clone(), JsonValue::Array(vec![child_value]));
+                } else {
+                    map.insert(tag.clone(), child_value);
                 }
             }
         }
     }
 
-    // Text
-    let text = elem
+    // Collect text nodes
+    let text_content = elem
         .children
         .iter()
-        .filter_map(|c| {
-            if let XMLNode::Text(t) = c {
-                Some(t.clone())
+        .filter_map(|node| {
+            if let XMLNode::Text(t) = node {
+                Some(t.trim().to_string())
             } else {
                 None
             }
         })
         .collect::<Vec<_>>()
-        .join("");
+        .join(" ");
 
-    if map.is_empty() {
-        if text.trim().is_empty() {
-            JsonValue::Null
+    if !text_content.is_empty() {
+        if map.is_empty() {
+            // If no attributes or children, return string directly
+            return JsonValue::String(text_content);
         } else {
-            JsonValue::String(text)
+            // Mixed content: include as #text
+            map.insert("#text".to_string(), JsonValue::String(text_content));
         }
-    } else {
-        if !text.trim().is_empty() {
-            map.insert("#text".to_string(), JsonValue::String(text));
-        }
-        JsonValue::Object(map)
     }
+
+    JsonValue::Object(map)
 }

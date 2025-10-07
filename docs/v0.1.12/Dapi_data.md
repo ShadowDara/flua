@@ -241,9 +241,163 @@ print(decoded) -- "Hello, Lua!"
 ```
 
 ## XML
+A Lua module for converting between **XML strings** and **Lua tables**, using Rust via `mlua` and `xmltree`.
 
 ### import
 ```lua
 local dapi_xml = require("dapi_xml")
 ```
 
+### `dapi_xml.decode(xml_string) -> lua_table`
+
+Parses an XML string and returns a structured Lua table.
+
+**Parameters**
+
+* `xml_string` (`string`): A valid XML string.
+
+**Returns**
+
+* `lua_table` (`table`): The corresponding Lua table structure.
+
+**Example**
+
+```lua
+local xml = [[
+<person age="30">
+    <name>John</name>
+    <hobbies>
+        <hobby>Reading</hobby>
+        <hobby>Coding</hobby>
+    </hobbies>
+</person>
+]]
+
+local lua_table = dapi_xml.decode(xml)
+
+-- Access
+print(lua_table.person["@age"])          -- "30"
+print(lua_table.person.name)             -- "John"
+print(lua_table.person.hobbies.hobby[1]) -- "Reading"
+```
+
+### `dapi_xml.encode(lua_table) -> xml_string`
+
+Converts a Lua table into an XML string.
+
+**Parameters**
+
+* `lua_table` (`table`): A structured Lua table representing XML elements, attributes, and text.
+
+**Returns**
+
+* `xml_string` (`string`): A valid XML string.
+
+**Example**
+
+```lua
+local lua_table = {
+    person = {
+        ["@age"] = "30",
+        name = "John",
+        hobbies = {
+            hobby = { "Reading", "Coding" }
+        }
+    }
+}
+
+local xml = dapi_xml.encode(lua_table)
+
+print(xml)
+--[[
+<root>
+  <person age="30">
+    <name>John</name>
+    <hobbies>
+      <hobby>Reading</hobby>
+      <hobby>Coding</hobby>
+    </hobbies>
+  </person>
+</root>
+]]
+```
+
+### XML-to-Table Conventions
+
+| XML Feature   | Lua Table Representation |
+| ------------- | ------------------------ |
+| Attributes    | Keys prefixed with `@`   |
+| Text content  | Key `#text`              |
+| Repeated tags | Lua arrays               |
+
+### Examples:
+
+#### Attributes
+
+```lua
+{ node = { ["@id"] = "123" } }
+```
+
+→
+
+```xml
+<node id="123" />
+```
+
+#### Text content
+
+```lua
+{ node = { ["#text"] = "Hello" } }
+```
+
+→
+
+```xml
+<node>Hello</node>
+```
+
+#### Multiple elements
+
+```lua
+{ items = { item = { "A", "B", "C" } } }
+```
+
+→
+
+```xml
+<items>
+  <item>A</item>
+  <item>B</item>
+  <item>C</item>
+</items>
+```
+
+---
+
+### Notes
+
+* The default root tag is `<root>` when encoding unless the table has a single top-level key.
+* Mixed content (text + child nodes) is only partially supported.
+* `null` values or empty elements are skipped during encoding.
+
+---
+
+### Roundtrip Example
+
+```lua
+local t = {
+    person = {
+        ["@id"] = "42",
+        name = {
+            ["#text"] = "Alice"
+        },
+        active = true
+    }
+}
+
+local xml = dapi_xml.encode(t)
+local t2 = dapi_xml.decode(xml)
+
+print(require("inspect")(t2))
+-- Output should closely match the original `t`
+```

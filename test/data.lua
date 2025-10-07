@@ -188,7 +188,7 @@ local function test_xml()
 
   local data2 = dapi_xml.decode(re_encoded)
   local features2 = as_array(data2.features.feature)
-  -- assert_equal(features2[1], features[1], "XML re-decode feature mismatch")
+  assert_equal(features2[1], features[1], "XML re-decode feature mismatch")
 
   -- Extra Tests
   local re_encoded = dapi_xml.encode(data)
@@ -197,6 +197,7 @@ local function test_xml()
   local data2 = dapi_xml.decode(re_encoded)
 
   -- Debug-Ausgabe
+  print("Debug Infos")
   print("data2.features:", data2.features)
   print("data2.features.feature:", data2.features and data2.features.feature)
   print("type(data2.features.feature):", type(data2.features and data2.features.feature))
