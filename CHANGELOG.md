@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.1.13
+- add auto publish for the mkdocs documentation
+
 ## 0.1.12
 - added yaml parser
 - updated install script
