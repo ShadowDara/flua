@@ -11,6 +11,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     let table = lua.create_table()?;
 
+    // Directory, Port
     let start_static_server = {
         let server_controls = Arc::clone(&server_controls);
         lua.create_function(move |_, (directory, port): (String, u16)| {
@@ -53,6 +54,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         })?
     };
 
+    // Port
     let stop_static_server = {
         let server_controls = Arc::clone(&server_controls);
         lua.create_function(move |_, port: u16| {

@@ -1,3 +1,12 @@
 name: ""
 version: ""
 description: ""
+license: ""
+
+# Start Point for the Module
+entrypoint: ""
+
+# Version for Luajit
+luajitversion:
+  min: ""
+  max: ""

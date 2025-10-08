@@ -6,7 +6,7 @@
 - added async http servers
 - made the whole code async via Tokio
 
-## 0.1.12
+## 0.1.12 - 08.10.2025
 - added yaml parser
 - updated install script
 - delered NSIS Admin Installer

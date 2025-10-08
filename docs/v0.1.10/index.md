@@ -12,6 +12,8 @@ on a particular OS
 - added JSON Encoding and Decoding
 - added TOML Parsing
 
+Read the DOCS for Version 0.1.10 for more Infos
+
 ## Info
 Documentation is NOT complete yet, but all funktion headers are listed in the
 documentation

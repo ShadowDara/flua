@@ -10,6 +10,15 @@ struct Config {
     name: String,
     version: String,
     description: String,
+    license: String,
+    entrypoint: String,
+    luajitversion: luajitversion
+}
+
+#[derive(Debug, Deserialize)]
+struct luajitversion {
+    min: String,
+    max: String
 }
 
 // Function to start running a Module

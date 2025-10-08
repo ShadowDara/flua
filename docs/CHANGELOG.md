@@ -1,6 +1,12 @@
 # CHANGELOG
 
-## 0.1.12
+## 0.1.13
+- add auto publish for the mkdocs documentation
+- restructered some Code
+- added async http servers
+- made the whole code async via Tokio
+
+## 0.1.12 - 08.10.2025
 - added yaml parser
 - updated install script
 - delered NSIS Admin Installer
@@ -12,6 +18,7 @@
 - added a function to get the file size
 - added Desktop Shortcut to the NSIS Installer
 - added XML Parser
+- added better help Message
 
 Read the DOCS for Version 0.1.12 for more Infos
 

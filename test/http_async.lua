@@ -15,3 +15,4 @@ print("End Server")
 
 -- später...
 dapi_http_async.stop_static_server(8080)
+dapi_http_async.stop_static_server(8080)
