@@ -89,4 +89,5 @@ cargo run build.lua
 ```sh
 cargo run test/main.lua
 cargo run test/data.lua
+cargo run test/http_async.lua
 ```
