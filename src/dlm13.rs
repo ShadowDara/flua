@@ -1,9 +1,11 @@
 // Custom Modules for Luajit
-// IDK what the name ...
+// IDK what the name means ...
 
 use serde::Deserialize;
 use std::fs;
 use std::path::Path;
+
+use crate::VERSION;
 
 #[derive(Debug, Deserialize)]
 struct Config {
@@ -25,6 +27,13 @@ struct luajitversion {
 pub fn start() -> Result<(), Box<dyn std::error::Error>> {
     println!("Not Implemented yet!");
     return Ok(());
+
+    // TODO
+    // Look for Index File
+    // Check Version of the Index File
+        // Version in 3 zahlen teilen
+        // diese dann zahl für zahl vergleichen
+    // Check if entry point file exists
 
     // Module Index File
     let index_file = "dlm13.yml";
