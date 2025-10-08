@@ -16,7 +16,7 @@ struct Config {
 pub fn start() -> Result<(), Box<dyn std::error::Error>> {
     println!("Not Implemented yet!");
     return Ok(());
-    
+
     // Module Index File
     let index_file = "dlm13.yml";
 

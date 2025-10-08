@@ -97,7 +97,7 @@ fn main() {
 
         println!("Starting Module");
 
-        dlm13::start();
+        let _ = dlm13::start();
     } else {
         // Execute the Lua Script
         if info {
