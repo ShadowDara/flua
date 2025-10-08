@@ -4,6 +4,7 @@
 - add auto publish for the mkdocs documentation
 - restructered some Code
 - added async http servers
+- made the whole code async via Tokio
 
 ## 0.1.12
 - added yaml parser
