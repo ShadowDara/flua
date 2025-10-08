@@ -2,10 +2,7 @@ use mlua::{Lua, Result, Table};
 use std::fs;
 use std::path::Path;
 
-use crate::api::{
-    base, base64_api, dotenv as api_dotenv, http as api_http, ini_parser as api_ini, io as api_io,
-    json as api_json, os as api_os, toml as api_toml, xml as api_xml, yaml as api_yaml,
-};
+use crate::api::{base, data_parsing, http as api_http, io as api_io, os as api_os};
 
 pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
     if *safe_mode {
@@ -26,14 +23,15 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
     let dapi = base::register(&lua)?;
     let dapi_io = api_io::register(&lua)?;
     let dapi_os = api_os::register(&lua)?;
-    let dapi_http = api_http::register(&lua)?;
-    let dapi_json = api_json::register(&lua)?;
-    let dapi_toml = api_toml::register(&lua)?;
-    let dapi_dotenv = api_dotenv::register(&lua)?;
-    let dapi_yaml = api_yaml::register(&lua)?;
-    let dapi_ini = api_ini::register(&lua)?;
-    let dapi_base64 = base64_api::register(&lua)?;
-    let dapi_xml = api_xml::register(&lua)?;
+    let dapi_http = api_http::http::register(&lua)?;
+    let dapi_json = data_parsing::json::register(&lua)?;
+    let dapi_toml = data_parsing::toml::register(&lua)?;
+    let dapi_dotenv = data_parsing::dotenv::register(&lua)?;
+    let dapi_yaml = data_parsing::yaml::register(&lua)?;
+    let dapi_ini = data_parsing::ini_parser::register(&lua)?;
+    let dapi_base64 = data_parsing::base64_api::register(&lua)?;
+    let dapi_xml = data_parsing::xml::register(&lua)?;
+    let dapi_http_async = api_http::async_server::register(&lua)?;
 
     let globals = lua.globals();
     let package: Table = globals.get("package")?;
@@ -79,6 +77,10 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
     preload.set(
         "dapi_xml",
         lua.create_function(move |_, ()| Ok(dapi_xml.clone()))?,
+    )?;
+    preload.set(
+        "dapi_http_async",
+        lua.create_function(move |_, ()| Ok(dapi_http_async.clone()))?,
     )?;
 
     lua.load(&script).exec()?;

@@ -1,20 +1,16 @@
 use mlua::{Lua, Result};
 use std::fs;
 use std::path::Path;
-use std::path::PathBuf;
-use std::sync::{Arc, Mutex};
+// use std::sync::{Arc, Mutex};
 use warp::Filter;
-use warp::filters::BoxedFilter;
-use warp::hyper::Body;
-use warp::reply::Response;
 
 pub fn register(lua: &Lua) -> Result<mlua::Table> {
     let table = lua.create_table()?;
 
-    // Shared mutable state for additional API handlers (future use)
-    // For now unused, aber vorbereitet für spätere Erweiterung
-    let api_handlers: Arc<Mutex<Vec<Box<dyn Fn() + Send + Sync>>>> =
-        Arc::new(Mutex::new(Vec::new()));
+    // // Shared mutable state for additional API handlers (future use)
+    // // For now unused, aber vorbereitet für spätere Erweiterung
+    // let api_handlers: Arc<Mutex<Vec<Box<dyn Fn() + Send + Sync>>>> =
+    //     Arc::new(Mutex::new(Vec::new()));
 
     // // Funktion zum Starten eines Static File Servers
     // // Argument: Verzeichnis, Port
@@ -61,7 +57,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // "/" is the System Root Directory
     let start_static_server = {
-        let api_handlers = Arc::clone(&api_handlers);
+        // let api_handlers = Arc::clone(&api_handlers);
         lua.create_function(move |_, (directory, port): (String, u16)| {
             let dir = directory.clone();
 
