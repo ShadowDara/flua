@@ -33,9 +33,15 @@ Section "Uninstall"
   Delete "$INSTDIR\CHANGELOG.md"
   Delete "$INSTDIR\LICENSE"
   Delete "$INSTDIR\Uninstall.exe"
+  Delete "$INSTDIR\luajitdocs"
+  Delete "$INSTDIR\luajitdocs.cmd"
+  Delete "$INSTDIR\luajitdocs.lua"
 
   # Verzeichnis löschen
   RMDir "$INSTDIR"
+
+  ; Löscht das docs rekursiv
+  RMDir /r "$INSTDIR\docs"
 
   # Delete Both Directories
   RMDir "$LOCALAPPDATA\@shadowdara"
@@ -120,6 +126,11 @@ Section "Install"
 
   # Erstelle Installationsverzeichnis
   CreateDirectory "$INSTDIR"
+  CreateDirectory "$INSTDIR\docs"
+
+  ; Rekursiv alle Dateien und Ordner einbinden
+  SetOutPath "$INSTDIR\docs"
+  File /r "..\..\site\*.*"
 
   # Kopiere Datei(en) ins Zielverzeichnis
   SetOutPath "$INSTDIR"
@@ -127,6 +138,9 @@ Section "Install"
   File "..\..\README.md"
   File "..\..\CHANGELOG.md"
   File "..\..\LICENSE"
+  File "..\docs\luajitdocs"
+  File "..\docs\luajitdocs.cmd"
+  File "..\docs\luajitdocs.lua"
 
   # Nutzer fragen, ob .lua-Dateien damit verknüpft werden sollen
   MessageBox MB_YESNO "Do you want to use luajit as the standard program for .lua files?" IDNO skip_assoc
