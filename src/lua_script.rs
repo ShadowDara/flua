@@ -6,7 +6,7 @@ use crate::api::{
     base, data_parsing, http as api_http, io as api_io, net as api_net, os as api_os,
 };
 
-pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
+pub fn execute_script(file: &str, safe_mode: &bool, lua_args: Vec<String>) -> Result<()> {
     if *safe_mode {
         println!("Safe mode not yet implemented.");
         return Ok(());
@@ -21,6 +21,11 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
         .map_err(|e| mlua::Error::external(format!("Error while reading: {}", e)))?;
 
     let lua = Lua::new();
+
+    let lua_arg = lua.create_table()?;
+    for (i, arg) in lua_args.iter().enumerate() {
+        lua_arg.set(i + 1, arg.clone())?;
+    }
 
     let dapi = base::register(&lua)?;
     let dapi_io = api_io::register(&lua)?;
@@ -37,6 +42,9 @@ pub fn execute_script(file: &str, safe_mode: &bool) -> Result<()> {
     let dapi_net = api_net::net::register(&lua)?;
 
     let globals = lua.globals();
+
+    globals.set("arg", lua_arg)?;
+
     let package: Table = globals.get("package")?;
     let preload: Table = package.get("preload")?;
 

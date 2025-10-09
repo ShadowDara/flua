@@ -30,6 +30,7 @@ function run_tests()
         os.execute("target/debug/luajit test/data.lua")
         os.execute("target/debug/luajit test/http_async.lua")
     end
+    print("Finished Tests")
 end
 
 -- Function to build for windows
@@ -54,6 +55,7 @@ end
 print("Luajit Build Script")
 
 if arg and arg[1] == "test" then
+    print("Running Tests")
     run_tests()
     os.exit(0)
 end

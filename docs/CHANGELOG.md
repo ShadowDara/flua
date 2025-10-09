@@ -15,6 +15,7 @@
 - added Script to get all versions
 - reformatted some folders
 - reformatted some scripts
+- added option to give arguments to luajit
 
 ## 0.1.12 - 08.10.2025
 - added yaml parser

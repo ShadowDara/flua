@@ -13,7 +13,7 @@ mod windows_utf8;
 
 pub const VERSION: &str = "0.1.13";
 
-use crate::helper::print::{END, GREEN, RED};
+use crate::helper::print::{BLUE, BOLD, END, GREEN, RED, YELLOW};
 
 #[tokio::main]
 async fn main() {
@@ -36,31 +36,46 @@ async fn main() {
     let mut safe = false;
     let mut info = true;
 
-    for arg in &args {
+    let mut args_iter = args.iter().peekable();
+    let mut lua_args: Vec<String> = Vec::new();
+    let mut collect_lua_args = false;
+
+    while let Some(arg) = args_iter.next() {
         match arg.as_str() {
-            // Save Mode to prevent file access and other Stuff
             "--safe" => {
                 safe = true;
                 eprintln!("{}[ERROR] Safe is not implemented yet{}", RED, END);
                 std::thread::sleep(std::time::Duration::from_secs(5));
-
-                // Return an Error Message because it is not implemented yet
                 std::process::exit(1);
             }
-            // Disable Message for starting and ending a script
-            "--no-info" => info = false,
-            // Show Version Info
+            "--no-info" => {
+                info = false;
+            }
             "--version" | "-v" => {
                 println!("{}", VERSION);
                 return;
             }
-            // Show Help
             "--help" | "-h" => {
                 print_help();
                 return;
             }
-            // Else do nothing
-            _ => {}
+            "lua-args" | "l" => {
+                // Starte das Sammeln der Lua-Argumente
+                collect_lua_args = true;
+                // Sammle alle folgenden Argumente, bis eins mit '-' beginnt
+                while let Some(next_arg) = args_iter.peek() {
+                    if next_arg.starts_with('-') {
+                        break;
+                    }
+                    lua_args.push(args_iter.next().unwrap().clone());
+                }
+            }
+            _ => {
+                if collect_lua_args {
+                    // Sollte theoretisch nie hier landen, da oben alles gesammelt wird
+                    // Kann aber zur Sicherheit leer gelassen werden
+                }
+            }
         }
     }
 
@@ -69,7 +84,7 @@ async fn main() {
             handle_run_command(&args).await;
         }
         Some(script_path) => {
-            handle_script_execution(script_path, safe, info).await;
+            handle_script_execution(script_path, safe, info, lua_args).await;
         }
         None => {
             eprintln!("{}[ERROR] No command or script provided.{}", RED, END);
@@ -77,22 +92,6 @@ async fn main() {
             std::process::exit(1);
         }
     }
-}
-
-fn print_help() {
-    println!("Luajit Help:");
-    println!("Using Version v{}", VERSION);
-    println!("\nUsage for scripts: <luajit> <script.lua> [SCRIPTOPTIONS]");
-    println!("\n[SCRIPTOPTIONS]");
-    println!("  --safe:     Run in safe mode (limited API, no OS access)");
-    println!("  --no-info:  Suppress start and end info messages");
-    println!("\nUsage for Modules: <luajit> run <action>");
-    println!("  <action>:   'update', 'install', or path to module directory");
-    println!("\nOther Usage: <luajit> [OPTIONS]");
-    println!("\n[OPTIONS]");
-    println!("  --VERSION   Function which prints the version in the terminal");
-    println!("\nFor more info about the Lua API, see:");
-    println!("https://github.com/ShadowDara/LuaAPI-Rust");
 }
 
 async fn handle_run_command(args: &[String]) {
@@ -122,7 +121,7 @@ async fn handle_run_command(args: &[String]) {
     }
 }
 
-async fn handle_script_execution(path: &str, safe: bool, info: bool) {
+async fn handle_script_execution(path: &str, safe: bool, info: bool, lua_args: Vec<String>) {
     if info {
         println!("{}[LUAJIT-INFO] Running script: {}{}", GREEN, path, END);
     }
@@ -130,7 +129,7 @@ async fn handle_script_execution(path: &str, safe: bool, info: bool) {
     let path = path.to_string(); // move into closure
     let path2 = path.clone();
     let result = tokio::task::spawn_blocking(move || {
-        lua_script::execute_script(&path, &safe).map_err(|e| e.to_string())
+        lua_script::execute_script(&path, &safe, lua_args).map_err(|e| e.to_string())
     })
     .await;
 
@@ -154,4 +153,45 @@ async fn handle_script_execution(path: &str, safe: bool, info: bool) {
             std::process::exit(1);
         }
     }
+}
+
+fn print_help() {
+    println!("{}Luajit Help:{}", GREEN, END);
+    println!("Using Version {}{}v{}{}", BOLD, GREEN, VERSION, END);
+    println!(
+        "\nUsage for scripts: {}<luajit>{} <script.lua> {}[SCRIPTOPTIONS]{}",
+        GREEN, END, YELLOW, END
+    );
+    println!("\n{}[SCRIPTOPTIONS]{}", YELLOW, END);
+    println!(
+        "{}  --safe:        {}Run in safe mode (limited API, no OS access)",
+        BLUE, END
+    );
+    println!(
+        "{}  --no-info:     {}Suppress start and end info messages",
+        BLUE, END
+    );
+    println!(
+        "{}  l, lua-args    {}submit arguments after lua-args for the lua file which will be run, stop the collectiong when it sees an argument which start with -",
+        BLUE, END
+    );
+    println!(
+        "\nUsage for Modules: {}<luajit>{} run {}<action>{}",
+        GREEN, END, YELLOW, END
+    );
+    println!(
+        "\n{}<action>{}:   'update', 'install', or path to module directory",
+        YELLOW, END
+    );
+    println!(
+        "\nOther Usage: {}<luajit>{} {}[OPTIONS]{}",
+        GREEN, END, YELLOW, END
+    );
+    println!("\n{}[OPTIONS]{}", YELLOW, END);
+    println!(
+        "{}  -v, --version   {}Function which prints the version in the terminal",
+        BLUE, END
+    );
+    println!("\nFor more info about the Lua API, see:");
+    println!("{}https://github.com/ShadowDara/LuaAPI-Rust{}", BLUE, END);
 }
