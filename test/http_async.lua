@@ -9,7 +9,8 @@ print("Start Server")
 -- Server asynchron starten
 dapi_http_async.start_static_server("public", 8080)
 
-dapi.wait(10000)
+print("Waiting 3 seconds")
+dapi.wait(3000)
 
 print("End Server")
 

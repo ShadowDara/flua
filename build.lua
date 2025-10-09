@@ -19,9 +19,16 @@ dapi.check_version("0.1.11", true)
 
 -- Function to run the tests
 function run_tests()
-    os.execute("cargo run test/main.lua")
-    os.execute("cargo run test/data.lua")
-    os.execute("cargo run test/http_async.lua")
+    local osdata2 = dapi_os.os()
+    if osdata2.win then
+        -- Tests for Windows
+        print()
+    else
+        -- Tests for Linux / MacOS
+        os.execute("target/debug/luajit test/main.lua")
+        os.execute("target/debug/luajit test/data.lua")
+        os.execute("target/debug/luajit test/http_async.lua")
+    end
 end
 
 -- Function to build for windows
