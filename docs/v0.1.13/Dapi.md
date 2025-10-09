@@ -29,6 +29,8 @@ dapi.check_version("0.1.9", true)
 ## download
 `download(url: string, destination: string) -> bool`
 
+- **Function is deprecated, use `dapi_net.download_file()` instead**
+
 Downloads a file from a URL and saves it to the given destination path.
 
 **Usage**

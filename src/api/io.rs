@@ -1,6 +1,7 @@
 use mlua::{Lua, Result};
 use std::fs;
-use std::io::{self, BufRead};
+use std::fs::OpenOptions;
+use std::io::{self, BufRead, Write};
 use std::path::Path;
 
 use dirs_next::{
@@ -125,6 +126,22 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
             .map_err(|e| mlua::Error::external(format!("Write file error: {}", e)))
     })?;
 
+    // Function to append data to the file
+    let append_file = lua.create_function(|_, (file, content): (String, String)| {
+        // Datei im Append-Modus öffnen (oder erstellen, wenn sie nicht existiert)
+        let mut f = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&file)
+            .map_err(|e| mlua::Error::external(format!("Datei-Fehler: {}", e)))?;
+
+        // Inhalt anhängen
+        f.write_all(content.as_bytes())
+            .map_err(|e| mlua::Error::external(format!("Schreib-Fehler: {}", e)))?;
+
+        Ok(())
+    })?;
+
     // Function to get the size of an file
     let get_file_size = lua.create_function(|_, path: String| {
         fs::metadata(&path)
@@ -162,6 +179,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     table.set("copy_dir", copy_dir)?;
     table.set("create_file", create_file)?;
     table.set("write_file", write_file)?;
+    table.set("append_file", append_file)?;
     table.set("get_file_size", get_file_size)?;
     table.set("read_line", read_line)?;
 

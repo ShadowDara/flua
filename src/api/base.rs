@@ -69,6 +69,11 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // Function to download a file
     let download = lua.create_function(|_, (url, destination): (String, String)| {
+        deprecated!(
+            "dapi.greet",
+            "0.1.13",
+            "Use dapi_net.download_file() instead!"
+        );
         match reqwest::blocking::get(&url) {
             Ok(mut resp) => {
                 match File::create(&destination) {

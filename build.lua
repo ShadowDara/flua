@@ -18,7 +18,7 @@ dapi.check_version("0.1.11", true)
 
 function build_windows()
     print("Running Build for Windows")
-    os.execute("python test/build_win.py")
+    os.execute("python build/win.py")
 end
 
 function build_linux()
@@ -44,9 +44,15 @@ os.execute("cargo check")
 print("Format Code")
 os.execute("cargo fmt")
 
+print("Creating Cargo Docs")
+os.execute("cargo doc")
+
+print("Get Release Tags")
+os.execute("cargo run build/get_tags.lua")
+
 -- Build the Documentation
 print("Build the Documentation")
-os.execute("pip install -r requirements.txt")
+os.execute("pip install -r build/requirements.txt")
 os.execute("mkdocs build")
 
 local osdata = dapi_os.os()

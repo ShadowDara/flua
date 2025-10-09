@@ -5,7 +5,7 @@ FROM mcr.microsoft.com/devcontainers/rust:1
 WORKDIR /workspace
 
 # Copy only requirements file to install Python dependencies
-COPY ../requirements.txt .
+COPY ../build/requirements.txt .
 
 # Install pip
 RUN apt-get update && apt-get install -y python3 python3-pip

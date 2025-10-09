@@ -121,6 +121,14 @@ dapi_io.copy_dir("/dir", "/dir2")
 
 ## write_file
 
+## append_file
+function to add data to an existing file
+
+```lua
+dapi_io.append_file("/tmp/test.txt", "Zeile 1\n")
+dapi_io.append_file("/tmp/test.txt", "Zeile 2\n")
+```
+
 ## get_file_size
 a function to get the size of an file
 
