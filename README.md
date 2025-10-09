@@ -90,6 +90,13 @@ cargo run build.lua
 
 ## Testing
 
+Testing commands with Shell
+```sh
+chmod +x ./test/command_tester.sh
+./test/command_tester.sh
+```
+
+Testing Lua
 ```sh
 cargo run test/main.lua
 cargo run test/data.lua

@@ -6,6 +6,10 @@
 - added async http servers
 - made the whole code async via Tokio
 - added Version parser for modules
+- added command testing script
+- added option to get the Version
+- added Exit Code 1 when an Error happends
+- added better Build for Linux
 
 ## 0.1.12 - 08.10.2025
 - added yaml parser

@@ -1,5 +1,14 @@
 -- Build Script for Luajit
--- Requires Cargo and Python Path Var
+
+-- Requirements Linux
+-- - cargo
+-- - python3
+-- - pip
+
+-- Requirements Windows
+-- - cargo
+-- - python
+-- - NSIS
 
 local dapi = require("dapi")
 local dapi_io = require("dapi_io")
@@ -9,11 +18,12 @@ dapi.check_version("0.1.11", true)
 
 function build_windows()
     print("Running Build for Windows")
-    os.execute("python build_win.py")
+    os.execute("python test/build_win.py")
 end
 
 function build_linux()
     print("Running Build for Linux")
+    os.execute("./test/command_tester.sh")
     os.execute("cargo build --release")
 end
 
@@ -28,10 +38,16 @@ print("Luajit Build Script")
 -- Copies the Changelog from Repo Root to /docs/
 dapi_io.copy_file("CHANGELOG.md", "docs/CHANGELOG.md")
 
+print("Check Code")
+os.execute("cargo check")
+
 print("Format Code")
 os.execute("cargo fmt")
 
--- print("Running Tests")
+-- Build the Documentation
+print("Build the Documentation")
+os.execute("pip install -r requirements.txt")
+os.execute("mkdocs build")
 
 local osdata = dapi_os.os()
 if osdata.win then

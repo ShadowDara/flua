@@ -1,7 +1,5 @@
 # Requirements
 # cargo
-# mkdocs
-# Inno Setup
 # NSIS
 
 import os
@@ -21,20 +19,12 @@ def get_version(file):
                     return val
 
 if __name__ == "__main__":
-    windows_export_folder = "windows_builds"
-
     print("LuajitBuilt for Windows")
 
     print("Clear Build")
 
     try: shutil.rmtree("windows_builds")
     except: pass
-
-    # Build Mkdocs
-    # print("Build Mkdocs")
-    # subprocess.run("mkdocs build", shell=True, capture_output=True, text=True)
-    # shutil.copytree("site/", "windows_builds/docs/", dirs_exist_ok=True)
-    # shutil.copytree("installer/win", "windows_builds/", dirs_exist_ok=True)
 
     os.makedirs("windows_builds", exist_ok=True)
 

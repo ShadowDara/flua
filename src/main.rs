@@ -29,13 +29,7 @@ async fn main() {
             RED, END
         );
         std::thread::sleep(std::time::Duration::from_secs(5));
-        return;
-    }
-
-    // Hilfe anzeigen
-    if args[1] == "-h" || args[1] == "--help" {
-        print_help();
-        return;
+        std::process::exit(1);
     }
 
     // Argumente parsen
@@ -44,13 +38,28 @@ async fn main() {
 
     for arg in &args {
         match arg.as_str() {
+            // Save Mode to prevent file access and other Stuff
             "--safe" => {
                 safe = true;
                 eprintln!("{}[ERROR] Safe is not implemented yet{}", RED, END);
                 std::thread::sleep(std::time::Duration::from_secs(5));
+
+                // Return an Error Message because it is not implemented yet
+                std::process::exit(1);
+            }
+            // Disable Message for starting and ending a script
+            "--no-info" => info = false,
+            // Show Version Info
+            "--version" | "-v" => {
+                println!("{}", VERSION);
                 return;
             }
-            "--no-info" => info = false,
+            // Show Help
+            "--help" | "-h" => {
+                print_help();
+                return;
+            }
+            // Else do nothing
             _ => {}
         }
     }
@@ -65,18 +74,23 @@ async fn main() {
         None => {
             eprintln!("{}[ERROR] No command or script provided.{}", RED, END);
             std::thread::sleep(std::time::Duration::from_secs(5));
+            std::process::exit(1);
         }
     }
 }
 
 fn print_help() {
-    println!("Luajit v{}", VERSION);
-    println!("\nUsage for scripts: <luajit> <script.lua> [OPTIONS]");
-    println!("\n[OPTIONS]");
+    println!("Luajit Help:");
+    println!("Using Version v{}", VERSION);
+    println!("\nUsage for scripts: <luajit> <script.lua> [SCRIPTOPTIONS]");
+    println!("\n[SCRIPTOPTIONS]");
     println!("  --safe:     Run in safe mode (limited API, no OS access)");
     println!("  --no-info:  Suppress start and end info messages");
     println!("\nUsage for Modules: <luajit> run <action>");
     println!("  <action>:   'update', 'install', or path to module directory");
+    println!("\nOther Usage: <luajit> [OPTIONS]");
+    println!("\n[OPTIONS]");
+    println!("  --VERSION   Function which prints the version in the terminal");
     println!("\nFor more info about the Lua API, see:");
     println!("https://github.com/ShadowDara/LuaAPI-Rust");
 }
@@ -87,12 +101,14 @@ async fn handle_run_command(args: &[String]) {
             if let Err(e) = helper::update::update() {
                 eprintln!("{}[ERROR] Update failed: {}{}", RED, e, END);
                 std::thread::sleep(std::time::Duration::from_secs(5));
+                std::process::exit(1);
             }
         }
         Some("install") => {
             if let Err(e) = helper::update::install() {
                 eprintln!("{}[ERROR] Installation failed: {}{}", RED, e, END);
                 std::thread::sleep(std::time::Duration::from_secs(5));
+                std::process::exit(1);
             }
         }
         Some(_) | None => {
@@ -100,6 +116,7 @@ async fn handle_run_command(args: &[String]) {
             if let Err(e) = dlm13::start() {
                 eprintln!("{}[ERROR] Module start failed: {}{}", RED, e, END);
                 std::thread::sleep(std::time::Duration::from_secs(5));
+                std::process::exit(1);
             }
         }
     }
@@ -129,10 +146,12 @@ async fn handle_script_execution(path: &str, safe: bool, info: bool) {
         Ok(Err(e)) => {
             eprintln!("{}[LUAJIT-ERROR] Script error: {}{}", RED, e, END);
             std::thread::sleep(std::time::Duration::from_secs(5));
+            std::process::exit(1);
         }
         Err(e) => {
             eprintln!("{}[LUAJIT-ERROR] Join error: {}{}", RED, e, END);
             std::thread::sleep(std::time::Duration::from_secs(5));
+            std::process::exit(1);
         }
     }
 }
