@@ -1,3 +1,6 @@
+-- INFO
+-- SCRIPT DOES GET IMPORTED, NOT EXECUTED !!!
+
 -- Imports
 local dapi = require("dapi")
 local dapi_io = require("dapi_io")
@@ -39,14 +42,14 @@ end
 local tags = get_github_release_tags("shadowdara", "LuaAPI-Rust")
 
 -- Ensure that the file exists
-dapi_io.create_file("tags.txt")
+dapi_io.create_file("build/tags.txt")
 
 -- Ausgabe der Tags
 if tags then
     for i, tag in ipairs(tags) do
         print("Tag " .. i .. ": " .. tag)
-        dapi_io.append_file("tags.txt", tag)
-        dapi_io.append_file("tags.txt", "\n")
+        dapi_io.append_file("build/tags.txt", tag)
+        dapi_io.append_file("build/tags.txt", "\n")
     end
 end
 

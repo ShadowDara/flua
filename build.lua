@@ -22,9 +22,10 @@ function run_tests()
     local osdata2 = dapi_os.os()
     if osdata2.win then
         -- Tests for Windows
-        print()
+        print("Testing does not work automatically on windows yet!")
     else
         -- Tests for Linux / MacOS
+        os.execute("./test/command_tester.sh")
         os.execute("target/debug/luajit test/main.lua")
         os.execute("target/debug/luajit test/data.lua")
         os.execute("target/debug/luajit test/http_async.lua")
@@ -40,7 +41,6 @@ end
 -- Function to build for Linux
 function build_linux()
     print("Running Build for Linux")
-    os.execute("./test/command_tester.sh")
     os.execute("cargo build --release")
 end
 
@@ -53,13 +53,7 @@ end
 -- Start the Script
 print("Luajit Build Script")
 
-io.write("\nWhat to do?\n")
-io.write("  1   Run Tests\n")
-io.write("  2   Build Export\n")
-io.write("Choose: ")
-local answer = io.read()
-
-if answer == "1" then
+if arg and arg[1] == "test" then
     run_tests()
     os.exit(0)
 end
@@ -73,11 +67,9 @@ os.execute("cargo check")
 print("Format Code")
 os.execute("cargo fmt")
 
-print("Creating Cargo Docs")
-os.execute("cargo doc")
-
+-- Import get release Tags file
 print("Get Release Tags")
-os.execute("cargo run build/get_tags.lua")
+local tags = require("build.get_tags")
 
 -- Build the Documentation
 print("Build the Documentation")
