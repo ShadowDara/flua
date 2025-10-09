@@ -33,6 +33,15 @@ luajit --help
 
 ### Linux
 
+**Dependencies**
+```sh
+sudo apt update
+sudo apt install build-essential
+sudo apt install pkg-config libssl-dev
+```
+
+**Install**
+
 ```sh
 # Download the script
 curl -L -o "LuajitInstall.sh" "https://raw.githubusercontent.com/ShadowDara/LuaAPI-Rust/refs/heads/main/installer/install.sh"
