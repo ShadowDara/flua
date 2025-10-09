@@ -1,0 +1,42 @@
+name: Build for Windows
+
+on:
+  workflow_call:
+
+permissions:
+  contents: write
+
+jobs:
+  buildwindows:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Setup Luajit
+      uses: shadowdara/LuaAPI-Rust/.github/workflows/InstallLuajit.yml@main
+      with:
+        version: v0.1.13
+    
+    - name: Build the Release
+      run: |
+        cargo build --release
+
+    - name: Set up NSIS
+      run: |
+        choco install nsis -y
+
+    - name: Build project
+      run: |
+        luajit build.lua
+    
+    - name: Upload to GitHub Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        name: "LuaJIT Setup ${{ github.ref_name }}"
+        tag_name: ${{ github.ref_name }}
+        files: |
+          ./target/release/luajit.exe
+          ./windows_builds/LuajitSetup_v${{ github.ref_name }}.exe

@@ -26,9 +26,9 @@ jobs:
           #   ext: ""
           
           # Windows x86_64
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            ext: ".exe"
+          # - os: windows-latest
+          #   target: x86_64-pc-windows-msvc
+          #   ext: ".exe"
           
           # MacOS x86_64
           - os: macos-latest
@@ -88,11 +88,11 @@ jobs:
       #     name: luajit-aarch64-unknown-linux-gnu
       #     path: release-assets/linux-arm64
 
-      - name: Download Windows artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: luajit-x86_64-pc-windows-msvc
-          path: release-assets/windows
+      # - name: Download Windows artifact
+      #     uses: actions/download-artifact@v4
+      #     with:
+      #     name: luajit-x86_64-pc-windows-msvc
+      #     path: release-assets/windows
 
       - name: Download Mac artifact
         uses: actions/download-artifact@v4
@@ -104,7 +104,7 @@ jobs:
         run: |
           mv release-assets/linux/luajit release-assets/luajit-linux-x86_64
           # mv release-assets/linux-arm64/luajit release-assets/luajit-linux-aarch64
-          mv release-assets/windows/luajit.exe release-assets/luajit-windows-x86_64.exe
+          # mv release-assets/windows/luajit.exe release-assets/luajit-windows-x86_64.exe
           mv release-assets/macos/luajit release-assets/luajit-macos-x86_64
     
       - name: Debug - zeige heruntergeladene Dateien
@@ -125,3 +125,9 @@ jobs:
           artifacts: |
             release-assets/*
           artifactErrorsFailBuild: true
+      
+      - name: Publish for Windows
+        uses: ./.github/workflows/ReleaseWindows.yml
+      
+      - name: Publish Docs
+        uses: ./.github/workflows/ReleaseDocs.yml

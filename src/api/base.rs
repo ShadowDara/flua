@@ -91,9 +91,8 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         }
     })?;
 
-    // Function to pause the programm for a certain amount of time
-    // Does not work with negative Numbers!
     let wait = lua.create_function(|_, time: u64| {
+        deprecated!("dapi.greet", "0.1.13", "Use dapi_time.wait() instead!");
         thread::sleep(Duration::from_millis(time));
         Ok(())
     })?;

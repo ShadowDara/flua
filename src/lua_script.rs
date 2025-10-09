@@ -4,6 +4,7 @@ use std::path::Path;
 
 use crate::api::{
     base, data_parsing, http as api_http, io as api_io, net as api_net, os as api_os,
+    time as api_time,
 };
 
 pub fn execute_script(file: &str, safe_mode: &bool, lua_args: Vec<String>) -> Result<()> {
@@ -40,6 +41,7 @@ pub fn execute_script(file: &str, safe_mode: &bool, lua_args: Vec<String>) -> Re
     let dapi_xml = data_parsing::xml::register(&lua)?;
     let dapi_http_async = api_http::async_server::register(&lua)?;
     let dapi_net = api_net::net::register(&lua)?;
+    let dapi_time = api_time::register(&lua)?;
 
     let globals = lua.globals();
 
@@ -96,6 +98,10 @@ pub fn execute_script(file: &str, safe_mode: &bool, lua_args: Vec<String>) -> Re
     preload.set(
         "dapi_net",
         lua.create_function(move |_, ()| Ok(dapi_net.clone()))?,
+    )?;
+    preload.set(
+        "dapi_time",
+        lua.create_function(move |_, ()| Ok(dapi_time.clone()))?,
     )?;
 
     lua.load(&script).exec()?;

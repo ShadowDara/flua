@@ -18,6 +18,12 @@
 - added option to give arguments to luajit
 - added Client to the Download File function
 - added Colors to the help Info
+- added Docs to the NSIS Installer for Windows
+- added NSIS Installer to Release Workflow
+- added Docs publish Workflow
+- added Install Workflow for Luajit
+
+Read the DOCS for Version 0.1.13 for more Infos
 
 ## 0.1.12 - 08.10.2025
 - added yaml parser
