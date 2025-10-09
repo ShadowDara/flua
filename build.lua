@@ -14,10 +14,12 @@ end
 
 function build_linux()
     print("Running Build for Linux")
+    os.execute("cargo build --release")
 end
 
 function build_macos()
     print("Running Build for MacOS")
+    os.execute("cargo build --release")
 end
 
 -- Start the Script

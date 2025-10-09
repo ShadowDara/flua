@@ -1,7 +1,9 @@
 name: ""
 version: ""
 description: ""
+author: ""
 license: ""
+link: ""
 
 # Start Point for the Module
 entrypoint: ""
@@ -10,3 +12,7 @@ entrypoint: ""
 luajitversion:
   min: ""
   max: ""
+
+# DO NOT EDIT THIS, THIS IS VERY IMPORTANT, IF THERE ARE CHANGES
+# IN THE MODULE FILE !!!
+edition: 2025
