@@ -10,23 +10,34 @@
 -- - python
 -- - NSIS
 
+-- Imports
 local dapi = require("dapi")
 local dapi_io = require("dapi_io")
 local dapi_os = require("dapi_os")
 
 dapi.check_version("0.1.11", true)
 
+-- Function to run the tests
+function run_tests()
+    os.execute("cargo run test/main.lua")
+    os.execute("cargo run test/data.lua")
+    os.execute("cargo run test/http_async.lua")
+end
+
+-- Function to build for windows
 function build_windows()
     print("Running Build for Windows")
     os.execute("python build/win.py")
 end
 
+-- Function to build for Linux
 function build_linux()
     print("Running Build for Linux")
     os.execute("./test/command_tester.sh")
     os.execute("cargo build --release")
 end
 
+-- Function to build for MacOS
 function build_macos()
     print("Running Build for MacOS")
     os.execute("cargo build --release")
@@ -34,6 +45,17 @@ end
 
 -- Start the Script
 print("Luajit Build Script")
+
+io.write("\nWhat to do?\n")
+io.write("  1   Run Tests\n")
+io.write("  2   Build Export\n")
+io.write("Choose: ")
+local answer = io.read()
+
+if answer == "1" then
+    run_tests()
+    os.exit(0)
+end
 
 -- Copies the Changelog from Repo Root to /docs/
 dapi_io.copy_file("CHANGELOG.md", "docs/CHANGELOG.md")
