@@ -12,7 +12,6 @@ jobs:
     uses: shadowdara/LuaAPI-Rust/.github/workflows/InstallLuajit.yml@main
     with:
       version: v0.1.13
-    runs-on: windows-latest
 
   buildwindows:
     name: Build and Package
