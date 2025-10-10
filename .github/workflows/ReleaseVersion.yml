@@ -127,7 +127,7 @@ jobs:
           artifactErrorsFailBuild: true
       
       - name: Publish for Windows
-        uses: ./.github/workflows/ReleaseWindows
-      
+        uses: shadowdara/LuaAPI-Rust/.github/workflows/ReleaseWindows.yml@main
+        
       - name: Publish Docs
-        uses: ./.github/workflows/ReleaseDocs
+        uses: shadowdara/LuaAPI-Rust/.github/workflows/ReleaseDocs.yml@main
