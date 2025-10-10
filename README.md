@@ -71,18 +71,33 @@ Download the NSIS installer [here](https://github.com/ShadowDara/LuaAPI-Rust/rel
 - Base64
 - XML
 
-## 1.0.0 Roadmap
-- [ ] add full data parsing
-- [ ] compabilllity with luarocks
+## Roadmap
+
+Feel free to open an Issue to add Ideas to the Roadmap which could
+useful.
+
+### 0.2.0
+- [ ] remove all deprecated functions or fix them
+- [ ] multi version kompabillity
+- [ ] working moduels
+- [ ] Safe Mode
+- [ ] gh workflow and script to install Luajit + (Dockerfile)
+
+### 0.3.0
 - [ ] multiversion modules
 - [ ] module creation like cargo
 - [ ] Autoupdater / Version Installer / Selector
-- [ ] Safe Mode
-- [ ] multiversion compabillity and multiversion installer
+
+### 0.4.0
 - [ ] adding VS-Code support for the functions
 - [ ] UI which can be used directly from lua
+
+### 0.5.0
 - [ ] ( ??? Windows API Bindings ??? )
-- [ ] gh workflow and script to install Luajit + (Dockerfile)
+
+### 1.0.0
+- [ ] compabillity with LuaRocks
+- [ ] builds for all sorts of systems
 
 <!-- ## Stats 0.1.11 -->
 <!--
