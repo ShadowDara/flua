@@ -127,7 +127,7 @@ jobs:
           artifactErrorsFailBuild: true
       
       - name: Publish for Windows
-        uses: ./.github/workflows/ReleaseWindows.yml
+        uses: ./.github/workflows/ReleaseWindows
       
       - name: Publish Docs
-        uses: ./.github/workflows/ReleaseDocs.yml
+        uses: ./.github/workflows/ReleaseDocs
