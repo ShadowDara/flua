@@ -77,6 +77,7 @@ local tags = require("build.get_tags")
 print("Build the Documentation")
 os.execute("pip install -r build/requirements.txt")
 os.execute("mkdocs build")
+io.open("site/.nojekyll", "w")
 
 local osdata = dapi_os.os()
 if osdata.win then
