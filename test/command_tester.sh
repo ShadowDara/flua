@@ -1,9 +1,9 @@
 #!/bin/bash
 
-echo "Script to test the luajit Terminal Functions"
+echo "Script to test the flua Terminal Functions"
 
 echo "Checking Version:"
-./target/debug/luajit --version
+./target/debug/flua --version
 
 echo "Checking Help:"
-./target/debug/luajit --help
+./target/debug/flua --help

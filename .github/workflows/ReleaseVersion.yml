@@ -1,4 +1,4 @@
-name: Build & Release Luajit
+name: Build & Release flua
 
 on:
   push:
@@ -44,8 +44,8 @@ jobs:
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
-          name: luajit-${{ matrix.target }}
-          path: target/${{ matrix.target }}/release/luajit${{ matrix.ext }}
+          name: flua-${{ matrix.target }}
+          path: target/${{ matrix.target }}/release/flua${{ matrix.ext }}
 
   release:
     needs: build
@@ -54,19 +54,19 @@ jobs:
       - name: Download Linux artifact
         uses: actions/download-artifact@v4
         with:
-          name: luajit-x86_64-unknown-linux-gnu
+          name: flua-x86_64-unknown-linux-gnu
           path: release-assets/linux
 
       - name: Download Mac artifact
         uses: actions/download-artifact@v4
         with:
-          name: luajit-x86_64-apple-darwin
+          name: flua-x86_64-apple-darwin
           path: release-assets/macos
 
       - name: Rename binaries
         run: |
-          mv release-assets/linux/luajit release-assets/luajit-linux-x86_64
-          mv release-assets/macos/luajit release-assets/luajit-macos-x86_64
+          mv release-assets/linux/flua release-assets/flua-linux-x86_64
+          mv release-assets/macos/flua release-assets/flua-macos-x86_64
 
       - name: Debug - zeige heruntergeladene Dateien
         run: ls -R release-assets
@@ -82,17 +82,17 @@ jobs:
           tag: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           body: |
-            Release built by CI for tag ${{ github.ref_name }}. See **[CHANGELOG.md](https://github.com/ShadowDara/LuaAPI-Rust/blob/master/CHANGELOG.md)** for Changelogs.
+            Release built by CI for tag ${{ github.ref_name }}. See **[CHANGELOG.md](https://github.com/ShadowDara/flua/blob/master/CHANGELOG.md#${{ github.ref_name }})** for Changelogs.
           artifacts: |
             release-assets/*
           artifactErrorsFailBuild: true
 
   release_windows:
     name: Publish for Windows
-    uses: shadowdara/LuaAPI-Rust/.github/workflows/ReleaseWindows.yml@main
+    uses: shadowdara/flua/.github/workflows/ReleaseWindows.yml@main
     needs: release
 
   release_docs:
     name: Publish Docs
-    uses: shadowdara/LuaAPI-Rust/.github/workflows/ReleaseDocs.yml@main
+    uses: shadowdara/flua/.github/workflows/ReleaseDocs.yml@main
     needs: release

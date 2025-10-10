@@ -11,7 +11,7 @@ mod dlm13;
 #[cfg(windows)]
 mod windows_utf8;
 
-pub const VERSION: &str = "0.1.13";
+pub const VERSION: &str = "0.2.0";
 
 use crate::helper::print::{BLUE, BOLD, END, GREEN, RED, YELLOW};
 

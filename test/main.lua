@@ -1,6 +1,6 @@
 dapi_os = require("dapi_os")
 
-print("Tests for Luajit")
+print("Tests for flua")
 
 local cwd = dapi_os.getcwd()
 

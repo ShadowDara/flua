@@ -1,4 +1,4 @@
-# Daras Lua API
+# flua
 
 a Lua API written in Rust to make scripting much easier!
 
@@ -7,7 +7,7 @@ a Lua API written in Rust to make scripting much easier!
 
 Run a script with
 ```sh
-luajit <your-script.lua>
+flua <your-script.lua>
 ```
 
 to suppress file and os access ad `-safe` at the end
@@ -22,7 +22,7 @@ Read the [CHANGELOG](./CHANGELOG.md) or the Docs for more Infos
 ## Running
 For Infos or help run:
 ```sh
-luajit --help
+flua --help
 ```
 
 ## Install
@@ -44,18 +44,18 @@ sudo apt install pkg-config libssl-dev
 
 ```sh
 # Download the script
-curl -L -o "LuajitInstall.sh" "https://raw.githubusercontent.com/ShadowDara/LuaAPI-Rust/refs/heads/main/installer/install.sh"
+curl -L -o "FluaInstall.sh" "https://raw.githubusercontent.com/ShadowDara/flua/refs/heads/main/installer/install.sh"
 
 # Make it executable
-chmod +x LuajitInstall.sh
+chmod +x FluaInstall.sh
 
 # Execute the script
-./LuajitInstall.sh "v0.1.13"
+./FluaInstall.sh "v0.1.13"
 ```
 
 ### Windows
 
-Download the NSIS installer [here](https://github.com/ShadowDara/LuaAPI-Rust/releases)
+Download the NSIS installer [here](https://github.com/ShadowDara/flua/releases)
 
 > [!NOTE]
 > Install Script for windows is although planned and hopefully coming soon!
@@ -77,22 +77,25 @@ Feel free to open an Issue to add Ideas to the Roadmap which could
 useful.
 
 ### 0.2.0
+- [x] renaming to flua
+
+### 0.3.0
 - [ ] remove all deprecated functions or fix them
 - [ ] multi version kompabillity
 - [ ] working moduels
 - [ ] Safe Mode
 - [ ] gh workflow and script to install Luajit + (Dockerfile)
 
-### 0.3.0
+### 0.4.0
 - [ ] multiversion modules
 - [ ] module creation like cargo
 - [ ] Autoupdater / Version Installer / Selector
 
-### 0.4.0
+### 0.5.0
 - [ ] adding VS-Code support for the functions
 - [ ] UI which can be used directly from lua
 
-### 0.5.0
+### 0.6.0
 - [ ] ( ??? Windows API Bindings ??? )
 
 ### 1.0.0

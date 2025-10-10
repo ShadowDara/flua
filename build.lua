@@ -69,15 +69,13 @@ os.execute("cargo check")
 print("Format Code")
 os.execute("cargo fmt")
 
--- Import get release Tags file
-print("Get Release Tags")
-local tags = require("build.get_tags")
-
 -- Build the Documentation
 print("Build the Documentation")
 os.execute("pip install -r build/requirements.txt")
 os.execute("mkdocs build")
 io.open("site/.nojekyll", "w")
+
+-- Add Zipping for the documentation
 
 local osdata = dapi_os.os()
 if osdata.win then
