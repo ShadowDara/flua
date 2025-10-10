@@ -22,6 +22,7 @@
 - added NSIS Installer to Release Workflow
 - added Docs publish Workflow
 - added Install Workflow for Luajit
+- added async stopwatch to stop time
 
 Read the DOCS for Version 0.1.13 for more Infos
 
