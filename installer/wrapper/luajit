@@ -1,0 +1,3 @@
+#!/bin/bash
+# Wrapper for luajit, so the old name still works
+exec flua "$@"

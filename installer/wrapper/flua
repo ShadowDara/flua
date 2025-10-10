@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# File is only for windows because .exe is needed to execute flua
+# This is although just a wrapper for the name
+
+exec flua.exe "$@"

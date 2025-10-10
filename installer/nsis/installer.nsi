@@ -36,6 +36,9 @@ Section "Uninstall"
   Delete "$INSTDIR\luajitdocs"
   Delete "$INSTDIR\luajitdocs.cmd"
   Delete "$INSTDIR\luajitdocs.lua"
+  Delete "$INSTDIR\luajit"
+  Delete "$INSTDIR\luajit.cmd"
+  Delete "$INSTDIR\flua"
 
   # Verzeichnis löschen
   RMDir "$INSTDIR"
@@ -141,6 +144,9 @@ Section "Install"
   File "..\docs\luajitdocs"
   File "..\docs\luajitdocs.cmd"
   File "..\docs\luajitdocs.lua"
+  File "..\wrapper\luajit"
+  File "..\wrapper\luajit.cmd"
+  File "..\wrapper\flua"
 
   # Nutzer fragen, ob .lua-Dateien damit verknüpft werden sollen
   MessageBox MB_YESNO "Do you want to use luajit as the standard program for .lua files?" IDNO skip_assoc
