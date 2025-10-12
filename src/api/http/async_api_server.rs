@@ -1,121 +1,156 @@
-use either::Either;
-use mlua::{Function, Lua, LuaSerdeExt, Result, Table, Value};
+use mlua::{Function, Lua, Result, Table, Value};
 use serde_json::Value as JsonValue;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use tokio::sync::oneshot;
-use warp::any;
+use tokio::sync::{mpsc, oneshot};
+use warp::Rejection;
 use warp::filters::BoxedFilter;
-use warp::http::Response;
-use warp::http::StatusCode;
+use warp::http::{Response, StatusCode};
 use warp::hyper::Body;
-use warp::{Filter, Rejection, Reply};
+use warp::{Filter, Reply};
 
 use crate::utils::json_utils::lua_to_json;
 
+// Nachrichtentyp für Dispatcher
+enum LuaRequest {
+    Call {
+        route: String,
+        resp_tx: oneshot::Sender<std::result::Result<JsonValue, String>>,
+    },
+}
+
 pub fn register(lua: &Lua) -> Result<Table> {
+    // Steuerelemente für Server-Shutdown
     let server_controls: Arc<Mutex<HashMap<u16, oneshot::Sender<()>>>> =
         Arc::new(Mutex::new(HashMap::new()));
 
     let table = lua.create_table()?;
     let lua = lua.clone();
 
-    // Start API server
+    // --- Start server ---
     let start_api_server = {
         let server_controls = Arc::clone(&server_controls);
 
-        lua.create_function(move |_, (port, handlers): (u16, Table)| {
+        lua.create_function(move |_, (port, handlers_table): (u16, Option<Table>)| {
             let (shutdown_tx, shutdown_rx) = oneshot::channel();
             server_controls.lock().unwrap().insert(port, shutdown_tx);
 
-            let lua = lua.clone();
-            let mut route_map: HashMap<String, Function> = HashMap::new();
-            for pair in handlers.pairs::<String, Function>() {
-                let (route, func) = pair?;
-                route_map.insert(route, func);
+            // Sammele alle Lua-Routen, falls vorhanden
+            let mut handlers: HashMap<String, Function> = HashMap::new();
+            if let Some(table) = handlers_table {
+                for pair in table.pairs::<String, Function>() {
+                    let (route, func) = pair?;
+                    handlers.insert(route, func);
+                }
             }
 
-            tokio::spawn(async move {
-                let lua = Arc::new(lua);
+            // Channel für Dispatcher
+            let (lua_tx, mut lua_rx) = mpsc::unbounded_channel::<LuaRequest>();
 
-                // Im Tokio-Thread
+            let handlers2 = handlers.clone();
 
-                let mut filters = Vec::new();
+            // Spawn Dispatcher-Task
+            tokio::task::spawn_local(async move {
+                let lua_routes = handlers2;
 
-                for (route_name, lua_func) in route_map {
-                    let lua = Arc::clone(&lua);
-                    let expected = route_name.clone();
-                    let func = lua_func.clone();
-
-                    let route = warp::path!("api" / String)
-                        .and(warp::path::end())
-                        .and(warp::get())
-                        .and_then(move |actual_path: String| {
-                            let lua = Arc::clone(&lua);
-                            let func = func.clone();
-                            let expected = expected.clone();
-
-                            async move {
-                                if actual_path != expected {
-                                    return Ok::<_, Rejection>(
-                                        warp::reply::with_status(
-                                            "Not found",
-                                            warp::http::StatusCode::NOT_FOUND,
-                                        )
-                                        .into_response(),
-                                    );
-                                }
-
-                                let result: std::result::Result<_, mlua::Error> = (|| {
-                                    let lua_value: Value = func.call(())?;
-                                    let json: JsonValue = lua_to_json(&lua_value)
-                                        .expect("Failed to convert Lua value to JSON");
+                while let Some(req) = lua_rx.recv().await {
+                    match req {
+                        LuaRequest::Call { route, resp_tx } => {
+                            let res: std::result::Result<JsonValue, String> = (|| {
+                                if let Some(func) = lua_routes.get(&route) {
+                                    let val: Value = func.call(())?;
+                                    let json = lua_to_json(&val)?;
                                     Ok(json)
-                                })(
-                                );
-
-                                match result {
-                                    Ok(json) => Ok(warp::reply::json(&json).into_response()),
-                                    Err(err) => {
-                                        eprintln!("Lua error: {:?}", err);
-                                        Ok(warp::reply::with_status(
-                                            "Lua execution error",
-                                            warp::http::StatusCode::INTERNAL_SERVER_ERROR,
-                                        )
-                                        .into_response())
-                                    }
+                                } else {
+                                    Ok(serde_json::json!({"error": "route not found"}))
                                 }
-                            }
-                        });
+                            })(
+                            )
+                            .map_err(|e: mlua::Error| format!("{:?}", e));
 
-                    filters.push(route); // **kein `.boxed()` hier!**
+                            let _ = resp_tx.send(res.map_err(|e| format!("{:?}", e)));
+                        }
+                    }
                 }
+            });
 
-                let not_found = warp::any()
-                    .map(|| warp::reply::with_status("Not found", StatusCode::NOT_FOUND))
+            // Warp Filter pro Route
+            let mut filters: Vec<BoxedFilter<(Response<Body>,)>> = Vec::new();
+            let handlers = Arc::new(handlers);
+
+            for route_name in handlers.keys() {
+                let lua_tx_clone = lua_tx.clone();
+                let route_name_clone = route_name.clone();
+
+                let route = warp::path("api")
+                    .and(warp::path(route_name_clone.clone()))
+                    .and(warp::path::end())
+                    .and(warp::get())
+                    .and_then(move || {
+                        let lua_tx_clone = lua_tx_clone.clone();
+                        let route_name_clone = route_name_clone.clone();
+
+                        async move {
+                            let (resp_tx, resp_rx) = oneshot::channel();
+                            let req = LuaRequest::Call {
+                                route: route_name_clone,
+                                resp_tx,
+                            };
+                            lua_tx_clone.send(req).map_err(|_| warp::reject())?;
+
+                            match resp_rx.await {
+                                Ok(Ok(json)) => Ok::<Response<Body>, Rejection>(
+                                    warp::reply::json(&json).into_response(),
+                                ),
+                                Ok(Err(err_msg)) => Ok(warp::reply::with_status(
+                                    err_msg,
+                                    StatusCode::INTERNAL_SERVER_ERROR,
+                                )
+                                .into_response()),
+                                Err(_) => Ok(warp::reply::with_status(
+                                    "Lua task dropped",
+                                    StatusCode::INTERNAL_SERVER_ERROR,
+                                )
+                                .into_response()),
+                            }
+                        }
+                    })
                     .boxed();
 
-                let filters = filters
-                    .into_iter()
-                    .map(|f| f.map(|_| ()).boxed())
-                    .collect::<Vec<_>>();
+                filters.push(route);
+            }
 
-                let combined = filters
-                    .into_iter()
-                    .reduce(|a, b| a.or(b))
-                    .unwrap_or(not_found)
-                    .boxed();
+            // Default 404
+            let not_found: BoxedFilter<(Response<Body>,)> = warp::any()
+                .map(|| {
+                    warp::reply::with_status("Not found", StatusCode::NOT_FOUND).into_response()
+                })
+                .boxed();
 
-                println!(
-                    "Lua API server running on http://0.0.0.0:{}/api/<endpoint>",
-                    port
-                );
+            // Alle Filter kombinieren
+            let combined: BoxedFilter<(Response<Body>,)> = filters
+                .into_iter()
+                .reduce(
+                    |a: BoxedFilter<(Response<Body>,)>, b: BoxedFilter<(Response<Body>,)>| {
+                        a.or(b).unify().boxed()
+                    },
+                )
+                .unwrap_or(not_found);
 
-                let (_addr, server) = warp::serve(combined.with(warp::log("lua_api")))
-                    .bind_with_graceful_shutdown(([0, 0, 0, 0], port), async move {
+            println!(
+                "Lua API server running on http://0.0.0.0:{}/api/<endpoint>",
+                port
+            );
+
+            // Warp Server starten
+            tokio::task::spawn(async move {
+                let (_addr, server) = warp::serve(combined).bind_with_graceful_shutdown(
+                    ([0, 0, 0, 0], port),
+                    async move {
                         shutdown_rx.await.ok();
                         println!("API server on port {} stopped", port);
-                    });
+                    },
+                );
 
                 server.await;
             });
@@ -124,13 +159,14 @@ pub fn register(lua: &Lua) -> Result<Table> {
         })?
     };
 
-    // Stop API server
+    // --- Stop server ---
     let stop_api_server = {
         let server_controls = Arc::clone(&server_controls);
+
         lua.create_function(move |_, port: u16| {
             let mut controls = server_controls.lock().unwrap();
             if let Some(sender) = controls.remove(&port) {
-                let _ = sender.send(()); // Stop signal
+                let _ = sender.send(());
                 println!("Server on port {} stopped", port);
             } else {
                 println!("No server on port {}", port);
@@ -141,6 +177,5 @@ pub fn register(lua: &Lua) -> Result<Table> {
 
     table.set("start_api_server", start_api_server)?;
     table.set("stop_api_server", stop_api_server)?;
-
     Ok(table)
 }

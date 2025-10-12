@@ -4,12 +4,15 @@ local dos = require("dapi_os")
 
 -- API-Server auf Port 8081 starten
 web.start_api_server(8081)
+web.stop_api_server(8081)
 
-web.start_api_server(8081, {
-  hello = function()
-    return { message = "Hello from Lua!" }
-  end
-})
+-- web.start_api_server(8081, {
+--   hello = function()
+--     return {
+--       message = "Hello from Lua!"
+--     }
+--   end
+-- })
 
 dos.open_link("http://127.0.0.1/api/hello")
 
