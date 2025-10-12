@@ -5,6 +5,8 @@
 dapi_time = require("dapi_time")
 ```
 
+## stopwatch
+
 **Example**
 ```lua
 local stopwatch = require("stopwatch")
@@ -29,4 +31,13 @@ dapi.wait(1000)
 print("Total after resume:", stopwatch.read("sw1"))
 
 stopwatch.stop("sw1")
+```
+
+## waitforever
+a simple wait function which waits until the programm is interrupted
+with `CTRL + C` or closed
+
+**Usage**
+```lua
+dapi_time.waitfr()
 ```

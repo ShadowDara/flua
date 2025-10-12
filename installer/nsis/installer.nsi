@@ -1,3 +1,5 @@
+# Flua Installer with NSIS for Windows
+
 !include "LogicLib.nsh"
 !include "StrFunc.nsh"
 
@@ -28,7 +30,7 @@ Page instfiles
 Section "Uninstall"
 
   # Dateien löschen
-  Delete "$INSTDIR\luajit.exe"
+  Delete "$INSTDIR\flua.exe"
   Delete "$INSTDIR\README.md"
   Delete "$INSTDIR\CHANGELOG.md"
   Delete "$INSTDIR\LICENSE"
@@ -40,18 +42,18 @@ Section "Uninstall"
   Delete "$INSTDIR\luajit.cmd"
   Delete "$INSTDIR\flua"
 
-  # Verzeichnis löschen
-  RMDir "$INSTDIR"
-
   ; Löscht das docs rekursiv
   RMDir /r "$INSTDIR\docs"
+
+  # Verzeichnis löschen
+  RMDir "$INSTDIR"
 
   # Delete Both Directories
   RMDir "$LOCALAPPDATA\@shadowdara"
 
-  Delete "$DESKTOP\luajit.lnk"
+  Delete "$DESKTOP\lua.lnk"
   Delete "$SMPROGRAMS\Luajit\Uninstall.lnk"
-  Delete "$SMPROGRAMS\Luajit\luajit.lnk"
+  Delete "$SMPROGRAMS\Luajit\flua.lnk"
   RMDir "$SMPROGRAMS\Luajit"
 
   ; Read current PATH from registry
@@ -137,7 +139,7 @@ Section "Install"
 
   # Kopiere Datei(en) ins Zielverzeichnis
   SetOutPath "$INSTDIR"
-  File "..\..\target\release\luajit.exe"
+  File "..\..\target\release\flua.exe"
   File "..\..\README.md"
   File "..\..\CHANGELOG.md"
   File "..\..\LICENSE"
@@ -147,6 +149,7 @@ Section "Install"
   File "..\wrapper\luajit"
   File "..\wrapper\luajit.cmd"
   File "..\wrapper\flua"
+  File "..\..\build\heart.ico"
 
   # Nutzer fragen, ob .lua-Dateien damit verknüpft werden sollen
   MessageBox MB_YESNO "Do you want to use luajit as the standard program for .lua files?" IDNO skip_assoc
@@ -154,8 +157,8 @@ Section "Install"
   # Dateityp- und ProgID-Verknüpfung setzen
   WriteRegStr HKCR ".lua" "" "MyLuaFile"
   WriteRegStr HKCR "MyLuaFile" "" "Lua-Skript"
-  WriteRegStr HKCR "MyLuaFile\DefaultIcon" "" "$INSTDIR\luajit.exe,0"
-  WriteRegStr HKCR "MyLuaFile\shell\open\command" "" '"$INSTDIR\luajit.exe" "%1"'
+  WriteRegStr HKCR "MyLuaFile\DefaultIcon" "" "$INSTDIR\heart.ico,0"
+  WriteRegStr HKCR "MyLuaFile\shell\open\command" "" '"$INSTDIR\lua.exe" "%1"'
 
   # Info für Windows 10/11 Standardprogramme-UI (nur teilweise effektiv)
   # Optional: ApplicationCapabilities setzen (mehr Aufwand)
@@ -173,21 +176,21 @@ skip_assoc:
   CreateDirectory "$SMPROGRAMS\Luajit"
 
   # Shortcuts
-  CreateShortCut "$SMPROGRAMS\Luajit\luajit.lnk" "$INSTDIR\luajit.exe"
+  CreateShortCut "$SMPROGRAMS\Luajit\flua.lnk" "$INSTDIR\flua.exe"
   CreateShortCut "$SMPROGRAMS\Luajit\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
 
   ; Desktop Shortcut
-  CreateShortCut "$DESKTOP\luajit.lnk" "$INSTDIR\luajit.exe" "" "$INSTDIR\luajit.ico"
+  CreateShortCut "$DESKTOP\flua.lnk" "$INSTDIR\flua.exe" "" "$INSTDIR\heart.ico"
 
   # ---- Uninstaller schreiben ----
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
   # ---- In Windows-Softwareliste eintragen ----
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LuajitInstaller" "DisplayName" "Luajit (Benutzerinstallation)"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LuajitInstaller" "DisplayName" "Flua (Benutzerinstallation)"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LuajitInstaller" "UninstallString" "$INSTDIR\Uninstall.exe"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LuajitInstaller" "DisplayIcon" "$INSTDIR\luajit.exe"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LuajitInstaller" "DisplayIcon" "$INSTDIR\flua.exe"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LuajitInstaller" "InstallLocation" "$INSTDIR"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LuajitInstaller" "Publisher" "@shadowdara"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LuajitInstaller" "DisplayVersion" "1.0.0"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LuajitInstaller" "DisplayVersion" "0.2.0"
 
 SectionEnd
