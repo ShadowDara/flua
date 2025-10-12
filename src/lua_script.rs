@@ -42,6 +42,7 @@ pub fn execute_script(file: &str, safe_mode: &bool, lua_args: Vec<String>) -> Re
     let dapi_http_async = api_http::async_server::register(&lua)?;
     let dapi_net = api_net::net::register(&lua)?;
     let dapi_time = api_time::register(&lua)?;
+    let dapi_api_async = api_http::async_api_server::register(&lua)?;
 
     let globals = lua.globals();
 
@@ -102,6 +103,10 @@ pub fn execute_script(file: &str, safe_mode: &bool, lua_args: Vec<String>) -> Re
     preload.set(
         "dapi_time",
         lua.create_function(move |_, ()| Ok(dapi_time.clone()))?,
+    )?;
+    preload.set(
+        "dapi_api_async",
+        lua.create_function(move |_, ()| Ok(dapi_api_async.clone()))?,
     )?;
 
     lua.load(&script).exec()?;

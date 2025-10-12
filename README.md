@@ -78,6 +78,7 @@ useful.
 
 ### 0.2.0
 - [x] renaming to flua
+- [ ] http server with custom api
 
 ### 0.3.0
 - [ ] remove all deprecated functions or fix them
@@ -92,6 +93,7 @@ useful.
 - [ ] Autoupdater / Version Installer / Selector
 
 ### 0.5.0
+- [ ] change modul names (only when multiversion compabillity works !)
 - [ ] adding VS-Code support for the functions
 - [ ] UI which can be used directly from lua
 
@@ -128,4 +130,5 @@ Testing Lua
 cargo run test/main.lua
 cargo run test/data.lua
 cargo run test/http_async.lua
+cargo run test/api_server.lua
 ```
