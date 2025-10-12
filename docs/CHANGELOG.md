@@ -1,6 +1,10 @@
 # CHANGELOG
 
-## 0.1.13
+## 0.2.0
+- renamed programm to flua
+- added flalaxy in another repository, the installer for flua - https://github.com/ShadowDara/flalaxy
+
+## 0.1.13 - 10.10.2025
 - add auto publish for the mkdocs documentation
 - restructered some Code
 - added async http servers

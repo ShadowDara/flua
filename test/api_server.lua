@@ -22,4 +22,11 @@ web.start_api_server(8082, {
 
 dos.open_link("http://127.0.0.1:8082/api/hello")
 
+web.start_api_server(8083, {
+    hello = function() return { message = "Hi" } end,      -- echte Funktion
+    now = "os.date()",                                     -- Ausdruck
+    greet = [[function() return { msg = "Hello!" } end]],  -- Mehrzeilige Function als String
+    empty = nil                                           -- nil handler -> gibt nil zurück
+})
+
 time.waitfr()
