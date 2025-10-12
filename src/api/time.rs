@@ -154,14 +154,13 @@ pub fn register(lua: &Lua) -> Result<Table> {
 
     // function to wait forever, so a startet http does not shutdown at the end of the script
     let wait_forever = lua.create_function(|_, ()| {
-    // Endlosschleife, blockiert den Thread für immer
-    loop {
-        std::thread::sleep(std::time::Duration::from_secs(60));
-    }
-    #[allow(unreachable_code)]
-    Ok(())
-})?;
-
+        // Endlosschleife, blockiert den Thread für immer
+        loop {
+            std::thread::sleep(std::time::Duration::from_secs(60));
+        }
+        #[allow(unreachable_code)]
+        Ok(())
+    })?;
 
     table.set("wait", wait)?;
     table.set("waitfr", wait_forever)?;
