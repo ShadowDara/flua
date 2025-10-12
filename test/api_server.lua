@@ -1,4 +1,5 @@
-local web = require("dapi_api_async")  -- Je nach Bindungssystem
+-- Imports
+local web = require("dapi_api_async")
 local time = require("dapi_time")
 local dos = require("dapi_os")
 
@@ -14,6 +15,11 @@ web.stop_api_server(8081)
 --   end
 -- })
 
-dos.open_link("http://127.0.0.1/api/hello")
+web.start_api_server(8082, {
+  hello = "function() return { message = 'Hello from Lua string!' } end",
+  now   = "return { now = os.date('%Y-%m-%d %H:%M:%S') }"
+})
+
+dos.open_link("http://127.0.0.1:8082/api/hello")
 
 time.waitfr()
