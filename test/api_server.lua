@@ -5,7 +5,7 @@ local dos = require("dapi_os")
 
 -- API-Server auf Port 8081 starten
 web.start_api_server(8081)
-web.stop_api_server(8081)
+-- web.stop_api_server(8081)
 
 -- web.start_api_server(8081, {
 --   hello = function()
