@@ -1,5 +1,8 @@
 use mlua::{Lua, Result, Value};
+use std::io::{BufRead, BufReader};
 use std::process::Command;
+use std::process::Stdio;
+use std::thread;
 
 use crate::deprecated;
 
@@ -87,12 +90,65 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         Ok(table)
     })?;
 
+    let run2 = lua.create_function(|lua, command: String| {
+        #[cfg(target_os = "windows")]
+        let mut child = Command::new("cmd")
+            .arg("/C")
+            .arg(&command)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()?;
+
+        #[cfg(not(target_os = "windows"))]
+        let mut child = Command::new("sh")
+            .arg("-c")
+            .arg(&command)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()?;
+
+        let stdout = child.stdout.take().unwrap();
+        let stderr = child.stderr.take().unwrap();
+
+        // Stdout thread
+        thread::spawn(move || {
+            let reader = BufReader::new(stdout);
+            for line in reader.lines() {
+                if let Ok(line) = line {
+                    println!("[stdout] {}", line);
+                    // Optional: Lua-Callback aufrufen hier
+                }
+            }
+        });
+
+        // Stderr thread
+        thread::spawn(move || {
+            let reader = BufReader::new(stderr);
+            for line in reader.lines() {
+                if let Ok(line) = line {
+                    eprintln!("[stderr] {}", line);
+                    // Optional: Lua-Callback aufrufen hier
+                }
+            }
+        });
+
+        let status = child.wait()?; // Warten, bis Prozess beendet ist
+
+        let table = lua.create_table_from(vec![(
+            "status",
+            Value::Integer(status.code().unwrap_or(-1) as i64),
+        )])?;
+
+        Ok(table)
+    })?;
+
     table.set("get_os_info", get_os_info)?;
     table.set("os", os)?;
     table.set("chdir", chdir)?;
     table.set("getcwd", getcwd)?;
     table.set("open_link", open_link)?;
     table.set("run", run)?;
+    table.set("run2", run2)?;
 
     Ok(table)
 }

@@ -90,3 +90,7 @@ dapi_os.open_link("https://github.com/shadowdara")
 ```
 
 ## `run()`
+
+## `run2()`
+runs a command with instant no flush,
+the command does not wait with the output until its finished

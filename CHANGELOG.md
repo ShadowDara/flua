@@ -3,6 +3,9 @@
 ## 0.2.0
 - renamed programm to flua
 - added flalaxy in another repository, the installer for flua - https://github.com/ShadowDara/flalaxy
+- added server with api but does not work :(
+- added `dapi_os.run2()` - runs a command with instant no flush,
+the command does not wait with the output until its finished
 
 ## 0.1.13 - 10.10.2025
 - add auto publish for the mkdocs documentation

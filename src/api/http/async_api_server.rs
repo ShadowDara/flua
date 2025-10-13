@@ -23,13 +23,14 @@ pub fn register(lua: &Lua) -> Result<Table> {
     let table = lua.create_table()?;
     let lua = Arc::new(lua.clone()); // Arc<Lua> für sichere Multi-Thread Nutzung
 
+    let lua = Arc::new(lua.clone());
     // --- Start API Server ---
     let start_api_server = {
         let server_controls = Arc::clone(&server_controls);
-        let lua2 = lua.clone();
+        let lua2 = lua.clone(); // <-- lua wird hier geklont
 
         lua2.create_function(move |_, (port, handlers_table): (u16, Option<Table>)| {
-            let lua = Arc::clone(&lua); // lokale clone für Closure
+            let lua = Arc::clone(&lua);
             let (shutdown_tx, shutdown_rx) = oneshot::channel();
             server_controls.lock().unwrap().insert(port, shutdown_tx);
 
@@ -41,10 +42,9 @@ pub fn register(lua: &Lua) -> Result<Table> {
                     let func: Function = match value {
                         LuaValue::Function(f) => f,
                         LuaValue::String(s_val) => {
-                            let src: &str = &s_val.to_str()?; // Direkt zu &str
+                            let src: &str = &s_val.to_str()?;
                             if src.trim_start().starts_with("function") {
                                 match lua.load(src).eval()? {
-                                    // jetzt funktioniert load
                                     LuaValue::Function(f) => f,
                                     other => {
                                         return Err(mlua::Error::external(format!(
@@ -59,7 +59,6 @@ pub fn register(lua: &Lua) -> Result<Table> {
                                 lua.create_function(move |_, ()| Ok(val.clone()))?
                             }
                         }
-
                         LuaValue::Nil => lua.create_function(|_, ()| Ok(LuaValue::Nil))?,
                         other => {
                             return Err(mlua::Error::external(format!(
@@ -75,12 +74,11 @@ pub fn register(lua: &Lua) -> Result<Table> {
             let (lua_tx, mut lua_rx) = mpsc::unbounded_channel::<LuaRequest>();
             let handlers_clone = handlers.clone();
 
-            // Dispatcher auf Tokio-Task
-            let local_set = tokio::task::LocalSet::new();
-            local_set.spawn_local(async move {
+            // Dispatcher-Task für Lua-Handler
+            let dispatcher = async move {
                 while let Some(req) = lua_rx.recv().await {
                     if let LuaRequest::Call { route, resp_tx } = req {
-                        let res: std::result::Result<JsonValue, String> = (|| {
+                        let res = (|| {
                             if let Some(func) = handlers_clone.get(&route) {
                                 let val: LuaValue = func.call(())?;
                                 let json = lua_to_json(&val)?;
@@ -88,13 +86,12 @@ pub fn register(lua: &Lua) -> Result<Table> {
                             } else {
                                 Ok(serde_json::json!({"error": "route not found"}))
                             }
-                        })(
-                        )
+                        })()
                         .map_err(|e: mlua::Error| format!("{:?}", e));
                         let _ = resp_tx.send(res);
                     }
                 }
-            });
+            };
 
             // Warp Filter pro Route
             let mut filters: Vec<BoxedFilter<(Response<Body>,)>> = Vec::new();
@@ -160,45 +157,30 @@ pub fn register(lua: &Lua) -> Result<Table> {
                 port
             );
 
-            tokio::spawn(async move {
-                warp::serve(combined)
-                    .bind_with_graceful_shutdown(([0, 0, 0, 0], port), async move {
+            // Synchron blockieren
+            let rt = tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+                .unwrap();
+
+            rt.block_on(async {
+                let port3 = port.clone();
+                let (_, server_future) = warp::serve(combined).bind_with_graceful_shutdown(
+                    ([0, 0, 0, 0], port3),
+                    async move {
                         shutdown_rx.await.ok();
-                        println!("API server on port {} stopped", port);
-                    })
-                    .1
-                    .await;
+                        println!("API server on port {} stopped", port3);
+                    },
+                );
+
+                server_future.await;
             });
 
             Ok(())
-        })?
-    };
-
-    // --- Stop API Server ---
-    // let stop_api_server = {
-    //     let server_controls = Arc::clone(&server_controls);
-    //     lua.create_function(move |_, port: Option<u16>| {
-    //         if let Some(port) = port {
-    //             let mut controls = server_controls.lock().unwrap();
-    //             if let Some(sender) = controls.remove(&port) {
-    //                 let _ = sender.send(());
-    //                 println!("Server on port {} stopped", port);
-    //             } else {
-    //                 println!("No server on port {}", port);
-    //             }
-    //         } else {
-    //             // Stoppe alle Server
-    //             let mut controls = server_controls.lock().unwrap();
-    //             for (port, sender) in controls.drain() {
-    //                 let _ = sender.send(());
-    //                 println!("Server on port {} stopped", port);
-    //             }
-    //         }
-    //         Ok(())
-    //     })?
-    // };
+        })
+    }?;
 
     table.set("start_api_server", start_api_server)?;
-    // table.set("stop_api_server", stop_api_server)?;
+
     Ok(table)
 }
