@@ -42,6 +42,9 @@ Section "Uninstall"
   Delete "$INSTDIR\luajit.cmd"
   Delete "$INSTDIR\flua"
 
+  # Verzeichnis löschen
+  RMDir "$INSTDIR"
+
   ; Löscht das docs rekursiv
   RMDir /r "$INSTDIR\docs"
 
