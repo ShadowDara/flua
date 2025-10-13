@@ -57,7 +57,19 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // Function to open a URL in the default Opener
     let open_link = lua.create_function(|_, url: String| {
+        deprecated!(
+            "dapi_os.open_link",
+            "0.2.0",
+            "The function changed its name, use 'dapi_os.open()' instead!"
+        );
+
         open::that(url).map_err(|e| mlua::Error::external(format!("Cannot open URL: {}", e)))?;
+        Ok(())
+    })?;
+
+    // Function to open a File in the default program or a Link
+    let open = lua.create_function(|_, file: String| {
+        open::that(file).map_err(|e| mlua::Error::external(format!("Cannot open: {}", e)))?;
         Ok(())
     })?;
 
@@ -66,7 +78,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         deprecated!(
             "dapi_os.run",
             "0.1.10",
-            "The function is although contained in the Lua STD"
+            "The function is although contained in the Lua STD or use 'dapi_os.run2()'"
         );
 
         #[cfg(target_os = "windows")]
@@ -147,6 +159,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     table.set("chdir", chdir)?;
     table.set("getcwd", getcwd)?;
     table.set("open_link", open_link)?;
+    table.set("open", open)?;
     table.set("run", run)?;
     table.set("run2", run2)?;
 

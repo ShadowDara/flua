@@ -89,6 +89,16 @@ opens a link in the standard browser of the User
 dapi_os.open_link("https://github.com/shadowdara")
 ```
 
+## `open`
+function to open a file or a link or etc in the standard programm
+of the users computer
+
+**Usage**
+```lua
+dapi_os.open("https://github.com/shadowdara/flua")
+dapi_os.open("sample.pdf")
+```
+
 ## `run()`
 
 ## `run2()`

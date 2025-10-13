@@ -6,6 +6,7 @@
 - added server with api but does not work :(
 - added `dapi_os.run2()` - runs a command with instant no flush,
 the command does not wait with the output until its finished
+- added `open` to open files and links in the standard program
 
 ## 0.1.13 - 10.10.2025
 - add auto publish for the mkdocs documentation

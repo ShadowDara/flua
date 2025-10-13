@@ -13,3 +13,22 @@
 ## Info
 Documentation is NOT complete yet, but all funktion headers are listed in the
 documentation
+
+## All Imports
+```lua
+local dapi = require("dapi")
+local dapi_io = require("dapi_io")
+local dapi_os = require("dapi_os")
+local dapi_http = require("dapi_http")
+local dapi_json = require("dapi_json")
+local dapi_toml = require("dapi_toml")
+local dapi_dotenv = require("dapi_dotenv")
+local dapi_yaml = require("dapi_yaml")
+local dapi_ini  = require("dapi_ini")
+local dapi_base64 = require("dapi_base64")
+local dapi_xml = require("dapi_xml")
+local dapi_http_async = require("dapi_http_async")
+local dapi_net = require("dapi_net")
+local dapi_time = require("dapi_time")
+local dapi_api_async = require("dapi_api_async")
+```
