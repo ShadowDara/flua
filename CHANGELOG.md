@@ -13,6 +13,8 @@ the command does not wait with the output until its finished
 - extented the version check function to interupt the script if wanted,
 and added an optional 3rd argument `(bool)` if the script should be interrupted
 - added function to throw an custom Error
+- added `startmenu` and `local_startmenu` from `some_default_dirs` to
+`dapi_io.get_default_directories`
 
 ## 0.1.13 - 10.10.2025
 - add auto publish for the mkdocs documentation

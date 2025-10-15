@@ -82,6 +82,16 @@ print(dir.home)
             <td>C:\Users\username\AppData\Local\Cache</td>
             <td>~/.cache</td>
         </tr>
+        <tr>
+            <td>startmenu</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>local startmenu</td>
+            <td></td>
+            <td></td>
+        </tr>
     </tbody>
 </table>
 

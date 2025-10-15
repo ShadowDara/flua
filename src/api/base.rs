@@ -1,4 +1,4 @@
-use mlua::{Error, Lua, Result};
+use mlua::{Lua, Result};
 use std::fs::File;
 use std::io::copy;
 use std::thread;

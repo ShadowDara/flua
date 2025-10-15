@@ -381,6 +381,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml",
+ "some_default_dirs",
  "sys-info",
  "tokio",
  "toml 0.8.23",
@@ -1848,6 +1849,15 @@ checksum = "233504af464074f9d066d7b5416c5f9b894a5862a6506e306f7b816cdd6f1807"
 dependencies = [
  "libc",
  "windows-sys 0.59.0",
+]
+
+[[package]]
+name = "some_default_dirs"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "947a8fcce03a08b603904f18a5627187bcc015a0b4edd0fa237492a4616426a7"
+dependencies = [
+ "windows",
 ]
 
 [[package]]

@@ -1,4 +1,6 @@
 use mlua::{Lua, Result};
+use some_default_dirs::local_startmenu_dir;
+use some_default_dirs::startmenu_dir;
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::{self, BufRead, Write};
@@ -54,6 +56,10 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         table.set("data", data_dir())?;
         table.set("localdata", data_local_dir())?;
         table.set("cache", cache_dir())?;
+
+        // added Directories from some_default_dirs
+        table.set("startmenu", startmenu_dir())?;
+        table.set("local_startmenu", local_startmenu_dir())?;
 
         Ok(table)
     })?;
