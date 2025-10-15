@@ -1,3 +1,11 @@
+<!--
+Testing Commands and Other Commands
+
+cargo build && test/command_tester.sh
+
+
+-->
+
 # flua
 
 a Lua API written in Rust to make scripting much easier!

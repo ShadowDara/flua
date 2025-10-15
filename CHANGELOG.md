@@ -2,11 +2,17 @@
 
 ## 0.2.0
 - renamed programm to flua
-- added flalaxy in another repository, the installer for flua - https://github.com/ShadowDara/flalaxy
+- added flalaxy in another repository, the installer for flua -
+https://github.com/ShadowDara/flalaxy
 - added server with api but does not work :(
 - added `dapi_os.run2()` - runs a command with instant no flush,
 the command does not wait with the output until its finished
 - added `open` to open files and links in the standard program
+- changed some messages and changed error time to 3 seconds instead of 2
+- reorganised Code and Help Message in the main.rs file
+- extented the version check function to interupt the script if wanted,
+and added an optional 3rd argument `(bool)` if the script should be interrupted
+- added function to throw an custom Error
 
 ## 0.1.13 - 10.10.2025
 - add auto publish for the mkdocs documentation

@@ -13,7 +13,7 @@ mod windows_utf8;
 
 pub const VERSION: &str = "0.2.0";
 
-use crate::helper::print::{BLUE, BOLD, END, GREEN, RED, YELLOW};
+use crate::helper::print::{BLUE, BOLD, CYAN, END, GREEN, PURPLE, RED, YELLOW};
 
 #[tokio::main]
 async fn main() {
@@ -21,15 +21,18 @@ async fn main() {
     #[cfg(windows)]
     let _ = windows_utf8::enable_utf8();
 
+    // Array of Programm Arguments
     let args: Vec<String> = env::args().collect();
 
+    let mut wait_on_exit = true;
+
     if args.len() < 2 {
+        println!("{}Flua v{}{}", YELLOW, VERSION, END);
         eprintln!(
             "{}No Path provided! Run with -h or --help for more information.{}",
             RED, END
         );
-        std::thread::sleep(std::time::Duration::from_secs(5));
-        std::process::exit(1);
+        exit(wait_on_exit);
     }
 
     // Argumente parsen
@@ -45,11 +48,14 @@ async fn main() {
             "--safe" => {
                 safe = true;
                 eprintln!("{}[ERROR] Safe is not implemented yet{}", RED, END);
-                std::thread::sleep(std::time::Duration::from_secs(5));
-                std::process::exit(1);
+                exit(wait_on_exit);
             }
             "--no-info" => {
                 info = false;
+            }
+            // To Suppress a wait Message
+            "-nw" => {
+                wait_on_exit = false;
             }
             "--version" | "-v" => {
                 println!("{}", VERSION);
@@ -81,117 +87,157 @@ async fn main() {
 
     match args.get(1).map(String::as_str) {
         Some("run") => {
-            handle_run_command(&args).await;
+            if let Err(e) = handle_run_command(&args).await {
+                eprintln!("{}[ERROR] {}{}", RED, e, END);
+                exit(wait_on_exit);
+            }
         }
         Some(script_path) => {
-            handle_script_execution(script_path, safe, info, lua_args).await;
+            if let Err(e) = handle_script_execution(script_path, safe, info, lua_args).await {
+                eprintln!("{}[LUAJIT-ERROR] {}{}", RED, e, END);
+                exit(wait_on_exit);
+            }
         }
         None => {
             eprintln!("{}[ERROR] No command or script provided.{}", RED, END);
-            std::thread::sleep(std::time::Duration::from_secs(5));
-            std::process::exit(1);
+            exit(wait_on_exit);
         }
+    }
+
+    async fn handle_run_command(args: &[String]) -> Result<(), String> {
+        match args.get(2).map(String::as_str) {
+            Some("update") => {
+                helper::update::update().map_err(|e| format!("Update failed: {}", e))?;
+            }
+            Some("install") => {
+                helper::update::install().map_err(|e| format!("Installation failed: {}", e))?;
+            }
+            Some(_) | None => {
+                println!("Starting module...");
+                dlm13::start().map_err(|e| format!("Module start failed: {}", e))?;
+            }
+        }
+
+        Ok(())
     }
 }
 
-async fn handle_run_command(args: &[String]) {
-    match args.get(2).map(String::as_str) {
-        Some("update") => {
-            if let Err(e) = helper::update::update() {
-                eprintln!("{}[ERROR] Update failed: {}{}", RED, e, END);
-                std::thread::sleep(std::time::Duration::from_secs(5));
-                std::process::exit(1);
-            }
-        }
-        Some("install") => {
-            if let Err(e) = helper::update::install() {
-                eprintln!("{}[ERROR] Installation failed: {}{}", RED, e, END);
-                std::thread::sleep(std::time::Duration::from_secs(5));
-                std::process::exit(1);
-            }
-        }
-        Some(_) | None => {
-            println!("Starting module...");
-            if let Err(e) = dlm13::start() {
-                eprintln!("{}[ERROR] Module start failed: {}{}", RED, e, END);
-                std::thread::sleep(std::time::Duration::from_secs(5));
-                std::process::exit(1);
-            }
-        }
-    }
-}
-
-async fn handle_script_execution(path: &str, safe: bool, info: bool, lua_args: Vec<String>) {
+// Function to run a Lua script -> returns a Error
+async fn handle_script_execution(
+    path: &str,
+    safe: bool,
+    info: bool,
+    lua_args: Vec<String>,
+) -> Result<(), String> {
     if info {
         println!("{}[LUAJIT-INFO] Running script: {}{}", GREEN, path, END);
     }
 
-    let path = path.to_string(); // move into closure
+    let path = path.to_string();
     let path2 = path.clone();
-    let result = tokio::task::spawn_blocking(move || {
-        lua_script::execute_script(&path, &safe, lua_args).map_err(|e| e.to_string())
-    })
-    .await;
 
-    match result {
-        Ok(Ok(())) => {
-            if info {
-                println!(
-                    "{}[LUAJIT-INFO] Finished executing: {}{}",
-                    GREEN, path2, END
-                );
-            }
-        }
-        Ok(Err(e)) => {
-            eprintln!("{}[LUAJIT-ERROR] Script error: {}{}", RED, e, END);
-            std::thread::sleep(std::time::Duration::from_secs(5));
-            std::process::exit(1);
-        }
-        Err(e) => {
-            eprintln!("{}[LUAJIT-ERROR] Join error: {}{}", RED, e, END);
-            std::thread::sleep(std::time::Duration::from_secs(5));
-            std::process::exit(1);
-        }
+    let join_result = tokio::task::spawn_blocking(move || {
+        lua_script::execute_script(&path, &safe, lua_args)
+            .map_err(|e| format!("Script error: {}", e))
+    })
+    .await
+    .map_err(|e| format!("Join error: {}", e))?; // 1. await + JoinError behandeln
+
+    // 2. Jetzt das innere Result behandeln
+    join_result?; // Wenn Err(String), wird es hier korrekt nach außen gereicht
+
+    if info {
+        println!(
+            "{}[LUAJIT-INFO] Finished executing: {}{}",
+            GREEN, path2, END
+        );
     }
+
+    Ok(())
 }
 
+// Function to wait some to read the command in an open Terminal Window
+// when an Error appears
+//
+// TODO
+// Make this Interuptable with pressing Enter
+fn exit(wait: bool) {
+    if wait {
+        std::thread::sleep(std::time::Duration::from_secs(3));
+    }
+    std::process::exit(1);
+}
+
+// Function for a detailed INFO help Message
 fn print_help() {
-    println!("{}Luajit Help:{}", GREEN, END);
+    //[GENERALL-OPTIONS]
+    let sco = PURPLE;
+
+    //[SCRIPTOPTIONS]
+    let sc = YELLOW;
+
+    //[OPTIONS]
+    let opt = CYAN;
+
+    //<action>
+    let ac = RED;
+
+    // OptionList
+    let op = BLUE;
+
+    // Links
+    let link = BLUE;
+
+    // Start
+    println!("{}Flua Help:{}", GREEN, END);
     println!("Using Version {}{}v{}{}", BOLD, GREEN, VERSION, END);
+    // Lua Scripts
     println!(
-        "\nUsage for scripts: {}<luajit>{} <script.lua> {}[SCRIPTOPTIONS]{}",
-        GREEN, END, YELLOW, END
+        "\nUsage for Lua scripts: {}<flua>{} <script.lua> {}[SCRIPTOPTIONS]{} {}[GENERALL-OPTIONS]{}",
+        GREEN, END, sc, END, sco, END
     );
-    println!("\n{}[SCRIPTOPTIONS]{}", YELLOW, END);
+    //[SCRIPTOPTIONS]
+    println!("\n{}[SCRIPTOPTIONS]{}", sc, END);
     println!(
         "{}  --safe:        {}Run in safe mode (limited API, no OS access)",
-        BLUE, END
+        op, END
     );
     println!(
         "{}  --no-info:     {}Suppress start and end info messages",
-        BLUE, END
+        op, END
     );
     println!(
         "{}  l, lua-args    {}submit arguments after lua-args for the lua file which will be run, stop the collectiong when it sees an argument which start with -",
-        BLUE, END
+        op, END
     );
+    // Modules
     println!(
-        "\nUsage for Modules: {}<luajit>{} run {}<action>{}",
-        GREEN, END, YELLOW, END
+        "\nUsage for Modules: {}<flua>{} run {}<action>{} {}[GENERALL-OPTIONS]{}",
+        GREEN, END, ac, END, sco, END
     );
     println!(
         "\n{}<action>{}:   'update', 'install', or path to module directory",
-        YELLOW, END
+        ac, END
     );
+    // Other
     println!(
-        "\nOther Usage: {}<luajit>{} {}[OPTIONS]{}",
-        GREEN, END, YELLOW, END
+        "\nOther Usage: {}<flua>{} {}[OPTIONS]{} {}[GENERALL-OPTIONS]{}",
+        GREEN, END, opt, END, sco, END
     );
-    println!("\n{}[OPTIONS]{}", YELLOW, END);
+    //[OPTIONS]
+    println!("\n{}[OPTIONS]{}", opt, END);
     println!(
         "{}  -v, --version   {}Function which prints the version in the terminal",
-        BLUE, END
+        op, END
     );
-    println!("\nFor more info about the Lua API, see:");
-    println!("{}https://github.com/ShadowDara/LuaAPI-Rust{}", BLUE, END);
+    //[GENERALL-OPTIONS]
+    println!("\n{}[GENERALL-OPTIONS]{}", sco, END);
+    println!(
+        "{}  -nw    {}No exit -> The Programm closes instantly after an error and showing an error message without waiting for some Time.",
+        op, END
+    );
+    // More
+    println!("\nFor more info about Flua and the Lua API, see:");
+    println!("{}https://github.com/ShadowDara/LuaAPI-Rust{}", link, END);
+    println!("{}https://shadowdara.github.io/flua/{}", link, END);
 }

@@ -13,25 +13,7 @@ use crate::utils::zip_utils::{unzip_file, zip_dir};
 
 use crate::deprecated;
 
-// Function to copy a dir recursivly
-fn copy_dir_recursive(from: &Path, to: &Path) -> io::Result<()> {
-    if !to.exists() {
-        fs::create_dir_all(to)?;
-    }
-
-    for entry_result in fs::read_dir(from)? {
-        let entry = entry_result?;
-        let from_path = entry.path();
-        let to_path = to.join(entry.file_name());
-
-        if from_path.is_dir() {
-            copy_dir_recursive(&from_path, &to_path)?;
-        } else {
-            fs::copy(&from_path, &to_path)?;
-        }
-    }
-    Ok(())
-}
+use crate::helper::dir::copy_dir_recursive;
 
 pub fn register(lua: &Lua) -> Result<mlua::Table> {
     let table = lua.create_table()?;
@@ -126,6 +108,12 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
             .map_err(|e| mlua::Error::external(format!("Write file error: {}", e)))
     })?;
 
+    // Funktion to read a file and return the content as a String
+    let rf = lua.create_function(|_, path: String| match fs::read_to_string(&path) {
+        Ok(content) => Ok(content),
+        Err(e) => Err(mlua::Error::external(e)),
+    })?;
+
     // Function to append data to the file
     let append_file = lua.create_function(|_, (file, content): (String, String)| {
         // Datei im Append-Modus öffnen (oder erstellen, wenn sie nicht existiert)
@@ -140,6 +128,25 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
             .map_err(|e| mlua::Error::external(format!("Schreib-Fehler: {}", e)))?;
 
         Ok(())
+    })?;
+
+    // Function get the content of a Folder as an Array
+    let get_folder_content = lua.create_function(|lua_ctx, path: String| {
+        let entries = fs::read_dir(&path).map_err(mlua::Error::external)?;
+
+        let lua_table = lua_ctx.create_table()?; // neue Lua-Tabelle
+        let mut index = 1;
+
+        for entry in entries {
+            let entry = entry.map_err(mlua::Error::external)?;
+            let file_name = entry.file_name();
+            let file_name_str = file_name.to_string_lossy();
+
+            lua_table.set(index, file_name_str)?;
+            index += 1;
+        }
+
+        Ok(lua_table)
     })?;
 
     // Function to get the size of an file
@@ -179,7 +186,9 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     table.set("copy_dir", copy_dir)?;
     table.set("create_file", create_file)?;
     table.set("write_file", write_file)?;
+    table.set("rf", rf)?;
     table.set("append_file", append_file)?;
+    table.set("get_folder_content", get_folder_content)?;
     table.set("get_file_size", get_file_size)?;
     table.set("read_line", read_line)?;
 

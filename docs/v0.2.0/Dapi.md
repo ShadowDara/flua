@@ -18,12 +18,21 @@ print(dapi.version())
 
 ## check_version
 a function to check if the correct version of Luajit is used, first parameter
-is the correct Version and second parameter is a Boolean for showing a warning
-or info message
+is the correct Version and second **optional** parameter is a Boolean for showing a warning
+or info message, the third arguments is although **optional** and if true, the script will
+throw an error when the wrong version is used.
 
 **Usage**
 ```lua
-dapi.check_version("0.1.9", true)
+dapi.check_version("0.1.9", true, false)
+```
+
+## throw_error
+a function to throw an error with a custom Message an interupt the script
+
+**Usage**
+```lua
+dapi.throw_error("Bonjour")
 ```
 
 ## download

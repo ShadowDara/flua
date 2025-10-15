@@ -1,4 +1,4 @@
-use mlua::{Lua, Result};
+use mlua::{Error, Lua, Result};
 use std::fs::File;
 use std::io::copy;
 use std::thread;
@@ -7,6 +7,8 @@ use std::time::Duration;
 use crate::deprecated;
 
 use crate::VERSION;
+
+use crate::helper::update::version_checker;
 
 use crate::helper::print::{
     BG_BLACK, BG_BLUE, BG_BRIGHT_BLACK, BG_BRIGHT_BLUE, BG_BRIGHT_CYAN, BG_BRIGHT_GREEN,
@@ -39,11 +41,12 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // Check if the right Version is used
     // Returns a Boolean and a warning message when the correct version is not used
-    let check_version =
-        lua.create_function(|_, (version, warning_opt): (String, Option<bool>)| {
+    let check_version = lua.create_function(
+        |_, (version, warning_opt, break_wrong_version): (String, Option<bool>, Option<bool>)| {
             let warning = warning_opt.unwrap_or(true);
+            let break_script = break_wrong_version.unwrap_or(false);
 
-            let result = match version == VERSION {
+            let result = match version_checker(&version, VERSION) {
                 true => {
                     if warning {
                         println!("{}[INFO] Using the right Version for LUAJIT!{}", GREEN, END);
@@ -61,11 +64,25 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
                             YELLOW, version, VERSION, END
                         );
                     }
+                    // To interupt the script
+                    if break_script {
+                        // check if the 2nd number is different
+                        // check if the 3rd number is not newer
+                        return Err(mlua::Error::external(
+                            "Wrong Version used! Interrupting Script!",
+                        ));
+                    }
                     Ok(false)
                 }
             };
             result
-        })?;
+        },
+    )?;
+
+    // Lua Function to throw an Error and Interrupt the Script
+    let throw_error = lua.create_function(|_, msg: String| {
+        return Err::<(), mlua::Error>(mlua::Error::external(msg));
+    })?;
 
     // Function to download a file
     let download = lua.create_function(|_, (url, destination): (String, String)| {
@@ -157,6 +174,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     table.set("add", add)?;
     table.set("version", version)?;
     table.set("check_version", check_version)?;
+    table.set("throw_error", throw_error)?;
     table.set("download", download)?;
     table.set("wait", wait)?;
     table.set("get_colors", get_colors)?;
