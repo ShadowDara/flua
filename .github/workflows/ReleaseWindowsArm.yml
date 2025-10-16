@@ -1,0 +1,49 @@
+name: Build for Windows ARM64
+
+on:
+  workflow_call:
+
+permissions:
+  contents: write
+
+jobs:
+  install_luajit:
+    name: Install LuaJIT
+    uses: shadowdara/LuaAPI-Rust/.github/workflows/InstallLuajit.yml@main
+    with:
+      version: v0.1.13
+
+  buildwindowsarm:
+    name: Build and Package (Windows ARM64)
+    needs: install_luajit
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Rust target for ARM64
+        run: |
+          rustup target add aarch64-pc-windows-msvc
+
+      - name: Build for Windows ARM64
+        run: |
+          cargo build --release --target=aarch64-pc-windows-msvc
+
+      - name: Set up NSIS
+        run: |
+          choco install nsis -y
+
+      - name: Build project (custom LuaJIT ARM64 packaging)
+        run: |
+          luajit build.lua aarch64-pc-windows-msvc
+
+      - name: Upload to GitHub Release (ARM64)
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          name: "LuaJIT Setup ARM64 ${{ github.ref_name }}"
+          tag_name: ${{ github.ref_name }}
+          files: |
+            ./target/aarch64-pc-windows-msvc/release/luajit.exe
+            ./windows_builds/LuajitSetup_ARM64_v${{ github.ref_name }}.exe

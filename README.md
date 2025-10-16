@@ -63,7 +63,7 @@ chmod +x FluaInstall.sh
 
 ### Windows
 
-Download the NSIS installer [here](https://github.com/ShadowDara/flua/releases)
+Download the NSIS installer for windows [here](https://github.com/ShadowDara/flua/releases)
 
 > [!NOTE]
 > Install Script for windows is although planned and hopefully coming soon!

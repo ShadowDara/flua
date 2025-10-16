@@ -91,6 +91,11 @@ jobs:
     name: Publish for Windows
     uses: shadowdara/flua/.github/workflows/ReleaseWindows.yml@main
     needs: release
+  
+  release_windows_arm:
+    name: Publish for Windows ARM
+    uses: shadowdara/flua/.github/workflows/ReleaseWindowsArm.yml@main
+    needs: release
 
   release_docs:
     name: Publish Docs
