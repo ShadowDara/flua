@@ -1,3 +1,6 @@
+// Functions and Values for Terminal printing
+use std::process::Command;
+
 // Color codes for Colorful printing with Ansi Colorcodes
 // Credit to for colorcodes
 // https://ss64.com/nt/syntax-ansi.html
@@ -48,3 +51,12 @@ pub const BG_BRIGHT_BLUE: &str = "\x1b[104m";
 pub const BG_BRIGHT_PURLPE: &str = "\x1b[105m";
 pub const BG_BRIGHT_CYAN: &str = "\x1b[106m";
 pub const BG_BRIGHT_WHITE: &str = "\x1b[107m";
+
+// Function to clear the Terminal Window
+pub fn clear_terminal() {
+    if cfg!(target_os = "windows") {
+        Command::new("cmd").args(["/C", "cls"]).status().unwrap();
+    } else {
+        Command::new("clear").status().unwrap();
+    }
+}

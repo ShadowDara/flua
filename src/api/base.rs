@@ -16,7 +16,7 @@ use crate::helper::print::{
     BG_PURPLE, BG_RED, BG_WHITE, BG_YELLOW, BLACK, BLUE, BOLD, BRIGHT_BLACK, BRIGHT_BLUE,
     BRIGHT_CYAN, BRIGHT_GREEN, BRIGHT_PURLPE, BRIGHT_RED, BRIGHT_WHITE, BRIGHT_YELLOW, CYAN, END,
     GREEN, ITALIC, NOT_UNDERLINED, POSITIVE_TEXT, PURPLE, RED, REVERSE_TEXT, UNDERLINED, WHITE,
-    YELLOW,
+    YELLOW, clear_terminal,
 };
 
 pub fn register(lua: &Lua) -> Result<mlua::Table> {
@@ -114,6 +114,18 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         Ok(())
     })?;
 
+    // TODO
+    // Move the function to a own Rust file for Terminal Stuff
+    //
+    // Function to clear the terminal content
+    let clear = lua.create_function(|_, (): ()| {
+        clear_terminal();
+        Ok(())
+    })?;
+
+    // TODO
+    // Move to another Rust file for Terminal Stuff
+    //
     // Function to get the ANSI Color Codes to print colored Text
     // Returns a Lua Table
     let get_colors = lua.create_function(|lua, ()| {
@@ -177,6 +189,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     table.set("throw_error", throw_error)?;
     table.set("download", download)?;
     table.set("wait", wait)?;
+    table.set("clear", clear)?;
     table.set("get_colors", get_colors)?;
 
     Ok(table)

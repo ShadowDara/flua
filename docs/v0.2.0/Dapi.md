@@ -65,6 +65,14 @@ dapi.wait(1000)
 ```
 The Programm will wait 1000 milliseconds (1 seconds) in this Example
 
+## clear
+a function to clear the Terminal Window
+
+**Usage**
+```lua
+dapi.clear()
+```
+
 ## get_colors
 a function which returns a Lua Table containing a lot of usable
 ANSI Color Codes for colored output
