@@ -16,6 +16,9 @@ and added an optional 3rd argument `(bool)` if the script should be interrupted
 - added `startmenu` and `local_startmenu` from `some_default_dirs` to
 `dapi_io.get_default_directories`
 - added clear - a function to clear the Terminal Window Content
+- added a function run3() to run a command async in the terminal
+- added a global `SCRIPT_FULL_PATH` var to Lua
+- added Functions in the OS Lib `secure_path()`, `split_path()` and `join_path()`
 
 Read the DOCS for Version 0.2.0 for more Infos
 

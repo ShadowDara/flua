@@ -27,7 +27,7 @@ struct Luajitversion {
 }
 
 // Function to start running a Module
-pub fn start() -> Result<(), Box<dyn std::error::Error>> {
+pub fn start_module() -> Result<(), Box<dyn std::error::Error>> {
     println!("Not Implemented yet!");
     return Ok(());
 
@@ -44,10 +44,25 @@ pub fn start() -> Result<(), Box<dyn std::error::Error>> {
 
     // Check if the edition is correct
     match config.edition {
-        2025 => {}
-        _ => {}
+        2025 => {
+            // Check for 2025 Modules
+        }
+        _ => {
+            return Err("Wrong Version".into());
+        }
     };
 
+    //
+    //
+    // More Module Checks
+    //
+    // If Name is the same as the folder
+    //
+
+    // TODO
+    //
+    // Update Version Checking
+    //
     // Stop when the version is not fitting
     if !(is_newer_version(VERSION, config.luajitversion.min)
         && is_newer_version(VERSION, config.luajitversion.max))
@@ -63,8 +78,13 @@ pub fn start() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
 
+    // Run the entrypoint File
+
     Ok(())
 }
+
+// Function to run a Module
+fn handle_module_execution() {}
 
 // Function to check if the current version is newer than another
 fn is_newer_version(current_version: &str, the_version: String) -> bool {

@@ -103,23 +103,24 @@ async fn main() {
             exit(wait_on_exit);
         }
     }
+}
 
-    async fn handle_run_command(args: &[String]) -> Result<(), String> {
-        match args.get(2).map(String::as_str) {
-            Some("update") => {
-                helper::update::update().map_err(|e| format!("Update failed: {}", e))?;
-            }
-            Some("install") => {
-                helper::update::install().map_err(|e| format!("Installation failed: {}", e))?;
-            }
-            Some(_) | None => {
-                println!("Starting module...");
-                dlm13::start().map_err(|e| format!("Module start failed: {}", e))?;
-            }
+// Function to handle these commands
+async fn handle_run_command(args: &[String]) -> Result<(), String> {
+    match args.get(2).map(String::as_str) {
+        Some("update") => {
+            helper::update::update().map_err(|e| format!("Update failed: {}", e))?;
         }
-
-        Ok(())
+        Some("install") => {
+            helper::update::install().map_err(|e| format!("Installation failed: {}", e))?;
+        }
+        Some(_) | None => {
+            println!("Starting module...");
+            dlm13::start_module().map_err(|e| format!("Module start failed: {}", e))?;
+        }
     }
+
+    Ok(())
 }
 
 // Function to run a Lua script -> returns a Error

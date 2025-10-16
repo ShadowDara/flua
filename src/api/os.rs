@@ -4,6 +4,8 @@ use std::process::Command;
 use std::process::Stdio;
 use std::thread;
 
+use crate::helper::dir::{join_path, secure_path, split_path};
+
 use crate::deprecated;
 
 pub fn register(lua: &Lua) -> Result<mlua::Table> {
@@ -102,7 +104,56 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         Ok(table)
     })?;
 
+    // Function to run a sync command in the Terminal
     let run2 = lua.create_function(|lua, command: String| {
+        use std::io::Read; // für stdout/stderr synchron lesen
+
+        #[cfg(target_os = "windows")]
+        let mut child = Command::new("cmd")
+            .arg("/C")
+            .arg(&command)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()?;
+
+        #[cfg(not(target_os = "windows"))]
+        let mut child = Command::new("sh")
+            .arg("-c")
+            .arg(&command)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()?;
+
+        // Stdout & Stderr synchron auslesen
+        let mut stdout = String::new();
+        let mut stderr = String::new();
+
+        if let Some(mut out) = child.stdout.take() {
+            out.read_to_string(&mut stdout)?;
+        }
+
+        if let Some(mut err) = child.stderr.take() {
+            err.read_to_string(&mut stderr)?;
+        }
+
+        let status = child.wait()?; // Warten, bis Prozess beendet ist
+
+        // Optional: Ausgabe anzeigen
+        println!("[stdout] {}", stdout);
+        eprintln!("[stderr] {}", stderr);
+
+        // Lua-Tabelle zurückgeben mit Status und ggf. auch stdout/stderr
+        let table = lua.create_table_from(vec![
+            ("status", Value::Integer(status.code().unwrap_or(-1) as i64)),
+            ("stdout", Value::String(lua.create_string(&stdout)?)),
+            ("stderr", Value::String(lua.create_string(&stderr)?)),
+        ])?;
+
+        Ok(table)
+    })?;
+
+    // Function to run a command Async
+    let run3 = lua.create_function(|lua, command: String| {
         #[cfg(target_os = "windows")]
         let mut child = Command::new("cmd")
             .arg("/C")
@@ -154,6 +205,15 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         Ok(table)
     })?;
 
+    // Binde split_path
+    let split_fn = lua.create_function(|_, path: String| Ok(split_path(&path)))?;
+
+    // Binde secure_path
+    let secure_fn = lua.create_function(|_, path: String| Ok(secure_path(&path)))?;
+
+    // Binde join_path
+    let join_fn = lua.create_function(|_, parts: Vec<String>| Ok(join_path(parts)))?;
+
     table.set("get_os_info", get_os_info)?;
     table.set("os", os)?;
     table.set("chdir", chdir)?;
@@ -162,6 +222,10 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     table.set("open", open)?;
     table.set("run", run)?;
     table.set("run2", run2)?;
+    table.set("run3", run3)?;
+    table.set("split_path", split_fn)?;
+    table.set("secure_path", secure_fn)?;
+    table.set("join_path", join_fn)?;
 
     Ok(table)
 }

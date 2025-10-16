@@ -23,6 +23,7 @@ pub fn execute_script(file: &str, safe_mode: &bool, lua_args: Vec<String>) -> Re
 
     let lua = Lua::new();
 
+    // Collect Arguments for Lua
     let lua_arg = lua.create_table()?;
     for (i, arg) in lua_args.iter().enumerate() {
         lua_arg.set(i + 1, arg.clone())?;
@@ -46,7 +47,12 @@ pub fn execute_script(file: &str, safe_mode: &bool, lua_args: Vec<String>) -> Re
 
     let globals = lua.globals();
 
+    // Add Arguments as a arg Lua Table
     globals.set("arg", lua_arg)?;
+
+    // Add the script path as a Lua path Table named SCRIPT_FULL_PATH
+    let full_path = std::fs::canonicalize(Path::new(file)).expect("Path does not work!");
+    globals.set("SCRIPT_FULL_PATH", full_path.to_string_lossy().to_string());
 
     let package: Table = globals.get("package")?;
     let preload: Table = package.get("preload")?;
@@ -109,6 +115,7 @@ pub fn execute_script(file: &str, safe_mode: &bool, lua_args: Vec<String>) -> Re
         lua.create_function(move |_, ()| Ok(dapi_api_async.clone()))?,
     )?;
 
+    // Execute the Script
     lua.load(&script).exec()?;
     Ok(())
 }

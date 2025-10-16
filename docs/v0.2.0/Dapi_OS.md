@@ -104,3 +104,11 @@ dapi_os.open("sample.pdf")
 ## `run2()`
 runs a command with instant no flush,
 the command does not wait with the output until its finished
+
+## `run3()`
+
+## `split_path()`
+
+## `secure_path()`
+
+## `join_path()`
