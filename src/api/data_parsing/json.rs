@@ -30,10 +30,18 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         Ok(json_utils::json_to_lua(lua, &json_value)?)
     })?;
 
-    // json.encode form lua table
-    let json_encode = lua.create_function(|_, value: Value| {
+    // json encode from lua table
+    let json_encode = lua.create_function(|_, (value, pretty): (Value, Option<bool>)| {
         let serde_value = json_utils::lua_to_json(&value)?;
-        let json_str = serde_json::to_string(&serde_value).map_err(Error::external)?;
+
+        // Decide for pretty JSON
+        let json_str = if pretty.unwrap_or(false) {
+            serde_json::to_string_pretty(&serde_value)
+        } else {
+            serde_json::to_string(&serde_value)
+        }
+        .map_err(Error::external)?;
+
         Ok(json_str)
     })?;
 
