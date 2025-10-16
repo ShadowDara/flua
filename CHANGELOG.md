@@ -17,6 +17,8 @@ and added an optional 3rd argument `(bool)` if the script should be interrupted
 `dapi_io.get_default_directories`
 - added clear - a function to clear the Terminal Window Content
 
+Read the DOCS for Version 0.2.0 for more Infos
+
 ## 0.1.13 - 10.10.2025
 - add auto publish for the mkdocs documentation
 - restructered some Code

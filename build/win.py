@@ -19,6 +19,8 @@ def get_version(file):
                     return val
 
 if __name__ == "__main__":
+    print(os.getcwd())
+    
     print("LuajitBuilt for Windows")
 
     print("Clear Build")
@@ -31,10 +33,12 @@ if __name__ == "__main__":
     print("Run cargo build --release")
     subprocess.run("cargo build --release", shell=True, capture_output=True, text=True)
 
-    os.chdir('installer/nsis')
+    os.chdir('installer')
 
+    # TODO
+    # Fix Installer Build for Windows
     print("Make Installer")
-    os.chdir('../nsis')
+    os.chdir('nsis')
     subprocess.run("makensis installer.nsi", shell=True, capture_output=True, text=True)
     shutil.copy("LuajitSetup.exe", "../../windows_builds")
 
