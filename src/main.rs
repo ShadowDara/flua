@@ -61,7 +61,7 @@ async fn main() {
                 println!("{}", VERSION);
                 return;
             }
-            "--help" | "-h" => {
+            "--help" | "-h" | "h" => {
                 print_help();
                 return;
             }
@@ -229,6 +229,10 @@ fn print_help() {
     println!("\n{}[OPTIONS]{}", opt, END);
     println!(
         "{}  -v, --version   {}Function which prints the version in the terminal",
+        op, END
+    );
+    println!(
+        "{}    h, -h, --help  {}Function which prints this help message in the terminal",
         op, END
     );
     //[GENERALL-OPTIONS]

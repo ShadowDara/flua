@@ -78,7 +78,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // Copy a file
     let copy_file = lua.create_function(|_, (from, to): (String, String)| {
-        fs::copy(&from, &to)
+        fs::copy(Path::new(&from), Path::new(&to))
             .map(|_| ()) // Ignore number of bytes copied
             .map_err(|e| mlua::Error::external(format!("Copy file error: {}", e)))
     })?;

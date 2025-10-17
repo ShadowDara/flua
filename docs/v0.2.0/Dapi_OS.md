@@ -106,6 +106,7 @@ runs a command with instant no flush,
 the command does not wait with the output until its finished
 
 ## `run3()`
+run a command async
 
 ## `split_path()`
 

@@ -10,12 +10,14 @@
 -- - python
 -- - NSIS
 
+-- Requirements Workflow
+
 -- Imports
 local dapi = require("dapi")
 local dapi_io = require("dapi_io")
 local dapi_os = require("dapi_os")
 
-dapi.check_version("0.1.11", true)
+dapi.check_version("0.2.0", true)
 
 -- Function to run the tests
 function run_tests()
@@ -54,10 +56,26 @@ end
 -- Start the Script
 print("Luajit Build Script")
 
+-- Use the args for selecting now
 if arg and arg[1] == "test" then
+    -- Running the tests
     print("Running Tests")
     run_tests()
+
+    -- Exit after running the tests
     os.exit(0)
+elseif arg and arg[1] == "workflow" then
+    -- Build Code for the Windows Workflow
+    print("Build for Windows Workflow")
+
+    dapi_os.run2("cargo build --release --target=x86_64-pc-windows-msvc")
+    --dapi_os.run2("cargo build --release --target=aarch64-pc-windows-msvc")
+
+    -- Finish after the Workflow build
+    os.exit(0)
+else
+    -- Normal Local USE
+    print("Run for normal local use")
 end
 
 -- Copies the Changelog from Repo Root to /docs/

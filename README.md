@@ -38,6 +38,14 @@ flua --help
 > [!IMPORTANT]
 > Building, installing, and using the workflow on **Linux** (especially ARM64/aarch64) and **macOS** may currently require manual setup or additional dependencies.  
 > If you're running into issues, you're **not alone** — improvements are planned, but help is **HIGHLY** appreciated.
+> Feel free to open an Issue to request a build for a specific plattform
+
+### Windows
+
+Download the NSIS installer for windows [here](https://github.com/ShadowDara/flua/releases)
+
+> [!NOTE]
+> Install Script for windows is although planned and hopefully coming soon!
 
 ### Linux
 
@@ -60,13 +68,6 @@ chmod +x FluaInstall.sh
 # Execute the script
 ./FluaInstall.sh "v0.1.13"
 ```
-
-### Windows
-
-Download the NSIS installer for windows [here](https://github.com/ShadowDara/flua/releases)
-
-> [!NOTE]
-> Install Script for windows is although planned and hopefully coming soon!
 
 ## Feature Overview
 

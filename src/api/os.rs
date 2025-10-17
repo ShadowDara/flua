@@ -1,8 +1,10 @@
 use mlua::{Lua, Result, Value};
 use std::io::{BufRead, BufReader};
-use std::process::Command;
-use std::process::Stdio;
+
+use std::process::{Command, Stdio};
 use std::thread;
+
+use std::io::Read;
 
 use crate::helper::dir::{join_path, secure_path, split_path};
 
@@ -106,43 +108,74 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // Function to run a sync command in the Terminal
     let run2 = lua.create_function(|lua, command: String| {
-        use std::io::Read; // für stdout/stderr synchron lesen
+        let mut child = if cfg!(target_os = "windows") {
+            Command::new("cmd")
+                .arg("/C")
+                .arg(&command)
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .spawn()?
+        } else {
+            Command::new("sh")
+                .arg("-c")
+                .arg(&command)
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .spawn()?
+        };
 
-        #[cfg(target_os = "windows")]
-        let mut child = Command::new("cmd")
-            .arg("/C")
-            .arg(&command)
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn()?;
+        let mut stdout = child.stdout.take().expect("stdout");
+        let mut stderr = child.stderr.take().expect("stderr");
 
-        #[cfg(not(target_os = "windows"))]
-        let mut child = Command::new("sh")
-            .arg("-c")
-            .arg(&command)
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn()?;
+        let stdout_handle = thread::spawn(move || {
+            let mut buffer = [0; 1024];
+            let mut output = Vec::new();
 
-        // Stdout & Stderr synchron auslesen
-        let mut stdout = String::new();
-        let mut stderr = String::new();
+            loop {
+                match stdout.read(&mut buffer) {
+                    Ok(0) => break, // EOF
+                    Ok(n) => {
+                        // Sofort ausgeben, so wie terminal
+                        let s = String::from_utf8_lossy(&buffer[..n]);
+                        print!("{}", s);
+                        output.extend_from_slice(&buffer[..n]);
+                    }
+                    Err(e) => {
+                        eprintln!("Error reading stdout: {}", e);
+                        break;
+                    }
+                }
+            }
 
-        if let Some(mut out) = child.stdout.take() {
-            out.read_to_string(&mut stdout)?;
-        }
+            String::from_utf8_lossy(&output).into_owned()
+        });
 
-        if let Some(mut err) = child.stderr.take() {
-            err.read_to_string(&mut stderr)?;
-        }
+        let stderr_handle = thread::spawn(move || {
+            let mut buffer = [0; 1024];
+            let mut output = Vec::new();
 
-        let status = child.wait()?; // Warten, bis Prozess beendet ist
+            loop {
+                match stderr.read(&mut buffer) {
+                    Ok(0) => break,
+                    Ok(n) => {
+                        let s = String::from_utf8_lossy(&buffer[..n]);
+                        eprint!("{}", s);
+                        output.extend_from_slice(&buffer[..n]);
+                    }
+                    Err(e) => {
+                        eprintln!("Error reading stderr: {}", e);
+                        break;
+                    }
+                }
+            }
 
-        // Optional: Ausgabe anzeigen
-        println!("[stdout] {}", stdout);
-        eprintln!("[stderr] {}", stderr);
+            String::from_utf8_lossy(&output).into_owned()
+        });
 
-        // Lua-Tabelle zurückgeben mit Status und ggf. auch stdout/stderr
+        let status = child.wait()?;
+        let stdout = stdout_handle.join().unwrap();
+        let stderr = stderr_handle.join().unwrap();
+
         let table = lua.create_table_from(vec![
             ("status", Value::Integer(status.code().unwrap_or(-1) as i64)),
             ("stdout", Value::String(lua.create_string(&stdout)?)),
@@ -152,6 +185,8 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         Ok(table)
     })?;
 
+    // TODO
+    // Only the error is printed is async
     // Function to run a command Async
     let run3 = lua.create_function(|lua, command: String| {
         #[cfg(target_os = "windows")]

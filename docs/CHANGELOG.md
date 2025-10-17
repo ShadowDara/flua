@@ -19,6 +19,10 @@ and added an optional 3rd argument `(bool)` if the script should be interrupted
 - added a function run3() to run a command async in the terminal
 - added a global `SCRIPT_FULL_PATH` var to Lua
 - added Functions in the OS Lib `secure_path()`, `split_path()` and `join_path()`
+- added a Function to decode JSON with comments
+- JSON encode function makes now always compressed JSON, but pretty JSON can
+be enable with an 2nd Optional Boolean Argument as `true`
+- fixed an error in the copy file function
 
 Read the DOCS for Version 0.2.0 for more Infos
 
