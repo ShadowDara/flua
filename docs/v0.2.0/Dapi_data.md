@@ -12,8 +12,14 @@ local json_string = "{allo: "kkkk"}"
 local json = dapi_json.decode2(json_string)
 ```
 
+## decode_with_comments()
+
 ## encode
 a function to encode a Lua Table to JSON
+
+the function has an Optionl 2nd Argument, set this to true to get pretty JSON
+
+**Usage**
 ```lua
 local lua_table = {
   key = "value",

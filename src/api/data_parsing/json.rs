@@ -1,3 +1,4 @@
+use json5;
 use mlua::{Error, Lua, Result, Value};
 use serde_json;
 
@@ -23,15 +24,30 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         Ok(json_utils::json_to_lua(lua, &json_value))
     })?;
 
-    // json.encode form lua table
-    let json_encode = lua.create_function(|_, value: Value| {
+    // JSON5 decode (unterstützt Kommentare)
+    let json_decode_with_comments = lua.create_function(|lua, json_str: String| {
+        let json_value: serde_json::Value = json5::from_str(&json_str).map_err(Error::external)?;
+        Ok(json_utils::json_to_lua(lua, &json_value)?)
+    })?;
+
+    // json encode from lua table
+    let json_encode = lua.create_function(|_, (value, pretty): (Value, Option<bool>)| {
         let serde_value = json_utils::lua_to_json(&value)?;
-        let json_str = serde_json::to_string(&serde_value).map_err(Error::external)?;
+
+        // Decide for pretty JSON
+        let json_str = if pretty.unwrap_or(false) {
+            serde_json::to_string_pretty(&serde_value)
+        } else {
+            serde_json::to_string(&serde_value)
+        }
+        .map_err(Error::external)?;
+
         Ok(json_str)
     })?;
 
     // table.set("decode", json_decode)?;
     table.set("decode2", json_decode2)?;
+    table.set("decode_with_comments", json_decode_with_comments)?;
     table.set("encode", json_encode)?;
 
     Ok(table)
