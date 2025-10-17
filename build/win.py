@@ -19,11 +19,9 @@ def get_version(file):
                     return val
 
 if __name__ == "__main__":
-    print(os.getcwd())
-    
     print("LuajitBuilt for Windows")
 
-    print("Clear Build")
+    print("Clear Build Folder")
 
     try: shutil.rmtree("windows_builds")
     except: pass
@@ -31,7 +29,10 @@ if __name__ == "__main__":
     os.makedirs("windows_builds", exist_ok=True)
 
     print("Run cargo build --release")
-    subprocess.run("cargo build --release", shell=True, capture_output=True, text=True)
+    result = subprocess.run("cargo build --release", shell=True, capture_output=True, text=True)
+    print("STDOUT:", result.stdout)
+    print("STDERR:", result.stderr)
+    print("Returncode:", result.returncode)
 
     os.chdir('installer')
 
@@ -39,7 +40,12 @@ if __name__ == "__main__":
     # Fix Installer Build for Windows
     print("Make Installer")
     os.chdir('nsis')
-    subprocess.run("makensis installer.nsi", shell=True, capture_output=True, text=True)
+    
+    result = subprocess.run("makensis installer.nsi", shell=True, capture_output=True, text=True)
+    print("STDOUT:", result.stdout)
+    print("STDERR:", result.stderr)
+    print("Returncode:", result.returncode)
+
     shutil.copy("LuajitSetup.exe", "../../windows_builds")
 
     os.chdir('../..')
@@ -51,4 +57,4 @@ if __name__ == "__main__":
     oldname1 = "LuajitSetup"
     os.rename(oldname1 + ".exe", str(oldname1) + "_v" + str(version) + ".exe")
 
-    print("Finished")
+    print("Finished Build for Windows")

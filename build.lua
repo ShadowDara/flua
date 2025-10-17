@@ -73,7 +73,17 @@ os.execute("cargo fmt")
 print("Build the Documentation")
 os.execute("pip install -r build/requirements.txt")
 os.execute("mkdocs build")
-io.open("site/.nojekyll", "w")
+local file = io.open("site/.nojekyll", "w")
+
+if file then
+    -- Text in die Datei schreiben
+    file:write("# Ignore for Jekyll\n")
+    
+    -- Datei schließen
+    file:close()
+else
+    print("Error while opening the file!")
+end
 
 -- Add Zipping for the documentation
 
