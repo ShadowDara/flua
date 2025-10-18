@@ -10,4 +10,4 @@ dapi_os.run2("cargo build --release --target=x86_64-pc-windows-msvc")
 
 dapi_os.run2("makensis installer/nsis/installer.nsi")
 
-os.rename("../target/x86_64-pc-windows-msvc/release/flua.exe", "../flua.exe")
+os.rename("target/x86_64-pc-windows-msvc/release/flua.exe", "flua.exe")
