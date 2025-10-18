@@ -1,5 +1,3 @@
-# To start the site
-# mkdocs serve --dev-addr 0.0.0.0:9000
 site_name: flua - a simple Lua API written in Rust
 theme:
   name: material

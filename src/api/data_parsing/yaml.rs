@@ -36,9 +36,7 @@ mod tests {
     #[test]
     fn test_yaml_decode() {
         let lua = Lua::new();
-        let yaml = 
-        // to prevent the inline
-        r#"
+        let yaml = r#"
         key1: value1
         key2:
           - listitem1
