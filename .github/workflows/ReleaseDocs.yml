@@ -1,4 +1,4 @@
-name: Deploy MkDocs to GitHub Pages
+name: Deploy MkDocs to GitHub Pages and Upload a docs ZIP
 
 on:
   workflow_call:
@@ -7,6 +7,12 @@ permissions:
   contents: write
 
 jobs:
+  install_luajit:
+    name: Install LuaJIT
+    uses: shadowdara/LuaAPI-Rust/.github/workflows/InstallLuajit.yml@main
+    with:
+      version: v0.1.13
+
   deploy:
     runs-on: ubuntu-latest
 
@@ -27,4 +33,20 @@ jobs:
         run: |
           # git config --global user.email "github-actions[bot]@users.noreply.github.com"
           # git config --global user.name "github-actions[bot]"
+          # Upload the Docs
           mkdocs gh-deploy --force --remote-name origin
+          # Zip the Docs in a Archive
+          luajit build/package_docs.lua
+      
+      - name: Rename the files
+        run: |
+          mv docs.zip flua-docs_${{ github.ref_name }}.zip
+      
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          name: "LuaJIT Setup ${{ github.ref_name }}"
+          tag_name: ${{ github.ref_name }}
+          files: |
+            ./flua-docs_${{ github.ref_name }}.zip

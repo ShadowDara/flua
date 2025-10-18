@@ -1,10 +1,12 @@
 # Rust Build Folder
 target
 
-*.exe
-
 # Windows Exports
 windows_builds
 
 # Mkdocs Export
 site
+
+# Binary Files
+*.zip
+*.exe

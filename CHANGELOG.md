@@ -28,6 +28,7 @@ be enable with an 2nd Optional Boolean Argument as `true`
 - fixed Output bug in `run2()`
 - added tests for the YAML Module
 - added a BUILDS file and changed some stuff in the README.md
+- added Workflow to zip the documentation and upload it to the next Github Workflow
 
 Read the DOCS for Version 0.2.0 for more Infos
 
