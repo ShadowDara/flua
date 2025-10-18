@@ -87,8 +87,6 @@ useful.
 
 ### 0.2.0
 - [x] renaming to flua
-- [ ] http server with custom api
-
 
 ### 0.3.0
 - [ ] remove all deprecated functions or fix them
@@ -96,6 +94,7 @@ useful.
 - [ ] working moduels
 - [ ] Safe Mode
 - [ ] gh workflow and script to install Luajit + (Dockerfile)
+- [ ] http server with custom api
 
 ### 0.4.0
 - [ ] multiversion modules

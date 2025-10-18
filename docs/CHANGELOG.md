@@ -23,8 +23,25 @@ and added an optional 3rd argument `(bool)` if the script should be interrupted
 - JSON encode function makes now always compressed JSON, but pretty JSON can
 be enable with an 2nd Optional Boolean Argument as `true`
 - fixed an error in the copy file function
+- added Tests for Base64
+- added `h` as a command to print the help message
+- fixed Output bug in `run2()`
+- added tests for the YAML Module
+- added a BUILDS file and changed some stuff in the README.md
+- added Workflow to zip the documentation and upload it to the next Github Workflow
+- fixed some paths in the IO and the OS Library
+- fixed Workflow for Windows Builds
+- fixed ZIP functions and added Tests to them
 
 Read the DOCS for Version 0.2.0 for more Infos
+
+<!--
+
+TODO
+- run2() - colors in cmd output windows
+- Docs
+
+-->
 
 ## 0.1.13 - 10.10.2025
 - add auto publish for the mkdocs documentation

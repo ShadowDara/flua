@@ -1,5 +1,6 @@
 -- Script to package the Docs in a Zip Archive
 
+local dapi_os = require("dapi_os")
 local dapi_io = require("dapi_io")
 
 -- Build the Docs
