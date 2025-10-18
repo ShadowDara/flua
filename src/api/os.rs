@@ -263,3 +263,86 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     Ok(table)
 }
+
+#[cfg(test)]
+mod lua_tests {
+    use mlua::Lua;
+
+    #[test]
+    fn test_lua_split_path() -> mlua::Result<()> {
+        let lua = Lua::new();
+        let split = lua.create_function(|_, path: String| Ok(super::split_path(&path)))?;
+        lua.globals().set("split_path", split)?;
+
+        let result: mlua::Table = lua.load(r#"return split_path("foo/bar/baz")"#).eval()?;
+        let parts: Vec<String> = result.sequence_values().collect::<Result<_, _>>()?;
+
+        assert_eq!(parts, vec!["foo", "bar", "baz"]);
+        Ok(())
+    }
+
+    #[test]
+    fn test_lua_join_path() -> mlua::Result<()> {
+        let lua = Lua::new();
+        let join = lua.create_function(|_, parts: Vec<String>| Ok(super::join_path(parts)))?;
+        lua.globals().set("join_path", join)?;
+
+        let path: String = lua
+            .load(r#"return join_path({"foo", "bar", "baz"})"#)
+            .eval()?;
+
+        assert!(path.ends_with("foo/bar/baz") || path.ends_with("foo\\bar\\baz"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_lua_secure_path_safe() -> mlua::Result<()> {
+        let lua = Lua::new();
+        let secure = lua.create_function(|_, path: String| Ok(super::secure_path(&path)))?;
+        lua.globals().set("secure_path", secure)?;
+
+        let is_safe: bool = lua
+            .load(r#"return secure_path("some/safe/path")"#)
+            .eval()?;
+
+        assert!(is_safe);
+        Ok(())
+    }
+
+    #[test]
+    fn test_lua_secure_path_unsafe() -> mlua::Result<()> {
+        let lua = Lua::new();
+        let secure = lua.create_function(|_, path: String| Ok(super::secure_path(&path)))?;
+        lua.globals().set("secure_path", secure)?;
+
+        let is_safe: bool = lua
+            .load(r#"return secure_path("../../etc/passwd")"#)
+            .eval()?;
+
+        assert!(!is_safe);
+        Ok(())
+    }
+
+    #[test]
+    fn test_lua_combined_usage() -> mlua::Result<()> {
+        let lua = Lua::new();
+        lua.globals().set("split_path", lua.create_function(|_, path: String| Ok(super::split_path(&path)))?)?;
+        lua.globals().set("join_path", lua.create_function(|_, parts: Vec<String>| Ok(super::join_path(parts)))?)?;
+        lua.globals().set("secure_path", lua.create_function(|_, path: String| Ok(super::secure_path(&path)))?)?;
+
+        let (path, is_secure): (String, bool) = lua
+            .load(
+                r#"
+                local parts = split_path("foo/bar/../baz")
+                local path = join_path(parts)
+                local secure = secure_path(path)
+                return path, secure
+                "#
+            )
+            .eval()?;
+
+        assert!(path.contains("foo") && path.contains("baz"));
+        assert!(!is_secure); // wegen `..`
+        Ok(())
+    }
+}

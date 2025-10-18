@@ -1,7 +1,7 @@
 # Because i am to lazy to remember all those commands
 
 # The commands are always forced
-.PHONY: test docs
+.PHONY: test docs cl
 
 # Standard run
 all: build
@@ -22,3 +22,7 @@ build:
 # Start the Docs Server
 docs:
 	mmkdocs serve --dev-addr 0.0.0.0:9000
+
+# Delete the Existing Build
+cl:
+	cargo clean

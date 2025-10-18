@@ -33,6 +33,9 @@ be enable with an 2nd Optional Boolean Argument as `true`
 - fixed Workflow for Windows Builds
 - fixed ZIP functions and added Tests to them
 - added `SCRIPT_DIRECTOY` as a global var to Lua
+- added Tests for join paths and other paths function
+- added a Makefile for the build so i dont have to remember commands
+- added `dir` tests
 
 Read the DOCS for Version 0.2.0 for more Infos
 
