@@ -1,9 +1,9 @@
 use mlua::{Lua, Result, Value};
+use std::io::Read;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 use std::process::{Command, Stdio};
 use std::thread;
-use std::io::Read;
 
 use crate::helper::dir::{join_path, secure_path, split_path};
 

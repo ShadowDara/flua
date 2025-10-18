@@ -6,12 +6,14 @@ use std::fs::OpenOptions;
 use std::io::{self, BufRead, Write};
 use std::path::Path;
 
+use crate::utils::zip_utils::unzip_file;
+use crate::utils::zip_utils::validate_path;
+use crate::utils::zip_utils::zip_dir;
+
 use dirs_next::{
     audio_dir, cache_dir, config_dir, data_dir, data_local_dir, desktop_dir, document_dir,
     download_dir, home_dir, picture_dir, video_dir,
 };
-
-use crate::utils::zip_utils::{unzip_file, zip_dir};
 
 use crate::deprecated;
 
@@ -20,24 +22,68 @@ use crate::helper::dir::copy_dir_recursive;
 pub fn register(lua: &Lua) -> Result<mlua::Table> {
     let table = lua.create_table()?;
 
-    // Function to ZIP a directory, do not use it yet!
+    // ZIP-Funktion
     let zip = lua.create_function(|_, (src, dest): (String, String)| {
         deprecated!(
             "dapi_io.zip",
             "0.1.10",
             "The function could go horribly wrong, use at your own risk!"
         );
-        zip_dir(&src, &dest).map_err(|e| mlua::Error::external(format!("Zip error: {}", e)))
+
+        // Validieren der Pfade (validate_path -> PathBuf)
+        let src_path = validate_path(&src)
+            .map_err(|e| mlua::Error::external(format!("Ungültiger Quellpfad: {}", e)))?;
+        let dest_path = validate_path(&dest)
+            .map_err(|e| mlua::Error::external(format!("Ungültiger Zielpfad: {}", e)))?;
+
+        // Existenz- / Typprüfung
+        if !src_path.exists() || !src_path.is_dir() {
+            return Err(mlua::Error::external(
+                "Quellverzeichnis existiert nicht oder ist kein Verzeichnis.",
+            ));
+        }
+
+        // Konvertiere PathBuf -> &str (UTF-8 prüfen)
+        let src_str = src_path
+            .to_str()
+            .ok_or_else(|| mlua::Error::external("Quellpfad enthält ungültige UTF-8-Zeichen."))?;
+        let dest_str = dest_path
+            .to_str()
+            .ok_or_else(|| mlua::Error::external("Zielpfad enthält ungültige UTF-8-Zeichen."))?;
+
+        zip_dir(src_str, dest_str).map_err(|e| mlua::Error::external(format!("Zip-Fehler: {}", e)))
     })?;
 
-    // Function to unZIP a directory, do not use it yet!
-    let unzip = lua.create_function(|_, (zip, dest): (String, String)| {
+    // UNZIP-Funktion
+    let unzip = lua.create_function(|_, (zip_file, dest): (String, String)| {
         deprecated!(
             "dapi_io.unzip",
             "0.1.10",
             "The function could go horribly wrong, use at your own risk!"
         );
-        unzip_file(&zip, &dest).map_err(|e| mlua::Error::external(format!("Unzip error: {}", e)))
+
+        let zip_path = validate_path(&zip_file)
+            .map_err(|e| mlua::Error::external(format!("Ungültiger Zip-Pfad: {}", e)))?;
+        let dest_path = validate_path(&dest)
+            .map_err(|e| mlua::Error::external(format!("Ungültiger Zielpfad: {}", e)))?;
+
+        // ZIP-Datei muss existieren und eine Datei sein
+        if !zip_path.exists() || !zip_path.is_file() {
+            return Err(mlua::Error::external(
+                "ZIP-Datei existiert nicht oder ist keine Datei.",
+            ));
+        }
+
+        // Konvertiere PathBuf -> &str (UTF-8 prüfen)
+        let zip_str = zip_path
+            .to_str()
+            .ok_or_else(|| mlua::Error::external("ZIP-Pfad enthält ungültige UTF-8-Zeichen."))?;
+        let dest_str = dest_path
+            .to_str()
+            .ok_or_else(|| mlua::Error::external("Zielpfad enthält ungültige UTF-8-Zeichen."))?;
+
+        unzip_file(zip_str, dest_str)
+            .map_err(|e| mlua::Error::external(format!("Unzip-Fehler: {}", e)))
     })?;
 
     // Functions to get the default directories, returns a Lua Tale
@@ -115,10 +161,12 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     })?;
 
     // Funktion to read a file and return the content as a String
-    let rf = lua.create_function(|_, path: String| match fs::read_to_string(Path::new(&path)) {
-        Ok(content) => Ok(content),
-        Err(e) => Err(mlua::Error::external(e)),
-    })?;
+    let rf = lua.create_function(
+        |_, path: String| match fs::read_to_string(Path::new(&path)) {
+            Ok(content) => Ok(content),
+            Err(e) => Err(mlua::Error::external(e)),
+        },
+    )?;
 
     // Function to append data to the file
     let append_file = lua.create_function(|_, (file, content): (String, String)| {
