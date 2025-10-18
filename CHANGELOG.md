@@ -32,6 +32,7 @@ be enable with an 2nd Optional Boolean Argument as `true`
 - fixed some paths in the IO and the OS Library
 - fixed Workflow for Windows Builds
 - fixed ZIP functions and added Tests to them
+- added `SCRIPT_DIRECTOY` as a global var to Lua
 
 Read the DOCS for Version 0.2.0 for more Infos
 

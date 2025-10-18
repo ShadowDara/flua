@@ -54,6 +54,13 @@ pub fn execute_script(file: &str, safe_mode: &bool, lua_args: Vec<String>) -> Re
     let full_path = std::fs::canonicalize(Path::new(file)).expect("Path does not work!");
     let _ = globals.set("SCRIPT_FULL_PATH", full_path.to_string_lossy().to_string());
 
+    // Hole das Verzeichnis (Elternverzeichnis der Datei)
+    if let Some(script_dir) = full_path.parent() {
+        let _ = globals.set("SCRIPT_DIRECTORY", script_dir.to_string_lossy().to_string());
+    } else {
+        eprintln!("Could not determine script directory");
+    }
+
     let package: Table = globals.get("package")?;
     let preload: Table = package.get("preload")?;
 
