@@ -20,7 +20,7 @@ local dapi_os = require("dapi_os")
 dapi.check_version("0.2.0", true)
 
 -- Function to run the tests
-function run_tests()
+local function run_tests()
     local osdata2 = dapi_os.os()
     if osdata2.win then
         -- Tests for Windows
@@ -36,19 +36,19 @@ function run_tests()
 end
 
 -- Function to build for windows
-function build_windows()
+local function build_windows()
     print("Running Build for Windows")
     os.execute("python build/win.py")
 end
 
 -- Function to build for Linux
-function build_linux()
+local function build_linux()
     print("Running Build for Linux")
     os.execute("cargo build --release")
 end
 
 -- Function to build for MacOS
-function build_macos()
+local function build_macos()
     print("Running Build for MacOS")
     os.execute("cargo build --release")
 end
@@ -96,7 +96,7 @@ local file = io.open("site/.nojekyll", "w")
 if file then
     -- Text in die Datei schreiben
     file:write("# Ignore for Jekyll\n")
-    
+
     -- Datei schließen
     file:close()
 else

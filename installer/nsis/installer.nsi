@@ -142,7 +142,7 @@ Section "Install"
 
   # Kopiere Datei(en) ins Zielverzeichnis
   SetOutPath "$INSTDIR"
-  File "..\..\target\release\flua.exe"
+  File "..\..\flua.exe"
   File "..\..\README.md"
   File "..\..\CHANGELOG.md"
   File "..\..\LICENSE"
