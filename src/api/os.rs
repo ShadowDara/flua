@@ -1,9 +1,8 @@
 use mlua::{Lua, Result, Value};
 use std::io::{BufRead, BufReader};
-
+use std::path::Path;
 use std::process::{Command, Stdio};
 use std::thread;
-
 use std::io::Read;
 
 use crate::helper::dir::{join_path, secure_path, split_path};
@@ -49,7 +48,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // function to change the current executing directory
     let chdir = lua.create_function(|_, path: String| {
-        std::env::set_current_dir(path)?;
+        std::env::set_current_dir(Path::new(&path))?;
         Ok(())
     })?;
 

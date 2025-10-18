@@ -66,13 +66,13 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // Create a directory
     let create_dir = lua.create_function(|_, dir: String| {
-        fs::create_dir_all(&dir)
+        fs::create_dir_all(Path::new(&dir))
             .map_err(|e| mlua::Error::external(format!("Create dir error: {}", e)))
     })?;
 
     // Delete a directory recursively
     let delete_dir = lua.create_function(|_, dir: String| {
-        fs::remove_dir_all(&dir)
+        fs::remove_dir_all(Path::new(&dir))
             .map_err(|e| mlua::Error::external(format!("Delete dir error: {}", e)))
     })?;
 
@@ -97,7 +97,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
             "0.1.10",
             "The function is although contained in the Lua STD"
         );
-        fs::File::create(&file)
+        fs::File::create(Path::new(&file))
             .map(|_| ())
             .map_err(|e| mlua::Error::external(format!("Create file error: {}", e)))
     })?;
@@ -109,13 +109,13 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
             "0.1.10",
             "The function is although contained in the Lua STD"
         );
-        fs::write(&file, &content)
+        fs::write(Path::new(&file), &content)
             .map(|_| ())
             .map_err(|e| mlua::Error::external(format!("Write file error: {}", e)))
     })?;
 
     // Funktion to read a file and return the content as a String
-    let rf = lua.create_function(|_, path: String| match fs::read_to_string(&path) {
+    let rf = lua.create_function(|_, path: String| match fs::read_to_string(Path::new(&path)) {
         Ok(content) => Ok(content),
         Err(e) => Err(mlua::Error::external(e)),
     })?;
@@ -126,7 +126,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         let mut f = OpenOptions::new()
             .create(true)
             .append(true)
-            .open(&file)
+            .open(Path::new(&file))
             .map_err(|e| mlua::Error::external(format!("Datei-Fehler: {}", e)))?;
 
         // Inhalt anhängen
@@ -138,7 +138,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // Function get the content of a Folder as an Array
     let get_folder_content = lua.create_function(|lua_ctx, path: String| {
-        let entries = fs::read_dir(&path).map_err(mlua::Error::external)?;
+        let entries = fs::read_dir(Path::new(&path)).map_err(mlua::Error::external)?;
 
         let lua_table = lua_ctx.create_table()?; // neue Lua-Tabelle
         let mut index = 1;
@@ -157,14 +157,14 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     // Function to get the size of an file
     let get_file_size = lua.create_function(|_, path: String| {
-        fs::metadata(&path)
+        fs::metadata(Path::new(&path))
             .map(|metadata| metadata.len())
             .map_err(|e| mlua::Error::external(format!("Failed to get file size: {}", e)))
     })?;
 
     // Function to read a file line by line
     let read_line = lua.create_function(|lua, (file, max_lines): (String, Option<usize>)| {
-        let file = fs::File::open(&file)
+        let file = fs::File::open(Path::new(&file))
             .map_err(|e| mlua::Error::external(format!("Open file error: {}", e)))?;
         let reader = io::BufReader::new(file);
         let lua_table = lua.create_table()?;
