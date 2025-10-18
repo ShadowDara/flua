@@ -10,8 +10,6 @@
 -- - python
 -- - NSIS
 
--- Requirements Workflow
-
 -- Imports
 local dapi = require("dapi")
 local dapi_io = require("dapi_io")
@@ -64,18 +62,6 @@ if arg and arg[1] == "test" then
 
     -- Exit after running the tests
     os.exit(0)
-elseif arg and arg[1] == "workflow" then
-    -- Build Code for the Windows Workflow
-    print("Build for Windows Workflow")
-
-    dapi_os.run2("cargo build --release --target=x86_64-pc-windows-msvc")
-    --dapi_os.run2("cargo build --release --target=aarch64-pc-windows-msvc")
-
-    -- Finish after the Workflow build
-    os.exit(0)
-else
-    -- Normal Local USE
-    print("Run for normal local use")
 end
 
 -- Copies the Changelog from Repo Root to /docs/
