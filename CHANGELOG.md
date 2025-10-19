@@ -45,6 +45,10 @@ be enable with an 2nd Optional Boolean Argument as `true`
 - added tests for JSON
 - added Tests to the SCRIPT Vars in Lua
 - fixed an Error in Join path function and a build script error
+- fixed secure path for UNIX Systems
+- added Commands to the Makefile
+- added Module Stuff
+- added Module Tests
 
 Read the DOCS for Version 0.2.0 for more Infos
 

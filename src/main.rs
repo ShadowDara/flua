@@ -86,15 +86,17 @@ async fn main() {
     }
 
     match args.get(1).map(String::as_str) {
+        // Run a Action command here
         Some("run") => {
             if let Err(e) = handle_run_command(&args).await {
                 eprintln!("{}[ERROR] {}{}", RED, e, END);
                 exit(wait_on_exit);
             }
         }
+        // Run a Lua Script here
         Some(script_path) => {
             if let Err(e) = handle_script_execution(script_path, safe, info, lua_args).await {
-                eprintln!("{}[LUAJIT-ERROR] {}{}", RED, e, END);
+                eprintln!("{}[FLUA-ERROR] {}{}", RED, e, END);
                 exit(wait_on_exit);
             }
         }
@@ -106,7 +108,28 @@ async fn main() {
 }
 
 // Function to handle these commands
-async fn handle_run_command(args: &[String]) -> Result<(), String> {
+async fn handle_run_command(args: &Vec<String>) -> Result<(), String> {
+    // Create the List
+    let mut action_args: Vec<String> = Vec::new();
+    let mut args_iter = args.iter().enumerate().peekable();
+
+    // Collect all args starting from index 3
+    while let Some((i, next_arg)) = args_iter.peek() {
+        if *i < 3 {
+            args_iter.next(); // einfach überspringen
+            continue;
+        }
+
+        if next_arg.starts_with('#') {
+            break;
+        }
+
+        // clone & push
+        let (_, arg) = args_iter.next().unwrap();
+        action_args.push(arg.clone());
+    }
+
+    // Run the Modules or actions
     match args.get(2).map(String::as_str) {
         Some("update") => {
             helper::update::update().map_err(|e| format!("Update failed: {}", e))?;
@@ -116,7 +139,7 @@ async fn handle_run_command(args: &[String]) -> Result<(), String> {
         }
         Some(_) | None => {
             println!("Starting module...");
-            dlm13::start_module().map_err(|e| format!("Module start failed: {}", e))?;
+            dlm13::start_module(action_args).map_err(|e| format!("Module start failed: {}", e))?;
         }
     }
 
@@ -183,6 +206,9 @@ fn print_help() {
     //<action>
     let ac = RED;
 
+    //<custom-action-options>
+    let aco = CYAN;
+
     // OptionList
     let op = BLUE;
 
@@ -208,18 +234,24 @@ fn print_help() {
         op, END
     );
     println!(
-        "{}  l, lua-args    {}submit arguments after lua-args for the lua file which will be run, stop the collectiong when it sees an argument which start with -",
-        op, END
+        "{}  l, lua-args    {}submit arguments after lua-args for the lua file which will be run, stop the collectiong when it sees an argument which starts with: {}'-'{}",
+        op, END, RED, END
     );
     // Modules
     println!(
-        "\nUsage for Modules: {}<flua>{} run {}<action>{} {}[GENERALL-OPTIONS]{}",
-        GREEN, END, ac, END, sco, END
+        "\nUsage for Modules: {}<flua>{} run {}<actions>{} {}<custom-action-options>{} {}[GENERALL-OPTIONS]{}",
+        GREEN, END, ac, END, aco, END, sco, END
+    );
+    println!("\n{}<actions>{}:   'update', 'install'", ac, END);
+    println!(
+        "{}  module         {}Argument to run a {}dlm13{} Module",
+        op, END, RED, END
     );
     println!(
-        "\n{}<action>{}:   'update', 'install', or path to module directory",
-        ac, END
+        "\n{}<custom-action-options>{}: Ends the arg collecting when a path starts with #",
+        aco, END
     );
+    println!("{}  -path=    {}Add the Module path after the '='", op, END);
     // Other
     println!(
         "\nOther Usage: {}<flua>{} {}[OPTIONS]{} {}[GENERALL-OPTIONS]{}",
@@ -228,17 +260,17 @@ fn print_help() {
     //[OPTIONS]
     println!("\n{}[OPTIONS]{}", opt, END);
     println!(
-        "{}  -v, --version   {}Function which prints the version in the terminal",
+        "{}  -v, --version  {}Function which prints the version in the terminal",
         op, END
     );
     println!(
-        "{}    h, -h, --help  {}Function which prints this help message in the terminal",
+        "{}  h, -h, --help  {}Function which prints this help message in the terminal",
         op, END
     );
     //[GENERALL-OPTIONS]
     println!("\n{}[GENERALL-OPTIONS]{}", sco, END);
     println!(
-        "{}  -nw    {}No exit -> The Programm closes instantly after an error and showing an error message without waiting for some Time.",
+        "{}  -nw            {}No exit -> The Programm closes instantly after an error and showing an error message without waiting for some Time.",
         op, END
     );
     // More

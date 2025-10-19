@@ -292,8 +292,8 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
 #[cfg(test)]
 mod lua_tests {
-    use mlua::Lua;
     use crate::helper::dir::join_path;
+    use mlua::Lua;
 
     #[test]
     fn test_lua_split_path() -> mlua::Result<()> {
@@ -414,20 +414,27 @@ mod lua_tests {
         let lua = Lua::new();
 
         // Binde join_path
-        let join_fn = lua.create_function(|_, parts: mlua::Table| {
-            let mut vec = Vec::new();
-            for pair in parts.sequence_values::<String>() {
-                vec.push(pair?);
-            }
-            Ok(join_path(vec))
-        }).unwrap();
+        let join_fn = lua
+            .create_function(|_, parts: mlua::Table| {
+                let mut vec = Vec::new();
+                for pair in parts.sequence_values::<String>() {
+                    vec.push(pair?);
+                }
+                Ok(join_path(vec))
+            })
+            .unwrap();
 
         lua.globals().set("join_path", join_fn).unwrap();
 
         // Teste Lua-Seite mit gültiger Tabelle
-        let result: String = lua.load(r#"
+        let result: String = lua
+            .load(
+                r#"
             return join_path({"home", "user", "docs"})
-        "#).eval().unwrap();
+        "#,
+            )
+            .eval()
+            .unwrap();
 
         #[cfg(windows)]
         assert_eq!(result, r"home\user\docs");
@@ -435,16 +442,26 @@ mod lua_tests {
         assert_eq!(result, "home/user/docs");
 
         // Teste Lua-Seite mit leerer Tabelle
-        let result_empty: String = lua.load(r#"
+        let result_empty: String = lua
+            .load(
+                r#"
             return join_path({})
-        "#).eval().unwrap();
+        "#,
+            )
+            .eval()
+            .unwrap();
 
         assert_eq!(result_empty, "");
 
         // Teste Lua-Seite mit einzelnen Element
-        let result_single: String = lua.load(r#"
+        let result_single: String = lua
+            .load(
+                r#"
             return join_path({"folder"})
-        "#).eval().unwrap();
+        "#,
+            )
+            .eval()
+            .unwrap();
 
         assert_eq!(result_single, "folder");
     }

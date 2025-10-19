@@ -33,7 +33,13 @@ pub fn split_path(path: &str) -> Vec<String> {
 /// Normalizes a path and checks for traversal attacks or absolute paths.
 /// Returns a secure, normalized `PathBuf` or an error string.
 pub fn secure_path(path: &str) -> Result<PathBuf, String> {
-    let original = Path::new(path);
+    #[cfg(unix)]
+    let path = path.replace('\\', "/");
+
+    #[cfg(not(unix))]
+    let path = path.to_string();
+
+    let original = Path::new(&path);
 
     // Reject absolute paths like /etc/passwd or C:\Windows
     if original.is_absolute() {
@@ -219,6 +225,13 @@ mod tests {
         assert_eq!(result, PathBuf::from(r"foo\baz"));
 
         #[cfg(unix)]
-        assert_eq!(result, PathBuf::from(r"foo\baz")); // backslash bleibt Literal unter Unix
+        {
+            assert_eq!(result, PathBuf::from("foo/baz"));
+
+            assert_eq!(
+                result.components().collect::<Vec<_>>(),
+                PathBuf::from("foo/baz").components().collect::<Vec<_>>()
+            );
+        }
     }
 }
