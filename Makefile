@@ -26,3 +26,7 @@ docs:
 # Delete the Existing Build
 cl:
 	cargo clean
+
+# Count Line Stats with cloc
+stats:
+	cloc . --csv --out=stats.csv --exclude-dir=target,site,docs

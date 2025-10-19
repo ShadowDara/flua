@@ -30,19 +30,35 @@ pub fn split_path(path: &str) -> Vec<String> {
         .collect()
 }
 
-// Function to secure Paths
-pub fn secure_path(path: &str) -> String {
+/// Normalizes a path and checks for traversal attacks or absolute paths.
+/// Returns a secure, normalized `PathBuf` or an error string.
+pub fn secure_path(path: &str) -> Result<PathBuf, String> {
+    let original = Path::new(path);
+
+    // Reject absolute paths like /etc/passwd or C:\Windows
+    if original.is_absolute() {
+        return Err("Absolute paths are not allowed".into());
+    }
+
     let mut normalized = PathBuf::new();
-    for comp in Path::new(path).components() {
+
+    for comp in original.components() {
         match comp {
             Component::CurDir => continue,
             Component::ParentDir => {
-                normalized.pop();
+                // We disallow traversing above the root
+                if !normalized.pop() {
+                    return Err("Path attempts to escape base directory".into());
+                }
             }
-            _ => normalized.push(comp),
+            Component::Normal(part) => normalized.push(part),
+            _ => {
+                return Err("Unsupported path component".into());
+            }
         }
     }
-    normalized.to_string_lossy().into_owned()
+
+    Ok(normalized)
 }
 
 // Function to join paths
@@ -57,6 +73,23 @@ pub fn join_path(parts: Vec<String>) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_secure_path_parent_dir_at_start() {
+        let path = "../foo/bar";
+        let result = secure_path(path);
+        assert!(
+            result.is_err(),
+            "Should reject path starting with parent dir"
+        );
+    }
+
+    #[test]
+    fn test_secure_path_only_parent_dirs() {
+        let path = "../../..";
+        let result = secure_path(path);
+        assert!(result.is_err(), "Should reject path with only parent dirs");
+    }
 
     #[test]
     fn test_split_path_simple() {
@@ -130,41 +163,34 @@ mod tests {
         assert!(path.contains("Windows\\System32"));
     }
 
+    use std::path::PathBuf;
+
     #[test]
     fn test_secure_path_basic() {
         let path = "foo/bar/baz";
-        assert_eq!(secure_path(path), "foo/bar/baz");
+        let result = secure_path(path).expect("Should be secure");
+        assert_eq!(result, PathBuf::from("foo/bar/baz"));
     }
 
     #[test]
     fn test_secure_path_removes_current_dir() {
         let path = "foo/./bar";
-        assert_eq!(secure_path(path), "foo/bar");
+        let result = secure_path(path).expect("Should normalize");
+        assert_eq!(result, PathBuf::from("foo/bar"));
     }
 
     #[test]
     fn test_secure_path_removes_parent_dir() {
         let path = "foo/bar/../baz";
-        assert_eq!(secure_path(path), "foo/baz");
+        let result = secure_path(path).expect("Should normalize");
+        assert_eq!(result, PathBuf::from("foo/baz"));
     }
 
     #[test]
     fn test_secure_path_multiple_parent_dirs() {
         let path = "foo/bar/baz/../../qux";
-        assert_eq!(secure_path(path), "foo/qux");
-    }
-
-    #[test]
-    fn test_secure_path_parent_dir_at_start() {
-        // ../ at start pops nothing, path stays empty or no error
-        let path = "../foo/bar";
-        assert_eq!(secure_path(path), "foo/bar");
-    }
-
-    #[test]
-    fn test_secure_path_only_parent_dirs() {
-        let path = "../../..";
-        assert_eq!(secure_path(path), "");
+        let result = secure_path(path).expect("Should normalize");
+        assert_eq!(result, PathBuf::from("foo/qux"));
     }
 
     #[test]
@@ -172,24 +198,27 @@ mod tests {
         #[cfg(unix)]
         {
             let path = "/foo/bar/../baz";
-            // normalized absolute path
-            assert_eq!(secure_path(path), "/foo/baz");
+            let result = secure_path(path);
+            assert!(result.is_err()); // Absolute Pfade sind unsicher
         }
+
         #[cfg(windows)]
         {
             let path = r"C:\foo\bar\..\baz";
-            assert_eq!(secure_path(path), r"C:\foo\baz");
+            let result = secure_path(path);
+            assert!(result.is_err()); // Auch unter Windows: absolut = Fehler
         }
     }
 
     #[test]
     fn test_secure_path_with_mixed_separators() {
         let path = r"foo\bar/../baz";
-        // on Windows, Path handles both separators, so normalized should be foo\baz
-        // on Unix, backslash is a valid char, so probably no normalization on that part
+        let result = secure_path(path).expect("Should normalize mixed separators");
+
         #[cfg(windows)]
-        assert_eq!(secure_path(path), r"foo\baz");
+        assert_eq!(result, PathBuf::from(r"foo\baz"));
+
         #[cfg(unix)]
-        assert_eq!(secure_path(path), r"foo\baz"); // note: backslash remains
+        assert_eq!(result, PathBuf::from(r"foo\baz")); // backslash bleibt Literal unter Unix
     }
 }

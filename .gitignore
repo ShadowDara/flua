@@ -10,3 +10,4 @@ site
 # Binary Files
 *.zip
 *.exe
+stats.csv
