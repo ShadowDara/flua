@@ -265,7 +265,14 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     })?;
 
     // Binde join_path
-    let join_fn = lua.create_function(|_, parts: Vec<String>| Ok(join_path(parts)))?;
+    let join_fn = lua.create_function(|_, parts: mlua::Table| {
+        // Lua Tabelle in Vec<String> umwandeln
+        let mut vec = Vec::new();
+        for pair in parts.sequence_values::<String>() {
+            vec.push(pair?);
+        }
+        Ok(join_path(vec))
+    })?;
 
     table.set("get_os_info", get_os_info)?;
     table.set("os", os)?;
@@ -286,6 +293,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 #[cfg(test)]
 mod lua_tests {
     use mlua::Lua;
+    use crate::helper::dir::join_path;
 
     #[test]
     fn test_lua_split_path() -> mlua::Result<()> {
@@ -375,5 +383,69 @@ mod lua_tests {
         assert!(path.contains("etc") && path.find("passwd").is_some());
         assert!(!is_secure); // sicherheitsprüfung soll hier fehlschlagen
         Ok(())
+    }
+
+    #[test]
+    fn test_join_path_basic() {
+        let parts = vec!["home".to_string(), "user".to_string(), "docs".to_string()];
+        let joined = join_path(parts);
+        #[cfg(windows)]
+        assert_eq!(joined, r"home\user\docs");
+        #[cfg(not(windows))]
+        assert_eq!(joined, "home/user/docs");
+    }
+
+    #[test]
+    fn test_join_path_empty() {
+        let parts: Vec<String> = vec![];
+        let joined = join_path(parts);
+        assert!(joined.is_empty());
+    }
+
+    #[test]
+    fn test_join_path_single() {
+        let parts = vec!["folder".to_string()];
+        let joined = join_path(parts);
+        assert_eq!(joined, "folder");
+    }
+
+    #[test]
+    fn test_join_path_lua_binding() {
+        let lua = Lua::new();
+
+        // Binde join_path
+        let join_fn = lua.create_function(|_, parts: mlua::Table| {
+            let mut vec = Vec::new();
+            for pair in parts.sequence_values::<String>() {
+                vec.push(pair?);
+            }
+            Ok(join_path(vec))
+        }).unwrap();
+
+        lua.globals().set("join_path", join_fn).unwrap();
+
+        // Teste Lua-Seite mit gültiger Tabelle
+        let result: String = lua.load(r#"
+            return join_path({"home", "user", "docs"})
+        "#).eval().unwrap();
+
+        #[cfg(windows)]
+        assert_eq!(result, r"home\user\docs");
+        #[cfg(not(windows))]
+        assert_eq!(result, "home/user/docs");
+
+        // Teste Lua-Seite mit leerer Tabelle
+        let result_empty: String = lua.load(r#"
+            return join_path({})
+        "#).eval().unwrap();
+
+        assert_eq!(result_empty, "");
+
+        // Teste Lua-Seite mit einzelnen Element
+        let result_single: String = lua.load(r#"
+            return join_path({"folder"})
+        "#).eval().unwrap();
+
+        assert_eq!(result_single, "folder");
     }
 }

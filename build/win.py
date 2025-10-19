@@ -34,13 +34,16 @@ if __name__ == "__main__":
     print("STDERR:", result.stderr)
     print("Returncode:", result.returncode)
 
+    # Copy the Executable to the root
+    shutil.copy("target/release/flua.exe", "flua.exe")
+
     os.chdir('installer')
 
     # TODO
     # Fix Installer Build for Windows
     print("Make Installer")
     os.chdir('nsis')
-    
+
     result = subprocess.run("makensis installer.nsi", shell=True, capture_output=True, text=True)
     print("STDOUT:", result.stdout)
     print("STDERR:", result.stderr)

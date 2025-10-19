@@ -44,6 +44,7 @@ be enable with an 2nd Optional Boolean Argument as `true`
 - added function to convert compressed json in pretty json and the other way around
 - added tests for JSON
 - added Tests to the SCRIPT Vars in Lua
+- fixed an Error in Join path function and a build script error
 
 Read the DOCS for Version 0.2.0 for more Infos
 
