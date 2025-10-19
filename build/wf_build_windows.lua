@@ -2,6 +2,11 @@
 
 -- Run from the root of the gh repo !!!
 
+local dapi = require("dapi")
+
+-- ALWAYS CHECK !!!
+dapi.check_version("0.2.0", true, true)
+
 local dapi_os = require("dapi_os")
 
 dapi_os.run2("mkdocs build")
