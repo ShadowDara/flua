@@ -44,7 +44,7 @@ pub fn start_module(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>>
                 // leerer String – ignorieren oder Fehler melden
             }
             _ => {
-                println!("Unbekanntes Argument: {}", arg);
+                // println!("Unbekanntes Argument: {}", arg);
             }
         }
     }
@@ -86,10 +86,10 @@ pub fn start_module(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>>
     // Update Version Checking
     //
     // Stop when the version is not fitting
-    if !(is_newer_version(VERSION, config.luajitversion.min)
+    if (!is_newer_version(VERSION, config.luajitversion.min)
         && is_newer_version(VERSION, config.luajitversion.max))
     {
-        return Err("Error".into());
+        return Err("Error the Version is not fitting".into());
     }
 
     // Check if Index File exists
@@ -115,20 +115,10 @@ fn handle_module_execution() {}
 // Maybe use the other function
 // Function to check if the current version is newer than another
 fn is_newer_version(current_version: &str, the_version: String) -> bool {
-    let v1 = parse_version(&current_version);
+    let v1 = parse_version(current_version);
     let v2 = parse_version(&the_version);
 
-    if v1[0] > v2[0] {
-        return true;
-    }
-    if v1[1] > v2[1] {
-        return true;
-    }
-    if v1[2] > v2[2] {
-        return true;
-    }
-
-    return false;
+    v1 > v2
 }
 
 // TODO
@@ -256,10 +246,10 @@ edition: 2025
         write(temp_path.join("main.lua"), "-- entrypoint").unwrap();
 
         let arg = format!("-path={}", temp_path.to_string_lossy());
-        let args = vec!["run".into(), "module".into(), arg];
+        let args = vec![arg];
 
         let result = start_module(args);
 
-        assert!(result.is_ok());
+        assert!(result.is_ok(), "start_module failed: {:?}", result);
     }
 }
