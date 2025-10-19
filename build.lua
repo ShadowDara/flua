@@ -75,7 +75,6 @@ os.execute("cargo fmt")
 
 -- Build the Documentation
 print("Build the Documentation")
-os.execute("pip install -r build/requirements.txt")
 os.execute("mkdocs build")
 local file = io.open("site/.nojekyll", "w")
 

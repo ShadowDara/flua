@@ -19,6 +19,10 @@ b:
 build:
 	cargo run build.lua
 
+# Command to Install Dependencies
+install:
+	pip install -r build/requirements.txt
+
 # Start the Docs Server
 docs:
 	mmkdocs serve --dev-addr 0.0.0.0:9000

@@ -1,6 +1,11 @@
 # CHANGELOG
 
 ## 0.2.0
+
+### Big Changes
+The programm is now called `flua`
+
+### Full Change List
 - renamed programm to flua
 - added flalaxy in another repository, the installer for flua -
 https://github.com/ShadowDara/flalaxy
@@ -36,6 +41,9 @@ be enable with an 2nd Optional Boolean Argument as `true`
 - added Tests for join paths and other paths function
 - added a Makefile for the build so i dont have to remember commands
 - added `dir` tests
+- added function to convert compressed json in pretty json and the other way around
+- added tests for JSON
+- added Tests to the SCRIPT Vars in Lua
 
 Read the DOCS for Version 0.2.0 for more Infos
 
