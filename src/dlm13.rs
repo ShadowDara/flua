@@ -2,10 +2,12 @@
 // IDK what the name means ...
 
 use serde::Deserialize;
+use std::error::Error;
 use std::fs;
 use std::path::Path;
 
 use crate::VERSION;
+use crate::lua_script::execute_script;
 
 #[derive(Debug, Deserialize)]
 struct Config {
@@ -28,8 +30,8 @@ struct Luajitversion {
 
 // Function to start running a Module
 pub fn start_module(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
-    //println!("Not Implemented yet!");
-    //return Ok(());
+    println!("Not Implemented yet!");
+    return Ok(());
 
     let mut modulepath = "";
 
@@ -56,13 +58,11 @@ pub fn start_module(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>>
 
     if !full_path.exists() {
         eprintln!("Error: File '{}' not found!", index_file);
-        return Ok(());
+        return Err("Index file not found".into());
     }
 
     let yaml_str = fs::read_to_string(&full_path)?;
     let config: Config = serde_yaml::from_str(&yaml_str)?;
-
-    let entrypoint: String = config.entrypoint;
 
     // Check if the edition is correct
     match config.edition {
@@ -86,30 +86,51 @@ pub fn start_module(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>>
     // Update Version Checking
     //
     // Stop when the version is not fitting
-    if (!is_newer_version(VERSION, config.luajitversion.min)
-        && is_newer_version(VERSION, config.luajitversion.max))
+    if !is_newer_version(VERSION, config.luajitversion.min.clone())
+        && is_newer_version(VERSION, config.luajitversion.max.clone())
     {
         return Err("Error the Version is not fitting".into());
     }
 
-    // Check if Index File exists
-    if !Path::new(&entrypoint).exists() {
-        eprintln!("Error: Entrypoint '{}' not found!", entrypoint);
-        return Ok(());
-    }
-
-    // TODO
-    // Starting the Module
-    println!("Starting Module: {}", config.name);
     // Run the entrypoint File
+    let _ = handle_module_execution(modulepath, config);
 
     Ok(())
 }
 
 // TODO
+// add a function to create a new Module
+
+// TODO
 // add this function
 // Function to run a Module
-fn handle_module_execution() {}
+// Führt das Modul aus
+fn handle_module_execution(basepath: &str, config: Config) -> Result<(), Box<dyn Error>> {
+    let full_entry_path = Path::new(basepath).join(&config.entrypoint);
+
+    if !full_entry_path.exists() {
+        eprintln!(
+            "Error: Entrypoint '{}' not found!",
+            full_entry_path.display()
+        );
+        return Err(format!("Entrypoint '{}' not found", config.entrypoint).into());
+    }
+
+    println!("Starting Module: {}", config.name);
+    println!("Running: {}", full_entry_path.display());
+
+    // TODO: Hier eigentlichen Modulstart integrieren (z.B. LuaJIT aufrufen)
+    let args: Vec<String> = Vec::new();
+
+    let file_path = full_entry_path.to_str().ok_or("Invalid path")?;
+
+    match execute_script(file_path, &false, args) {
+        Ok(()) => {}
+        Err(e) => return Err(format!("Script execution failed: {}", e).into()),
+    };
+
+    Ok(())
+}
 
 // TODO
 // Maybe use the other function

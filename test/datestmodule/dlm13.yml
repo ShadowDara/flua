@@ -6,12 +6,12 @@ license: ""
 link: ""
 
 # Start Point for the Module
-entrypoint: ""
+entrypoint: "main.lua"
 
 # Version for Luajit
 luajitversion:
-  min: ""
-  max: ""
+  min: "0.1.0"
+  max: "0.3.0"
 
 # DO NOT EDIT THIS, THIS IS VERY IMPORTANT, IF THERE ARE CHANGES
 # IN THE MODULE FILE !!!
