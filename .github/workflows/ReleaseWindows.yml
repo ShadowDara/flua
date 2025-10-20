@@ -9,7 +9,7 @@ permissions:
 jobs:
   install_luajit:
     name: Install LuaJIT
-    uses: shadowdara/LuaAPI-Rust/.github/workflows/InstallLuajit.yml@main
+    uses: shadowdara/flalaxy/.github/workflows/InstallLuajit.yml@main
     with:
       version: v0.1.13
 
