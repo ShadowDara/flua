@@ -1,0 +1,2653 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../Dapi_OS/">
+      
+      
+        <link rel="next" href="../HTTP/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.22">
+    
+    
+      
+        <title>JSON - flua - a simple Lua API written in Rust</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.84d31ad4.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#json" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="flua - a simple Lua API written in Rust" class="md-header__button md-logo" aria-label="flua - a simple Lua API written in Rust" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            flua - a simple Lua API written in Rust
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              JSON
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Luajit
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../CHANGELOG/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  CHANGELOG
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../MLua-std/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  MLua std
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../Scripting/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Scripting
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../v0.1.10/" class="md-tabs__link">
+          
+  
+  
+  V0.1.10
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../v0.1.11/" class="md-tabs__link">
+          
+  
+  
+  V0.1.11
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../v0.1.12/" class="md-tabs__link">
+          
+  
+  
+  V0.1.12
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../v0.1.13/" class="md-tabs__link">
+          
+  
+  
+  V0.1.13
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../v0.1.4/" class="md-tabs__link">
+          
+  
+  
+  V0.1.4
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../v0.1.5/" class="md-tabs__link">
+          
+  
+  
+  V0.1.5
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../v0.1.6/" class="md-tabs__link">
+          
+  
+  
+  V0.1.6
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../v0.1.7/" class="md-tabs__link">
+          
+  
+  
+  V0.1.7
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../v0.1.8/" class="md-tabs__link">
+          
+  
+  
+  V0.1.8
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../v0.1.9/" class="md-tabs__link">
+          
+  
+  
+  V0.1.9
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+  V0.2.0
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="flua - a simple Lua API written in Rust" class="md-nav__button md-logo" aria-label="flua - a simple Lua API written in Rust" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    flua - a simple Lua API written in Rust
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Luajit
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    CHANGELOG
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MLua-std/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MLua std
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Scripting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Scripting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    V0.1.10
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            V0.1.10
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Version 0.1.10
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.10/Dapi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.10/Dapi_HTTP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi HTTP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.10/Dapi_IO/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi IO
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.10/Dapi_OS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi OS
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.10/Dapi_data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi data
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    V0.1.11
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            V0.1.11
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.11/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Version 0.1.11
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.11/Dapi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.11/Dapi_HTTP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi HTTP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.11/Dapi_IO/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi IO
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.11/Dapi_OS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi OS
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.11/Dapi_data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi data
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    V0.1.12
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            V0.1.12
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.12/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Version 0.1.12
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.12/Dapi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.12/Dapi_HTTP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi HTTP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.12/Dapi_IO/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi IO
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.12/Dapi_OS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi OS
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.12/Dapi_data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi data
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    V0.1.13
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            V0.1.13
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.13/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Version 0.1.13
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.13/Dapi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.13/Dapi_IO/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi IO
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.13/Dapi_OS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi OS
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.13/Dapi_data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    JSON
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.13/HTTP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi HTTP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.13/HTTP_async/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi HTTP Async
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.13/NET/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    NET
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.13/Time/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Time
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.13/dlm13/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Modules
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    V0.1.4
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            V0.1.4
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Version 0.1.4
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    V0.1.5
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            V0.1.5
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Version 0.1.5
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    V0.1.6
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            V0.1.6
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Version 0.1.6
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    V0.1.7
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            V0.1.7
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Version 0.1.7
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_13" id="__nav_13_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    V0.1.8
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
+            <span class="md-nav__icon md-icon"></span>
+            V0.1.8
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.8/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Version 0.1.8
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    V0.1.9
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            V0.1.9
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../v0.1.9/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Version 0.1.9
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_15" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_15" id="__nav_15_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    V0.2.0
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_15_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_15">
+            <span class="md-nav__icon md-icon"></span>
+            V0.2.0
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Version 0.1.13
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Dapi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Dapi_IO/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi IO
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Dapi_OS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi OS
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    JSON
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    JSON
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#import" class="md-nav__link">
+    <span class="md-ellipsis">
+      import
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decode2" class="md-nav__link">
+    <span class="md-ellipsis">
+      decode2
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decode_with_comments" class="md-nav__link">
+    <span class="md-ellipsis">
+      decode_with_comments()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#encode" class="md-nav__link">
+    <span class="md-ellipsis">
+      encode
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../HTTP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi HTTP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../HTTP_async/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dapi HTTP Async
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../NET/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    NET
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Time/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Time
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dlm13/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Modules
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="json">JSON<a class="headerlink" href="#json" title="Permanent link">&para;</a></h1>
+<h2 id="import">import<a class="headerlink" href="#import" title="Permanent link">&para;</a></h2>
+<div class="codehilite"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">dapi_json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;dapi_json&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<h2 id="decode2">decode2<a class="headerlink" href="#decode2" title="Permanent link">&para;</a></h2>
+<p>a function to decode JSON to a LUa Table</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">json_string</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{allo: &quot;</span><span class="nv">kkkk</span><span class="s2">&quot;}&quot;</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">dapi_json</span><span class="p">.</span><span class="nf">decode2</span><span class="p">(</span><span class="nv">json_string</span><span class="p">)</span>
+</code></pre></div>
+
+<h2 id="decode_with_comments">decode_with_comments()<a class="headerlink" href="#decode_with_comments" title="Permanent link">&para;</a></h2>
+<h2 id="encode">encode<a class="headerlink" href="#encode" title="Permanent link">&para;</a></h2>
+<p>a function to encode a Lua Table to JSON</p>
+<p>the function has an Optionl 2nd Argument, set this to true to get pretty JSON</p>
+<p><strong>Usage</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">lua_table</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nv">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;value&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nv">numbers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span>
+<span class="w">  </span><span class="nv">flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">json_string</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">dapi_json</span><span class="p">.</span><span class="nf">encode</span><span class="p">(</span><span class="nv">lua_table</span><span class="p">)</span>
+</code></pre></div>
+
+<h1 id="toml">Toml<a class="headerlink" href="#toml" title="Permanent link">&para;</a></h1>
+<h2 id="import_1">import<a class="headerlink" href="#import_1" title="Permanent link">&para;</a></h2>
+<p>to start, you need to import the api in your script, you can do it with</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">dapi_http</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;dapi_toml&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<h2 id="decode">decode<a class="headerlink" href="#decode" title="Permanent link">&para;</a></h2>
+<p>decode toml data to a Lua Table</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[[</span>
+<span class="s">title = &quot;Mein Beispiel&quot;</span>
+
+<span class="s">[user]</span>
+<span class="s">name = &quot;Alice&quot;</span>
+<span class="s">age = 30</span>
+<span class="s">]]</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">dapi_toml</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="nv">input</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nv">result</span><span class="p">.</span><span class="py">title</span><span class="p">)</span><span class="w">           </span><span class="c1">--&gt; &quot;Mein Beispiel&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="nv">result</span><span class="p">.</span><span class="py">user</span><span class="p">.</span><span class="py">name</span><span class="p">)</span><span class="w">       </span><span class="c1">--&gt; &quot;Alice&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="nv">result</span><span class="p">.</span><span class="py">user</span><span class="p">.</span><span class="py">age</span><span class="p">)</span><span class="w">        </span><span class="c1">--&gt; 30</span>
+</code></pre></div>
+
+<h2 id="encode_1">encode<a class="headerlink" href="#encode_1" title="Permanent link">&para;</a></h2>
+<p>encode a Lua table to toml data</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Konfiguration&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">settings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nv">width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1920</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1080</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">fullscreen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">toml_string</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">dapi_toml</span><span class="p">.</span><span class="nf">encode</span><span class="p">(</span><span class="nv">data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nv">toml_string</span><span class="p">)</span>
+</code></pre></div>
+
+<h1 id="dotenv">DotENV<a class="headerlink" href="#dotenv" title="Permanent link">&para;</a></h1>
+<h2 id="import_2">import<a class="headerlink" href="#import_2" title="Permanent link">&para;</a></h2>
+<div class="codehilite"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">dapi_dotenv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;dapi_dotenv&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<h2 id="get">get<a class="headerlink" href="#get" title="Permanent link">&para;</a></h2>
+<p>Gets the value of an environment variable.</p>
+<p><strong>Lua Usage</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">dapi_dotenv</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">)</span>
+<span class="kr">if</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">  </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Found:&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">value</span><span class="p">)</span>
+<span class="kr">else</span>
+<span class="w">  </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Not set&quot;</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+
+<p><strong>Returns</strong>
+- <code>string</code>: the value if found
+- <code>nil</code>: if the variable is not set</p>
+<h2 id="load">load<a class="headerlink" href="#load" title="Permanent link">&para;</a></h2>
+<p>Loads environment variables from a <code>.env</code> file into the process environment.</p>
+<p><strong>Lua Usage</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nv">dapi_dotenv</span><span class="p">.</span><span class="nf">load</span><span class="p">()</span><span class="w">             </span><span class="c1">-- loads from &quot;.env&quot; by default</span>
+<span class="nv">dapi_dotenv</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="s2">&quot;custom.env&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">-- loads from a custom file</span>
+</code></pre></div>
+
+<p><strong>Errors</strong>
+Returns a Lua error if the file could not be found or parsed.</p>
+<h2 id="set">set<a class="headerlink" href="#set" title="Permanent link">&para;</a></h2>
+<p>Sets an environment variable (unsafe in multi-threaded contexts).</p>
+<p>This uses <code>std::env::set_var</code>, which is <code>unsafe</code> as of Rust 1.77.
+Only use this in single-threaded scenarios.</p>
+<p><strong>Lua Usage</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nv">dapi_dotenv</span><span class="p">.</span><span class="nf">set</span><span class="p">(</span><span class="s2">&quot;MY_VAR&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;123&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nv">dapi_dotenv</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s2">&quot;MY_VAR&quot;</span><span class="p">))</span><span class="w"> </span><span class="c1">--&gt; &quot;123&quot;</span>
+</code></pre></div>
+
+<p><strong>Safety</strong>
+This function uses an <code>unsafe</code> block because modifying environment variables
+is not thread-safe across all platforms.</p>
+<p><strong>Errors</strong>
+Returns a Lua error if key or value contain null bytes (<code>\0</code>), which are invalid.</p>
+<h1 id="yaml">Yaml<a class="headerlink" href="#yaml" title="Permanent link">&para;</a></h1>
+<h2 id="import_3">import<a class="headerlink" href="#import_3" title="Permanent link">&para;</a></h2>
+<div class="codehilite"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">dapi_yaml</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;dapi_yaml&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<h2 id="yamlencode-and-yamldecode"><code>yaml.encode</code> and <code>yaml.decode</code><a class="headerlink" href="#yamlencode-and-yamldecode" title="Permanent link">&para;</a></h2>
+<p>Lua bindings for serializing and deserializing YAML using Rust + <code>mlua</code>.</p>
+<p><strong>Lua Usage</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">yaml</span><span class="p">.</span><span class="nf">decode</span><span class="p">([[</span>
+<span class="nv">name</span><span class="p">:</span><span class="w"> </span><span class="py">ChatGPT</span>
+<span class="nv">version</span><span class="p">:</span><span class="w"> </span><span class="err">4</span>
+<span class="py">features</span><span class="p">:</span>
+<span class="w">  </span><span class="err">-</span><span class="w"> </span><span class="py">mlua</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nv">yaml</span>
+<span class="p">]])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nv">data</span><span class="p">.</span><span class="py">name</span><span class="p">)</span><span class="w">           </span><span class="c1">--&gt; &quot;ChatGPT&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="nv">data</span><span class="p">.</span><span class="py">features</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="w">    </span><span class="c1">--&gt; &quot;mlua&quot;</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">yaml_str</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">yaml</span><span class="p">.</span><span class="nf">encode</span><span class="p">(</span><span class="nv">data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nv">yaml_str</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>Functions</strong></p>
+<p><code>yaml.decode(yaml_str: string) → table</code></p>
+<p>Parses a YAML string and returns a Lua table.</p>
+<p><code>yaml.encode(table: table) → string</code></p>
+<p>Serializes a Lua table into a YAML string.</p>
+<p><strong>Error Handling</strong></p>
+<ul>
+<li>Errors are thrown as Lua exceptions if parsing or serialization fails.</li>
+<li>Invalid Lua types (e.g. userdata, functions) cannot be encoded.</li>
+</ul>
+<h1 id="ini">INI<a class="headerlink" href="#ini" title="Permanent link">&para;</a></h1>
+<p>This API enables conversion between <strong>INI files</strong> and <strong>Lua tables</strong>. It is exposed through a <code>register(lua)</code> function that provides two key functions: <code>parse</code> and <code>convert</code>.</p>
+<h2 id="import_4">import<a class="headerlink" href="#import_4" title="Permanent link">&para;</a></h2>
+<div class="codehilite"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">dapi_ini</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;dapi_ini&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<h2 id="parseini_string-string-table"><code>parse(ini_string: string) -&gt; table</code><a class="headerlink" href="#parseini_string-string-table" title="Permanent link">&para;</a></h2>
+<p><strong>Description:</strong><br />
+Parses a string in INI format and returns a Lua table representing the structure and data.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>ini_string</code> <em>(string)</em>: The contents of an INI file as a string.</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul>
+<li><em>(table)</em>: A Lua table containing sections and key-value pairs from the INI file.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">ini</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[[</span>
+<span class="s">[general]</span>
+<span class="s">name = Max</span>
+<span class="s">active = true</span>
+
+<span class="s">[settings]</span>
+<span class="s">volume = 80</span>
+<span class="s">]]</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">parsed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">dapi_ini</span><span class="p">.</span><span class="nf">parse</span><span class="p">(</span><span class="nv">ini</span><span class="p">)</span>
+
+<span class="c1">-- Access values:</span>
+<span class="nb">print</span><span class="p">(</span><span class="nv">parsed</span><span class="p">.</span><span class="py">general</span><span class="p">.</span><span class="py">name</span><span class="p">)</span><span class="w">      </span><span class="c1">--&gt; &quot;Max&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="nv">parsed</span><span class="p">.</span><span class="py">settings</span><span class="p">.</span><span class="py">volume</span><span class="p">)</span><span class="w">   </span><span class="c1">--&gt; &quot;80&quot;</span>
+</code></pre></div>
+
+<h2 id="convert">convert<a class="headerlink" href="#convert" title="Permanent link">&para;</a></h2>
+<p>This function takes a Lua Table and returns an INI File as a String</p>
+<p><strong>Usage</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1">-- Using Value from above</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">ini_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">dapi_ini</span><span class="p">.</span><span class="nf">convert</span><span class="p">(</span><span class="nv">parsed</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nv">ini_b</span><span class="p">)</span>
+</code></pre></div>
+
+<h1 id="base64">Base64<a class="headerlink" href="#base64" title="Permanent link">&para;</a></h1>
+<h2 id="import_5">import<a class="headerlink" href="#import_5" title="Permanent link">&para;</a></h2>
+<div class="codehilite"><pre><span></span><code><span class="nv">dapi_base64</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;dapi_base64&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<h2 id="encode_2">encode<a class="headerlink" href="#encode_2" title="Permanent link">&para;</a></h2>
+<p>encodes a Text string to base 64</p>
+<h2 id="decode_1">decode<a class="headerlink" href="#decode_1" title="Permanent link">&para;</a></h2>
+<p>decodes a base64 string back to text</p>
+<p><strong>Usage</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">dapi_base64</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;dapi_base64&quot;</span><span class="p">)</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">encoded</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">dapi_base64</span><span class="p">.</span><span class="nf">encode</span><span class="p">(</span><span class="s2">&quot;Hello, Lua!&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nv">encoded</span><span class="p">)</span><span class="w"> </span><span class="c1">-- &quot;SGVsbG8sIEx1YSE=&quot;</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">decoded</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">dapi_base64</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="nv">encoded</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nv">decoded</span><span class="p">)</span><span class="w"> </span><span class="c1">-- &quot;Hello, Lua!&quot;</span>
+</code></pre></div>
+
+<h1 id="xml">XML<a class="headerlink" href="#xml" title="Permanent link">&para;</a></h1>
+<p>A Lua module for converting between <strong>XML strings</strong> and <strong>Lua tables</strong>, using Rust via <code>mlua</code> and <code>xmltree</code>.</p>
+<h2 id="import_6">import<a class="headerlink" href="#import_6" title="Permanent link">&para;</a></h2>
+<div class="codehilite"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">dapi_xml</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;dapi_xml&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<h2 id="dapi_xmldecodexml_string-lua_table"><code>dapi_xml.decode(xml_string) -&gt; lua_table</code><a class="headerlink" href="#dapi_xmldecodexml_string-lua_table" title="Permanent link">&para;</a></h2>
+<p>Parses an XML string and returns a structured Lua table.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>xml_string</code> (<code>string</code>): A valid XML string.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>lua_table</code> (<code>table</code>): The corresponding Lua table structure.</li>
+</ul>
+<p><strong>Example</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">xml</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[[</span>
+<span class="s">&lt;person age=&quot;30&quot;&gt;</span>
+<span class="s">    &lt;name&gt;John&lt;/name&gt;</span>
+<span class="s">    &lt;hobbies&gt;</span>
+<span class="s">        &lt;hobby&gt;Reading&lt;/hobby&gt;</span>
+<span class="s">        &lt;hobby&gt;Coding&lt;/hobby&gt;</span>
+<span class="s">    &lt;/hobbies&gt;</span>
+<span class="s">&lt;/person&gt;</span>
+<span class="s">]]</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">lua_table</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">dapi_xml</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="nv">xml</span><span class="p">)</span>
+
+<span class="c1">-- Access</span>
+<span class="nb">print</span><span class="p">(</span><span class="nv">lua_table</span><span class="p">.</span><span class="py">person</span><span class="p">[</span><span class="s2">&quot;@age&quot;</span><span class="p">])</span><span class="w">          </span><span class="c1">-- &quot;30&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="nv">lua_table</span><span class="p">.</span><span class="py">person</span><span class="p">.</span><span class="py">name</span><span class="p">)</span><span class="w">             </span><span class="c1">-- &quot;John&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="nv">lua_table</span><span class="p">.</span><span class="py">person</span><span class="p">.</span><span class="py">hobbies</span><span class="p">.</span><span class="py">hobby</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="w"> </span><span class="c1">-- &quot;Reading&quot;</span>
+</code></pre></div>
+
+<h2 id="dapi_xmlencodelua_table-xml_string"><code>dapi_xml.encode(lua_table) -&gt; xml_string</code><a class="headerlink" href="#dapi_xmlencodelua_table-xml_string" title="Permanent link">&para;</a></h2>
+<p>Converts a Lua table into an XML string.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>lua_table</code> (<code>table</code>): A structured Lua table representing XML elements, attributes, and text.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>xml_string</code> (<code>string</code>): A valid XML string.</li>
+</ul>
+<p><strong>Example</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">lua_table</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">person</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="p">[</span><span class="s2">&quot;@age&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;30&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;John&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">hobbies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nv">hobby</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;Reading&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Coding&quot;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">xml</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">dapi_xml</span><span class="p">.</span><span class="nf">encode</span><span class="p">(</span><span class="nv">lua_table</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nv">xml</span><span class="p">)</span>
+<span class="cm">--[[</span>
+<span class="cm">&lt;root&gt;</span>
+<span class="cm">  &lt;person age=&quot;30&quot;&gt;</span>
+<span class="cm">    &lt;name&gt;John&lt;/name&gt;</span>
+<span class="cm">    &lt;hobbies&gt;</span>
+<span class="cm">      &lt;hobby&gt;Reading&lt;/hobby&gt;</span>
+<span class="cm">      &lt;hobby&gt;Coding&lt;/hobby&gt;</span>
+<span class="cm">    &lt;/hobbies&gt;</span>
+<span class="cm">  &lt;/person&gt;</span>
+<span class="cm">&lt;/root&gt;</span>
+<span class="cm">]]</span>
+</code></pre></div>
+
+<h1 id="xml-to-table-conventions">XML-to-Table Conventions<a class="headerlink" href="#xml-to-table-conventions" title="Permanent link">&para;</a></h1>
+<table>
+<thead>
+<tr>
+<th>XML Feature</th>
+<th>Lua Table Representation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Attributes</td>
+<td>Keys prefixed with <code>@</code></td>
+</tr>
+<tr>
+<td>Text content</td>
+<td>Key <code>#text</code></td>
+</tr>
+<tr>
+<td>Repeated tags</td>
+<td>Lua arrays</td>
+</tr>
+</tbody>
+</table>
+<h2 id="examples">Examples:<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
+<h3 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nv">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;@id&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;123&quot;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
+<p>→</p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;node</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;123&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+</code></pre></div>
+
+<h3 id="text-content">Text content<a class="headerlink" href="#text-content" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nv">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;#text&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Hello&quot;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
+<p>→</p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;node&gt;</span>Hello<span class="nt">&lt;/node&gt;</span>
+</code></pre></div>
+
+<h3 id="multiple-elements">Multiple elements<a class="headerlink" href="#multiple-elements" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nv">items</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">item</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;A&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;B&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;C&quot;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
+<p>→</p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;items&gt;</span>
+<span class="w">  </span><span class="nt">&lt;item&gt;</span>A<span class="nt">&lt;/item&gt;</span>
+<span class="w">  </span><span class="nt">&lt;item&gt;</span>B<span class="nt">&lt;/item&gt;</span>
+<span class="w">  </span><span class="nt">&lt;item&gt;</span>C<span class="nt">&lt;/item&gt;</span>
+<span class="nt">&lt;/items&gt;</span>
+</code></pre></div>
+
+<hr />
+<h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h2>
+<ul>
+<li>The default root tag is <code>&lt;root&gt;</code> when encoding unless the table has a single top-level key.</li>
+<li>Mixed content (text + child nodes) is only partially supported.</li>
+<li><code>null</code> values or empty elements are skipped during encoding.</li>
+</ul>
+<hr />
+<h2 id="roundtrip-example">Roundtrip Example<a class="headerlink" href="#roundtrip-example" title="Permanent link">&para;</a></h2>
+<div class="codehilite"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">person</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="p">[</span><span class="s2">&quot;@id&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;42&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="p">[</span><span class="s2">&quot;#text&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Alice&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nv">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">xml</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">dapi_xml</span><span class="p">.</span><span class="nf">encode</span><span class="p">(</span><span class="nv">t</span><span class="p">)</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">t2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">dapi_xml</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="nv">xml</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;inspect&quot;</span><span class="p">)(</span><span class="nv">t2</span><span class="p">))</span>
+<span class="c1">-- Output should closely match the original `t`</span>
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy", "content.tabs.link", "toc.integrate"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>
