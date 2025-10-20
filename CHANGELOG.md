@@ -49,6 +49,7 @@ be enable with an 2nd Optional Boolean Argument as `true`
 - added Commands to the Makefile
 - added Module Stuff
 - added Module Tests
+- `run3()` runs now a command with colors
 
 Read the DOCS for Version 0.2.0 for more Infos
 

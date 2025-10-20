@@ -185,56 +185,33 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     })?;
 
     // TODO
-    // Only the error is printed is async
-    // Function to run a command Async
+    // Run a command with colors with out the Errir printing?
     let run3 = lua.create_function(|lua, command: String| {
-        #[cfg(target_os = "windows")]
-        let mut child = Command::new("cmd")
-            .arg("/C")
-            .arg(&command)
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn()?;
+        let status = if cfg!(target_os = "windows") {
+            Command::new("cmd")
+                .arg("/C")
+                .arg(&command)
+                .stdin(Stdio::inherit())
+                .stdout(Stdio::inherit())
+                .stderr(Stdio::inherit())
+                .status()?
+        } else {
+            Command::new("sh")
+                .arg("-c")
+                .arg(&command)
+                .stdin(Stdio::inherit())
+                .stdout(Stdio::inherit())
+                .stderr(Stdio::inherit())
+                .status()?
+        };
 
-        #[cfg(not(target_os = "windows"))]
-        let mut child = Command::new("sh")
-            .arg("-c")
-            .arg(&command)
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn()?;
-
-        let stdout = child.stdout.take().unwrap();
-        let stderr = child.stderr.take().unwrap();
-
-        // Stdout thread
-        thread::spawn(move || {
-            let reader = BufReader::new(stdout);
-            for line in reader.lines() {
-                if let Ok(line) = line {
-                    println!("[stdout] {}", line);
-                    // Optional: Lua-Callback aufrufen hier
-                }
-            }
-        });
-
-        // Stderr thread
-        thread::spawn(move || {
-            let reader = BufReader::new(stderr);
-            for line in reader.lines() {
-                if let Ok(line) = line {
-                    eprintln!("[stderr] {}", line);
-                    // Optional: Lua-Callback aufrufen hier
-                }
-            }
-        });
-
-        let status = child.wait()?; // Warten, bis Prozess beendet ist
-
-        let table = lua.create_table_from(vec![(
-            "status",
-            Value::Integer(status.code().unwrap_or(-1) as i64),
-        )])?;
+        // Kein Output-Buffering hier – da stdout/stderr direkt an Terminal gingen
+        // Aber wir geben trotzdem den Status zurück
+        let table = lua.create_table_from(vec![
+            ("status", Value::Integer(status.code().unwrap_or(-1) as i64)),
+            ("stdout", Value::Nil),
+            ("stderr", Value::Nil),
+        ])?;
 
         Ok(table)
     })?;
