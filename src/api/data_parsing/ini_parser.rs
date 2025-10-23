@@ -64,7 +64,17 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     // Start with the content of a Ini File, returns a Lua Table
     let parse_ini = lua.create_function(|lua, value: String| {
         let ini_value: &str = &value;
-        let ini_map = ini::inistr!(ini_value);
+        let mut ini_map = ini::inistr!(ini_value);
+
+        // 👇 Patch: ensure flag keys are not dropped
+        for (section, entries) in ini_map.iter_mut() {
+            for (k, v) in entries.clone() {
+                if v.is_none() {
+                    entries.insert(k.clone(), Some(String::new()));
+                }
+            }
+        }
+
         let json_str = serde_json::to_string_pretty(&ini_map)
             .map_err(|e| mlua::Error::RuntimeError(e.to_string()))?;
         let json_value: serde_json::Value =
@@ -82,4 +92,226 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     table.set("convert", create_ini)?;
 
     Ok(table)
+}
+
+#[cfg(test)]
+mod tests {
+    use mlua::Lua;
+
+    const SAMPLE_INI: &str = r#"
+[server]
+host = localhost
+port = 8080
+
+[database]
+user = admin
+password = secret
+"#;
+
+    #[test]
+    fn test_lua_table_to_ini_roundtrip() {
+        let lua = Lua::new();
+
+        let table = lua.create_table().unwrap();
+        let server_tbl = lua.create_table().unwrap();
+        server_tbl.set("host", "localhost").unwrap();
+        server_tbl.set("port", 8080).unwrap();
+        table.set("server", server_tbl).unwrap();
+
+        let db_tbl = lua.create_table().unwrap();
+        db_tbl.set("user", "admin").unwrap();
+        db_tbl.set("password", "secret").unwrap();
+        table.set("database", db_tbl).unwrap();
+
+        let ini_str = super::map_to_ini_string(&super::lua_table_to_ini(&table).unwrap());
+        assert!(ini_str.contains("[server]"));
+        assert!(ini_str.contains("host = localhost"));
+        assert!(ini_str.contains("port = 8080"));
+        assert!(ini_str.contains("[database]"));
+        assert!(ini_str.contains("password = secret"));
+    }
+
+    #[test]
+    fn test_full_cycle_parse_and_convert() {
+        let lua = Lua::new();
+        let ini_table = super::register(&lua).unwrap();
+
+        let parse_func: mlua::Function = ini_table.get("parse").unwrap();
+        let table: mlua::Table = parse_func.call(SAMPLE_INI.to_string()).unwrap();
+
+        let convert_func: mlua::Function = ini_table.get("convert").unwrap();
+        let ini_output: String = convert_func.call(table).unwrap();
+
+        assert!(ini_output.contains("[server]"));
+        assert!(ini_output.contains("host = localhost"));
+        assert!(ini_output.contains("[database]"));
+        assert!(ini_output.contains("user = admin"));
+    }
+
+    #[test]
+    fn test_empty_and_flag_values() {
+        let lua = Lua::new();
+        let ini_table = super::register(&lua).unwrap();
+
+        let sample = r#"
+[flags]
+enabled
+disabled = 
+checked = true
+count = 42
+"#;
+
+        let parse_func: mlua::Function = ini_table.get("parse").unwrap();
+        let table: mlua::Table = parse_func.call(sample.to_string()).unwrap();
+
+        let flags: mlua::Table = table.get("flags").unwrap();
+
+        // "enabled" ist ein key ohne "=" → sollte Nil oder None sein
+        let enabled: Option<String> = flags.get("enabled").ok();
+        assert!(enabled.is_none() || enabled.as_deref() == Some(""));
+
+        // "disabled" hat ein leeres "=" → sollte leeren String liefern
+        let disabled: Option<String> = flags.get("disabled").ok();
+        assert!(disabled.is_none() || disabled.as_deref() == Some(""));
+
+        assert_eq!(flags.get::<String>("checked").unwrap(), "true");
+        assert_eq!(flags.get::<String>("count").unwrap(), "42");
+
+        // Roundtrip: zurück in INI konvertieren
+        let convert_func: mlua::Function = ini_table.get("convert").unwrap();
+        let ini_output: String = convert_func.call(table).unwrap();
+
+        assert!(ini_output.contains("checked = true"));
+        assert!(ini_output.contains("count = 42"));
+        assert!(ini_output.contains("enabled"));
+    }
+
+    #[test]
+    fn test_default_section_handling() {
+        let lua = Lua::new();
+        let ini_table = super::register(&lua).unwrap();
+
+        let sample = r#"
+username = guest
+password = test123
+[server]
+host = 127.0.0.1
+"#;
+
+        let parse_func: mlua::Function = ini_table.get("parse").unwrap();
+        let table: mlua::Table = parse_func.call(sample.to_string()).unwrap();
+
+        let default_section: mlua::Table = table.get("default").unwrap();
+        assert_eq!(default_section.get::<String>("username").unwrap(), "guest");
+        assert_eq!(
+            default_section.get::<String>("password").unwrap(),
+            "test123"
+        );
+
+        let server: mlua::Table = table.get("server").unwrap();
+        assert_eq!(server.get::<String>("host").unwrap(), "127.0.0.1");
+
+        // zurück in INI-Text
+        let convert_func: mlua::Function = ini_table.get("convert").unwrap();
+        let ini_str: String = convert_func.call(table).unwrap();
+
+        // default keys sollten ohne [default] erscheinen
+        assert!(ini_str.contains("username = guest"));
+        assert!(ini_str.contains("[server]"));
+    }
+
+    #[test]
+    fn test_case_insensitivity_of_keys() {
+        let lua = Lua::new();
+        let ini_table = super::register(&lua).unwrap();
+
+        let sample = r#"
+[MySection]
+Host = localhost
+PORT = 9000
+"#;
+
+        let parse_func: mlua::Function = ini_table.get("parse").unwrap();
+        let table: mlua::Table = parse_func.call(sample.to_string()).unwrap();
+
+        let sec: mlua::Table = table.get("mysection").unwrap(); // wird kleingeschrieben
+        assert_eq!(sec.get::<String>("host").unwrap(), "localhost");
+        assert_eq!(sec.get::<String>("port").unwrap(), "9000");
+
+        // Roundtrip prüfen
+        let convert_func: mlua::Function = ini_table.get("convert").unwrap();
+        let ini_output: String = convert_func.call(table).unwrap();
+
+        assert!(ini_output.contains("[mysection]"));
+        assert!(ini_output.contains("port = 9000"));
+    }
+
+    #[test]
+    fn test_numeric_and_boolean_values_roundtrip() {
+        let lua = Lua::new();
+        let ini_table = super::register(&lua).unwrap();
+
+        let sample = r#"
+[settings]
+enabled = true
+threshold = 0.75
+count = 100
+"#;
+
+        let parse_func: mlua::Function = ini_table.get("parse").unwrap();
+        let table: mlua::Table = parse_func.call(sample.to_string()).unwrap();
+
+        let settings: mlua::Table = table.get("settings").unwrap();
+        assert_eq!(settings.get::<String>("enabled").unwrap(), "true");
+        assert_eq!(settings.get::<String>("threshold").unwrap(), "0.75");
+        assert_eq!(settings.get::<String>("count").unwrap(), "100");
+
+        let convert_func: mlua::Function = ini_table.get("convert").unwrap();
+        let output: String = convert_func.call(table).unwrap();
+
+        assert!(output.contains("enabled = true"));
+        assert!(output.contains("threshold = 0.75"));
+        assert!(output.contains("count = 100"));
+    }
+
+    #[test]
+    fn test_complex_roundtrip_multiple_sections() {
+        let lua = Lua::new();
+        let ini_table = super::register(&lua).unwrap();
+
+        let sample = r#"
+[app]
+name = testapp
+version = 1.2.3
+
+[logging]
+level = debug
+path = /tmp/app.log
+
+[network]
+timeout = 30
+ssl = false
+"#;
+
+        let parse_func: mlua::Function = ini_table.get("parse").unwrap();
+        let table: mlua::Table = parse_func.call(sample.to_string()).unwrap();
+
+        let app: mlua::Table = table.get("app").unwrap();
+        assert_eq!(app.get::<String>("name").unwrap(), "testapp");
+        assert_eq!(app.get::<String>("version").unwrap(), "1.2.3");
+
+        let net: mlua::Table = table.get("network").unwrap();
+        assert_eq!(net.get::<String>("timeout").unwrap(), "30");
+        assert_eq!(net.get::<String>("ssl").unwrap(), "false");
+
+        // Rückwandlung prüfen
+        let convert_func: mlua::Function = ini_table.get("convert").unwrap();
+        let out: String = convert_func.call(table).unwrap();
+
+        assert!(out.contains("[app]"));
+        assert!(out.contains("[logging]"));
+        assert!(out.contains("[network]"));
+        assert!(out.contains("ssl = false"));
+        assert!(out.contains("version = 1.2.3"));
+    }
 }

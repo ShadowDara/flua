@@ -91,3 +91,110 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     Ok(table)
 }
+
+#[cfg(test)]
+mod tests {
+    use mlua::{Lua, Value};
+    use std::env;
+    use std::fs::{self, File};
+    use std::io::Write;
+
+    // Importiere deine Funktion
+    use super::*; // ← anpassen an dein Crate
+
+    #[test]
+    fn test_env_get_and_set() -> mlua::Result<()> {
+        let lua = Lua::new();
+        let env_mod = register(&lua)?;
+        lua.globals().set("env", env_mod)?;
+
+        // Setze eine Variable
+        lua.load(r#"env.set("FOO", "BAR")"#).exec()?;
+
+        // Lese sie wieder
+        let val: Option<String> = lua.load(r#"return env.get("FOO")"#).eval()?;
+        assert_eq!(val, Some("BAR".to_string()));
+
+        // Entferne sie wieder
+        lua.load(r#"env.set("FOO", nil)"#).exec()?;
+        let val: Option<String> = lua.load(r#"return env.get("FOO")"#).eval()?;
+        assert_eq!(val, None);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_env_get_nonexistent() -> mlua::Result<()> {
+        let lua = Lua::new();
+        let env_mod = register(&lua)?;
+        lua.globals().set("env", env_mod)?;
+
+        // Variable, die es nicht gibt
+        let val: Value = lua
+            .load(r#"return env.get("SOMETHING_THAT_DOESNT_EXIST")"#)
+            .eval()?;
+        assert!(matches!(val, Value::Nil));
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_env_set_with_null_bytes() {
+        let lua = Lua::new();
+        let env_mod = register(&lua).unwrap();
+        lua.globals().set("env", env_mod).unwrap();
+
+        // Null-Byte im Key
+        let result: mlua::Result<()> = lua.load(r#"env.set("BAD\0KEY", "VAL")"#).exec();
+        assert!(result.is_err());
+
+        // Null-Byte im Value
+        let result: mlua::Result<()> = lua.load(r#"env.set("KEY", "VAL\0UE")"#).exec();
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_env_load_default() -> mlua::Result<()> {
+        // Erzeuge temporäre .env-Datei
+        let path = ".env";
+        let mut file = File::create(path).unwrap();
+        writeln!(file, "MY_TEST_VAR=123").unwrap();
+
+        let lua = Lua::new();
+        let env_mod = register(&lua)?;
+        lua.globals().set("env", env_mod)?;
+
+        lua.load(r#"env.load()"#).exec()?;
+        assert_eq!(env::var("MY_TEST_VAR").unwrap(), "123");
+
+        // Aufräumen
+        fs::remove_file(path).unwrap();
+        unsafe {
+            env::remove_var("MY_TEST_VAR");
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_env_load_custom_file() -> mlua::Result<()> {
+        let path = "custom.env";
+        let mut file = File::create(path).unwrap();
+        writeln!(file, "ANOTHER_VAR=hello_world").unwrap();
+
+        let lua = Lua::new();
+        let env_mod = register(&lua)?;
+        lua.globals().set("env", env_mod)?;
+
+        lua.load(&format!(r#"env.load("{}")"#, path)).exec()?;
+        assert_eq!(env::var("ANOTHER_VAR").unwrap(), "hello_world");
+
+        // Aufräumen
+        fs::remove_file(path).unwrap();
+        unsafe {
+            env::remove_var("ANOTHER_VAR");
+        }
+
+        Ok(())
+    }
+}

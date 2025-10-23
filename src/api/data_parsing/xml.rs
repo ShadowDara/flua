@@ -284,69 +284,70 @@ mod tests {
     }
 
     #[test]
-fn test_null_and_bool_values() {
-    let json_value = json!({
-        "root": {
-            "active": true,
-            "count": 5,
-            "empty": null
-        }
-    });
-
-    let elem = value_to_element("root", &json_value).unwrap();
-    let mut buf = Vec::new();
-    elem.write(&mut buf).unwrap();
-    let xml_out = String::from_utf8(buf).unwrap();
-
-    assert!(xml_out.contains("<active>true</active>"));
-    assert!(xml_out.contains("<count>5</count>"));
-    assert!(xml_out.contains("<empty")); // ✅ geändert
-}
-
-
-    #[test]
-fn test_array_round_trip() {
-    let json_value = json!({
-        "root": {
-            "items": [
-                {"name": "A"},
-                {"name": "B"}
-            ]
-        }
-    });
-
-    // JSON → XML
-    let elem = value_to_element("root", &json_value).unwrap();
-    let mut buf = Vec::new();
-    elem.write(&mut buf).unwrap();
-    let xml_str = String::from_utf8(buf).unwrap();
-
-    // XML → JSON
-    let elem_back = xmltree::Element::parse(xml_str.as_bytes()).unwrap();
-    let json_back = element_to_value(&elem_back);
-
-    println!("json_back = {}", serde_json::to_string_pretty(&json_back).unwrap());
-
-    // Zugriff auf root → items
-    let items = json_back
-        .get("root")
-        .and_then(|r| r.get("items"))
-        .and_then(|i| i.as_array())
-        .unwrap_or_else(|| {
-            panic!(
-                "json_back had unexpected structure: {}",
-                serde_json::to_string_pretty(&json_back).unwrap()
-            )
+    fn test_null_and_bool_values() {
+        let json_value = json!({
+            "root": {
+                "active": true,
+                "count": 5,
+                "empty": null
+            }
         });
 
-    assert_eq!(items.len(), 2, "Expected 2 array items");
+        let elem = value_to_element("root", &json_value).unwrap();
+        let mut buf = Vec::new();
+        elem.write(&mut buf).unwrap();
+        let xml_out = String::from_utf8(buf).unwrap();
 
-    let names: Vec<_> = items
-        .iter()
-        .filter_map(|v| v.get("name").and_then(|n| n.as_str()))
-        .collect();
+        assert!(xml_out.contains("<active>true</active>"));
+        assert!(xml_out.contains("<count>5</count>"));
+        assert!(xml_out.contains("<empty")); // ✅ geändert
+    }
 
-    assert_eq!(names, vec!["A", "B"]);
-}
+    #[test]
+    fn test_array_round_trip() {
+        let json_value = json!({
+            "root": {
+                "items": [
+                    {"name": "A"},
+                    {"name": "B"}
+                ]
+            }
+        });
 
+        // JSON → XML
+        let elem = value_to_element("root", &json_value).unwrap();
+        let mut buf = Vec::new();
+        elem.write(&mut buf).unwrap();
+        let xml_str = String::from_utf8(buf).unwrap();
+
+        // XML → JSON
+        let elem_back = xmltree::Element::parse(xml_str.as_bytes()).unwrap();
+        let json_back = element_to_value(&elem_back);
+
+        println!(
+            "json_back = {}",
+            serde_json::to_string_pretty(&json_back).unwrap()
+        );
+
+        // Zugriff auf root → items
+        let items = json_back
+            .get("root")
+            .and_then(|r| r.get("items"))
+            .and_then(|i| i.as_array())
+            .unwrap_or_else(|| {
+                panic!(
+                    "json_back had unexpected structure: {}",
+                    serde_json::to_string_pretty(&json_back).unwrap()
+                )
+            });
+
+        assert_eq!(items.len(), 2, "Expected 2 array items");
+
+        let names: Vec<_> = items
+            .iter()
+            .filter_map(|v| v.get("name").and_then(|n| n.as_str()))
+            .collect();
+
+        assert_eq!(names, vec!["A", "B"]);
+    }
 }
