@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Newest Develepment
+- added Tests for TOML
+- added Tests for XML
+
 ## 0.2.0
 
 ### Big Changes

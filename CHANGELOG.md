@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## Newest Develepment
+- added Tests for TOML
+- added Tests for XML
+- added Workflow to run tests on PUSH and PR
+
 ## 0.2.0
 
 ### Big Changes
