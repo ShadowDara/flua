@@ -67,7 +67,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         let mut ini_map = ini::inistr!(ini_value);
 
         // 👇 Patch: ensure flag keys are not dropped
-        for (section, entries) in ini_map.iter_mut() {
+        for (_section, entries) in ini_map.iter_mut() {
             for (k, v) in entries.clone() {
                 if v.is_none() {
                     entries.insert(k.clone(), Some(String::new()));
