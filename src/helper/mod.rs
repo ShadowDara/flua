@@ -3,8 +3,8 @@ pub mod macros;
 pub mod print;
 pub mod update;
 
-use crate::helper::print::{BLUE, BOLD, CYAN, END, GREEN, PURPLE, RED, YELLOW};
 use crate::VERSION;
+use crate::helper::print::{BLUE, BOLD, CYAN, END, GREEN, PURPLE, RED, YELLOW};
 
 // Function for a detailed INFO help Message
 pub fn print_help() {
