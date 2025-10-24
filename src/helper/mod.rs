@@ -1,4 +1,5 @@
 pub mod dir;
+pub mod logger;
 pub mod macros;
 pub mod print;
 pub mod update;

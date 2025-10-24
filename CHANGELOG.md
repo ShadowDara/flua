@@ -10,6 +10,7 @@
 - added Config File in `config_dir()/@shadowdara/flua/config.lua`
 - loading the Config File
 - added config file Infos to the help message
+- added Tests for Time
 
 ## 0.2.0
 
