@@ -1,3 +1,4 @@
+pub mod config;
 pub mod dir;
 pub mod logger;
 pub mod macros;
@@ -128,4 +129,24 @@ pub fn config_help() {
         "{}    check{}       to check if the config file is correct",
         op, END
     );
+    println!(
+        "{}    clean{}       to delete the current configfile",
+        op, END
+    );
+}
+
+// Function to wait some to read the command in an open Terminal Window
+// when an Error appears
+//
+// TODO
+// Make this Interuptable with pressing Enter
+pub fn exit(wait: bool, error: bool) {
+    if wait {
+        std::thread::sleep(std::time::Duration::from_secs(3));
+    }
+    if error {
+        std::process::exit(1);
+    } else {
+        std::process::exit(0);
+    }
 }

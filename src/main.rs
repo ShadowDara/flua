@@ -1,8 +1,4 @@
-use dirs_next;
-use mlua::Lua;
 use std::env;
-use std::fs;
-use std::path::PathBuf;
 use tokio;
 
 mod api;
@@ -18,11 +14,7 @@ mod windows_utf8;
 pub const VERSION: &str = "0.2.1";
 
 use crate::helper::print::{END, GREEN, RED, YELLOW};
-
-struct FluaConfig {
-    // CONFIG VALUES
-    wait_time: u64,
-}
+use crate::helper::exit;
 
 #[tokio::main]
 async fn main() {
@@ -33,6 +25,8 @@ async fn main() {
     // Array of Programm Arguments
     let args: Vec<String> = env::args().collect();
 
+    // TODO
+    // Refactor wait on exit for the timer
     let mut wait_on_exit = true;
 
     if args.len() < 2 {
@@ -63,6 +57,7 @@ async fn main() {
     let mut helpconfig = false;
 
     // Modules
+    let mut config = false;
     let mut module_init = false;
 
     let mut args_iter = args.iter().peekable();
@@ -75,15 +70,9 @@ async fn main() {
             // IMPORTANT BOOL ARGUMENTS
             //
             // To Suppress a wait Message
-            "-nw" => {
-                wait_on_exit = false;
-            }
-            "-no-config" => {
-                load_config = false;
-            }
-            "--no-info" => {
-                info = false;
-            }
+            "-nw" => wait_on_exit = false,
+            "-no-config" => load_config = false,
+            "--no-info" => info = false,
             //
             // ARGUMENTS WHICH CLOSE AFTER RUNNING
             //
@@ -94,78 +83,14 @@ async fn main() {
                 exit(wait_on_exit, true);
             }
             // Showing the version
-            "--version" | "-v" => {
-                version = true;
-            }
+            "--version" | "-v" => version = true,
             // Seding a Help Message
-            "--help" | "-h" | "h" => {
-                help = true;
-            }
-            "--help-config" => {
-                helpconfig = true;
-            }
+            "--help" | "-h" | "h" => help = true,
+            "--help-config" => helpconfig = true,
             // CREATING A MODULE
-            "init" => {
-                module_init = false;
-            }
+            "init" => module_init = false,
             // Config Stuff
-            "config" => {
-                let mut path: PathBuf =
-                    dirs_next::config_dir().expect("could not find config_dir()");
-
-                path.push("@shadowdara");
-                path.push("flua");
-                path.push("config.lua");
-
-                match args_iter.peek().map(|s| s.as_str()) {
-                    // To generate a new Config File
-                    Some("generate") => {
-                        println!("Generating new config file...");
-
-                        if path.exists() {
-                            println!(
-                                "Config file already exists at '{}', skipping creation.",
-                                path.display()
-                            );
-                        } else {
-                            let contents = r#"
--- Configfile for Flua
---
--- More Infos available here
--- https://github.com/ShadowDara/LuaAPI-Rust
--- https://shadowdara.github.io/flua/
-
--- Variable for Config Values
-config = {}
-
--- Varibales for the close / error wait time
-config.wait_time = 0
-"#;
-
-                            match fs::write(path.clone(), contents) {
-                                Ok(_) => println!("File '{}' created!", path.display()),
-                                Err(e) => eprintln!("Error while creating file: {}", e),
-                            }
-                        }
-                    }
-                    // To open the Config File in a default Editor
-                    Some("open") => {
-                        // args_iter.next(); // consume the "open" argument
-                        println!("Opening config file...");
-                        open::that(&path).expect("Failed to open file");
-                        // Open code here
-                    }
-                    Some("check") => {
-                        // Trying to load the config file if it works
-                        println!("Implemented soon!");
-                    }
-                    _ => {
-                        println!("No subcommand specified for config.");
-                    }
-                }
-                // Interrupt after opening the Config File
-                exit(wait_on_exit, false);
-            }
+            "config" => config = true,
             //
             // OTHER ARGUMENTS
             //
@@ -193,7 +118,7 @@ config.wait_time = 0
 
     // 1. LOAD THE CONFIG
 
-    let configvalue = loadconfig(load_config);
+    let configvalue = helper::config::loadconfig(load_config);
 
     // 2. Run Version, Help, Module Init
 
@@ -208,6 +133,10 @@ config.wait_time = 0
     if helpconfig {
         helper::config_help();
         exit(wait_on_exit, false);
+    }
+    // Showing options for config
+    if config {
+        helper::config::configstuff(args_iter.clone(), wait_on_exit)
     }
     if module_init {
         println!("Not implemnted!");
@@ -307,54 +236,4 @@ async fn handle_script_execution(
     }
 
     Ok(())
-}
-
-// Function to wait some to read the command in an open Terminal Window
-// when an Error appears
-//
-// TODO
-// Make this Interuptable with pressing Enter
-fn exit(wait: bool, error: bool) {
-    if wait {
-        std::thread::sleep(std::time::Duration::from_secs(3));
-    }
-    if error {
-        std::process::exit(1);
-    } else {
-        std::process::exit(0);
-    }
-}
-
-fn loadconfig(doload: bool) -> FluaConfig {
-    if !doload {
-        return FluaConfig { wait_time: 3 };
-    }
-
-    let mut path: PathBuf = dirs_next::config_dir().expect("could not find config_dir()");
-
-    path.push("@shadowdara");
-    path.push("flua");
-    path.push("config.lua");
-
-    let contents: String = match fs::read_to_string(&path) {
-        Ok(c) => c,
-        Err(_) => {
-            println!("Config file not found, using default Config.");
-            return FluaConfig { wait_time: 3 };
-        }
-    };
-
-    let lua = Lua::new();
-
-    // Lua ausführen
-    lua.load(contents).exec().expect("Failed to exec Lua");
-
-    // Jetzt aus Rust die Lua-Tabelle auslesen
-    let globals = lua.globals();
-    let config_table = globals
-        .get::<mlua::Table>("config")
-        .expect("No 'config' table found");
-
-    let wait_time: u64 = config_table.get("wait_time").unwrap_or(0);
-    FluaConfig { wait_time }
 }
