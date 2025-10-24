@@ -58,8 +58,9 @@ async fn main() {
     let mut load_config = true;
 
     // Usage Args
-    let mut help = false;
     let mut version = false;
+    let mut help = false;
+    let mut helpconfig = false;
 
     // Modules
     let mut module_init = false;
@@ -100,29 +101,70 @@ async fn main() {
             "--help" | "-h" | "h" => {
                 help = true;
             }
+            "--help-config" => {
+                helpconfig = true;
+            }
             // CREATING A MODULE
             "init" => {
                 module_init = false;
             }
             // Config Stuff
             "config" => {
+                let mut path: PathBuf =
+                    dirs_next::config_dir().expect("could not find config_dir()");
+
+                path.push("@shadowdara");
+                path.push("flua");
+                path.push("config.lua");
+
                 match args_iter.peek().map(|s| s.as_str()) {
+                    // To generate a new Config File
                     Some("generate") => {
-                        args_iter.next(); // consume the "generate" argument
-                        println!("Generating config...");
-                        // Generate code here
+                        println!("Generating new config file...");
+
+                        if path.exists() {
+                            println!(
+                                "Config file already exists at '{}', skipping creation.",
+                                path.display()
+                            );
+                        } else {
+                            let contents = r#"
+-- Configfile for Flua
+--
+-- More Infos available here
+-- https://github.com/ShadowDara/LuaAPI-Rust
+-- https://shadowdara.github.io/flua/
+
+-- Variable for Config Values
+config = {}
+
+-- Varibales for the close / error wait time
+config.wait_time = 0
+"#;
+
+                            match fs::write(path.clone(), contents) {
+                                Ok(_) => println!("File '{}' created!", path.display()),
+                                Err(e) => eprintln!("Error while creating file: {}", e),
+                            }
+                        }
                     }
+                    // To open the Config File in a default Editor
                     Some("open") => {
-                        args_iter.next(); // consume the "open" argument
-                        println!("Opening config...");
+                        // args_iter.next(); // consume the "open" argument
+                        println!("Opening config file...");
+                        open::that(&path).expect("Failed to open file");
                         // Open code here
+                    }
+                    Some("check") => {
+                        // Trying to load the config file if it works
+                        println!("Implemented soon!");
                     }
                     _ => {
                         println!("No subcommand specified for config.");
                     }
                 }
                 // Interrupt after opening the Config File
-                break;
+                exit(wait_on_exit, false);
             }
             //
             // OTHER ARGUMENTS
@@ -155,12 +197,16 @@ async fn main() {
 
     // 2. Run Version, Help, Module Init
 
-    if help {
-        helper::print_help();
-        exit(wait_on_exit, false);
-    }
     if version {
         println!("{}", VERSION);
+        exit(wait_on_exit, false);
+    }
+    if help {
+        helper::help();
+        exit(wait_on_exit, false);
+    }
+    if helpconfig {
+        helper::config_help();
         exit(wait_on_exit, false);
     }
     if module_init {

@@ -4,41 +4,47 @@ pub mod print;
 pub mod update;
 
 use crate::VERSION;
-use crate::helper::print::{BLUE, BOLD, CYAN, END, GREEN, PURPLE, RED, YELLOW};
+use crate::helper::print::{BLUE, BOLD, BRIGHT_BLUE, CYAN, END, GREEN, PURPLE, RED, YELLOW};
+
+// TODO
+// add no color argument for no color output
+
+//[GENERALL-OPTIONS]
+const sco: &str = PURPLE;
+
+//[SCRIPTOPTIONS]
+const SC: &str = YELLOW;
+
+//[OPTIONS]
+const opt: &str = CYAN;
+
+//<action>
+const AC: &str = RED;
+
+//<custom-action-options>
+const aco: &str = CYAN;
+
+// OptionList
+const op: &str = BLUE;
+
+// LINKs
+const LINK: &str = BLUE;
+
+// CONFIG
+const CONFIG: &str = BRIGHT_BLUE;
 
 // Function for a detailed INFO help Message
-pub fn print_help() {
-    //[GENERALL-OPTIONS]
-    let sco = PURPLE;
-
-    //[SCRIPTOPTIONS]
-    let sc = YELLOW;
-
-    //[OPTIONS]
-    let opt = CYAN;
-
-    //<action>
-    let ac = RED;
-
-    //<custom-action-options>
-    let aco = CYAN;
-
-    // OptionList
-    let op = BLUE;
-
-    // Links
-    let link = BLUE;
-
+pub fn help() {
     // Start
     println!("{}Flua Help:{}", GREEN, END);
     println!("Using Version {}{}v{}{}", BOLD, GREEN, VERSION, END);
     // Lua Scripts
     println!(
         "\nUsage for Lua scripts: {}<flua>{} <script.lua> {}[SCRIPTOPTIONS]{} {}[GENERALL-OPTIONS]{}",
-        GREEN, END, sc, END, sco, END
+        GREEN, END, SC, END, sco, END
     );
     //[SCRIPTOPTIONS]
-    println!("\n{}[SCRIPTOPTIONS]{}", sc, END);
+    println!("\n{}[SCRIPTOPTIONS]{}", SC, END);
     println!(
         "{}  --safe:        {}Run in safe mode (limited API, no OS access)",
         op, END
@@ -54,9 +60,9 @@ pub fn print_help() {
     // Modules
     println!(
         "\nUsage for Modules: {}<flua>{} run {}<actions>{} {}<custom-action-options>{} {}[GENERALL-OPTIONS]{}",
-        GREEN, END, ac, END, aco, END, sco, END
+        GREEN, END, AC, END, aco, END, sco, END
     );
-    println!("\n{}<actions>{}:   'update', 'install'", ac, END);
+    println!("\n{}<actions>{}:   'update', 'install'", AC, END);
     println!(
         "{}  module         {}Argument to run a {}dlm13{} Module",
         op, END, RED, END
@@ -88,11 +94,37 @@ pub fn print_help() {
         op, END
     );
     println!(
-        "{}  -no-config     {}The Programm will not search or load the config file. Standard Option is true, if there is no config file, the step will be skipped. A config file will not be created automaticly!",
+        "{}  -no-config     {}The Programm will not search or load the Config file. Standard Option is true, if there is no Config file, the step will be skipped. A Config file will not be created automaticly!",
         op, END
     );
+    // CONFIG
+    println!("\n{}[MORE-OPTIONS]{}", CONFIG, END);
+    println!("  --help-config");
     // More
     println!("\nFor more info about Flua and the Lua API, see:");
-    println!("{}https://github.com/ShadowDara/LuaAPI-Rust{}", link, END);
-    println!("{}https://shadowdara.github.io/flua/{}", link, END);
+    println!("{}https://github.com/ShadowDara/LuaAPI-Rust{}", LINK, END);
+    println!("{}https://shadowdara.github.io/flua/{}", LINK, END);
+}
+
+// CONFIG
+// println!("generate, open, check");
+pub fn config_help() {
+    println!("{}[CONFIG]{} Help Info for Flua v{}", CONFIG, END, VERSION);
+    println!(
+        "\nUsage: flua conifg {}[CONFIGOPTIONS]{} {}[GENERALL-OPTIONS]{}",
+        CONFIG, END, sco, END
+    );
+    println!("\n{}[CONFIGOPTIONS]{}", CONFIG, END);
+    println!(
+        "{}    generate{}    Be careful! This will create a new config file, the old one will be overritten",
+        op, END
+    );
+    println!(
+        "{}    open{}        to open the config file in the default programm",
+        op, END
+    );
+    println!(
+        "{}    check{}       to check if the config file is correct",
+        op, END
+    );
 }
