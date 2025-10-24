@@ -7,6 +7,8 @@
 - added Tests for dotenv
 - added Tests for INI Module
 - added Tests for NET Module
+- added Config File in `config_dir()/@shadowdara/flua/config.lua`
+- loading the Config File
 
 ## 0.2.0
 

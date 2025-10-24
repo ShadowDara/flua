@@ -3,6 +3,12 @@
 ## Newest Develepment
 - added Tests for TOML
 - added Tests for XML
+- added Workflow to run tests on PUSH and PR
+- added Tests for dotenv
+- added Tests for INI Module
+- added Tests for NET Module
+- added Config File in `config_dir()/@shadowdara/flua/config.lua`
+- loading the Config File
 
 ## 0.2.0
 
