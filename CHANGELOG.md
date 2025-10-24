@@ -6,6 +6,7 @@
 - added Workflow to run tests on PUSH and PR
 - added Tests for dotenv
 - added Tests for INI Module
+- added Tests for NET Module
 
 ## 0.2.0
 
