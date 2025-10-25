@@ -125,7 +125,9 @@ c.show_info = false
         }
         Some("check") => {
             // Trying to load the config file if it works
-            println!("Config Check Implemented soon!\nPlease open an Issue on GitHub if you see this!");
+            println!(
+                "Config Check Implemented soon!\nPlease open an Issue on GitHub if you see this!"
+            );
         }
         _ => {
             println!("No subcommand specified for config.");
