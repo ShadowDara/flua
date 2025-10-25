@@ -119,6 +119,9 @@ async fn main() {
     // 1. LOAD THE CONFIG
 
     let configvalue = helper::config::loadconfig(load_config);
+    if !configvalue.show_info {
+        info = false;
+    }
 
     // 2. Run Version, Help, Module Init
 

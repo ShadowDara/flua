@@ -11,13 +11,14 @@ use crate::helper::exit;
 // flua Config struct
 pub struct FluaConfig {
     // CONFIG VALUES
-    wait_time: u64,
+    pub wait_time: u64,
+    pub show_info: bool
 }
 
 // Function to load the Config File
 pub fn loadconfig(doload: bool) -> FluaConfig {
     if !doload {
-        return FluaConfig { wait_time: 3 };
+        return FluaConfig { wait_time: 3, show_info: true };
     }
 
     let mut path: PathBuf = dirs_next::config_dir().expect("could not find config_dir()");
@@ -30,7 +31,7 @@ pub fn loadconfig(doload: bool) -> FluaConfig {
         Ok(c) => c,
         Err(_) => {
             println!("Config file not found, using default Config.");
-            return FluaConfig { wait_time: 3 };
+            return FluaConfig { wait_time: 3, show_info: true };
         }
     };
 
@@ -42,11 +43,13 @@ pub fn loadconfig(doload: bool) -> FluaConfig {
     // Jetzt aus Rust die Lua-Tabelle auslesen
     let globals = lua.globals();
     let config_table = globals
-        .get::<mlua::Table>("config")
-        .expect("No 'config' table found");
+        .get::<mlua::Table>("c")
+        .expect("No 'c' table found");
 
     let wait_time: u64 = config_table.get("wait_time").unwrap_or(0);
-    FluaConfig { wait_time }
+    let show_info: bool = config_table.get("wait_time").unwrap_or(true);
+    
+    return FluaConfig { wait_time, show_info }
 }
 
 pub fn configstuff(
@@ -79,10 +82,13 @@ pub fn configstuff(
 -- https://shadowdara.github.io/flua/
 
 -- Variable for Config Values
-config = {}
+c = {}
 
 -- Varibales for the close / error wait time
-config.wait_time = 0
+c.wait_time = 0
+
+-- Setting for Info printing in the Terminal
+c.show_info = false
 "#;
 
                 match fs::write(path.clone(), contents) {
