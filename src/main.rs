@@ -1,6 +1,9 @@
 use std::env;
 use tokio;
 
+use crate::helper::exit;
+use crate::helper::print::{END, GREEN, RED, YELLOW};
+
 mod api;
 mod helper;
 mod lua_script;
@@ -13,8 +16,6 @@ mod windows_utf8;
 
 pub const VERSION: &str = "0.2.1";
 
-use crate::helper::print::{BLUE, BOLD, CYAN, END, GREEN, PURPLE, RED, YELLOW};
-
 #[tokio::main]
 async fn main() {
     // Windows UTF-8 Support aktivieren
@@ -24,6 +25,8 @@ async fn main() {
     // Array of Programm Arguments
     let args: Vec<String> = env::args().collect();
 
+    // TODO
+    // Refactor wait on exit for the timer
     let mut wait_on_exit = true;
 
     if args.len() < 2 {
@@ -32,12 +35,30 @@ async fn main() {
             "{}No Path provided! Run with -h or --help for more information.{}",
             RED, END
         );
-        exit(wait_on_exit);
+        exit(wait_on_exit, true);
     }
 
+    // TODO
+    // Refactor the Argument Parsing
+
+    //
     // Argumente parsen
+    //
+    // Config Args
     let mut safe = false;
     let mut info = true;
+
+    // Config
+    let mut load_config = true;
+
+    // Usage Args
+    let mut version = false;
+    let mut help = false;
+    let mut helpconfig = false;
+
+    // Modules
+    let mut config = false;
+    let mut module_init = false;
 
     let mut args_iter = args.iter().peekable();
     let mut lua_args: Vec<String> = Vec::new();
@@ -45,26 +66,34 @@ async fn main() {
 
     while let Some(arg) = args_iter.next() {
         match arg.as_str() {
+            //
+            // IMPORTANT BOOL ARGUMENTS
+            //
+            // To Suppress a wait Message
+            "-nw" => wait_on_exit = false,
+            "-no-config" => load_config = false,
+            "--no-info" => info = false,
+            //
+            // ARGUMENTS WHICH CLOSE AFTER RUNNING
+            //
+            // Safe Mode
             "--safe" => {
                 safe = true;
                 eprintln!("{}[ERROR] Safe is not implemented yet{}", RED, END);
-                exit(wait_on_exit);
+                exit(wait_on_exit, true);
             }
-            "--no-info" => {
-                info = false;
-            }
-            // To Suppress a wait Message
-            "-nw" => {
-                wait_on_exit = false;
-            }
-            "--version" | "-v" => {
-                println!("{}", VERSION);
-                return;
-            }
-            "--help" | "-h" | "h" => {
-                print_help();
-                return;
-            }
+            // Showing the version
+            "--version" | "-v" => version = true,
+            // Seding a Help Message
+            "--help" | "-h" | "h" => help = true,
+            "--help-config" => helpconfig = true,
+            // CREATING A MODULE
+            "init" => module_init = false,
+            // Config Stuff
+            "config" => config = true,
+            //
+            // OTHER ARGUMENTS
+            //
             "lua-args" | "l" => {
                 // Starte das Sammeln der Lua-Argumente
                 collect_lua_args = true;
@@ -85,24 +114,56 @@ async fn main() {
         }
     }
 
+    // EXECUTION ORDER
+
+    // 1. LOAD THE CONFIG
+
+    let configvalue = helper::config::loadconfig(load_config);
+    if !configvalue.show_info {
+        info = false;
+    }
+
+    // 2. Run Version, Help, Module Init
+
+    if version {
+        println!("{}", VERSION);
+        exit(wait_on_exit, false);
+    }
+    if help {
+        helper::help();
+        exit(wait_on_exit, false);
+    }
+    if helpconfig {
+        helper::config_help();
+        exit(wait_on_exit, false);
+    }
+    if config {
+        let args_clone = args[2..].to_vec();
+        helper::config::configstuff(args_clone, wait_on_exit);
+    }
+    if module_init {
+        println!("Not implemnted!");
+        exit(wait_on_exit, true);
+    }
+
     match args.get(1).map(String::as_str) {
         // Run a Action command here
         Some("run") => {
             if let Err(e) = handle_run_command(&args).await {
                 eprintln!("{}[ERROR] {}{}", RED, e, END);
-                exit(wait_on_exit);
+                exit(wait_on_exit, true);
             }
         }
         // Run a Lua Script here
         Some(script_path) => {
             if let Err(e) = handle_script_execution(script_path, safe, info, lua_args).await {
                 eprintln!("{}[FLUA-ERROR] {}{}", RED, e, END);
-                exit(wait_on_exit);
+                exit(wait_on_exit, true);
             }
         }
         None => {
             eprintln!("{}[ERROR] No command or script provided.{}", RED, END);
-            exit(wait_on_exit);
+            exit(wait_on_exit, true);
         }
     }
 }
@@ -178,103 +239,4 @@ async fn handle_script_execution(
     }
 
     Ok(())
-}
-
-// Function to wait some to read the command in an open Terminal Window
-// when an Error appears
-//
-// TODO
-// Make this Interuptable with pressing Enter
-fn exit(wait: bool) {
-    if wait {
-        std::thread::sleep(std::time::Duration::from_secs(3));
-    }
-    std::process::exit(1);
-}
-
-// Function for a detailed INFO help Message
-fn print_help() {
-    //[GENERALL-OPTIONS]
-    let sco = PURPLE;
-
-    //[SCRIPTOPTIONS]
-    let sc = YELLOW;
-
-    //[OPTIONS]
-    let opt = CYAN;
-
-    //<action>
-    let ac = RED;
-
-    //<custom-action-options>
-    let aco = CYAN;
-
-    // OptionList
-    let op = BLUE;
-
-    // Links
-    let link = BLUE;
-
-    // Start
-    println!("{}Flua Help:{}", GREEN, END);
-    println!("Using Version {}{}v{}{}", BOLD, GREEN, VERSION, END);
-    // Lua Scripts
-    println!(
-        "\nUsage for Lua scripts: {}<flua>{} <script.lua> {}[SCRIPTOPTIONS]{} {}[GENERALL-OPTIONS]{}",
-        GREEN, END, sc, END, sco, END
-    );
-    //[SCRIPTOPTIONS]
-    println!("\n{}[SCRIPTOPTIONS]{}", sc, END);
-    println!(
-        "{}  --safe:        {}Run in safe mode (limited API, no OS access)",
-        op, END
-    );
-    println!(
-        "{}  --no-info:     {}Suppress start and end info messages",
-        op, END
-    );
-    println!(
-        "{}  l, lua-args    {}submit arguments after lua-args for the lua file which will be run, stop the collectiong when it sees an argument which starts with: {}'-'{}",
-        op, END, RED, END
-    );
-    // Modules
-    println!(
-        "\nUsage for Modules: {}<flua>{} run {}<actions>{} {}<custom-action-options>{} {}[GENERALL-OPTIONS]{}",
-        GREEN, END, ac, END, aco, END, sco, END
-    );
-    println!("\n{}<actions>{}:   'update', 'install'", ac, END);
-    println!(
-        "{}  module         {}Argument to run a {}dlm13{} Module",
-        op, END, RED, END
-    );
-    println!(
-        "\n{}<custom-action-options>{}: Ends the arg collecting when a path starts with #",
-        aco, END
-    );
-    println!("{}  -path=    {}Add the Module path after the '='", op, END);
-    // Other
-    println!(
-        "\nOther Usage: {}<flua>{} {}[OPTIONS]{} {}[GENERALL-OPTIONS]{}",
-        GREEN, END, opt, END, sco, END
-    );
-    //[OPTIONS]
-    println!("\n{}[OPTIONS]{}", opt, END);
-    println!(
-        "{}  -v, --version  {}Function which prints the version in the terminal",
-        op, END
-    );
-    println!(
-        "{}  h, -h, --help  {}Function which prints this help message in the terminal",
-        op, END
-    );
-    //[GENERALL-OPTIONS]
-    println!("\n{}[GENERALL-OPTIONS]{}", sco, END);
-    println!(
-        "{}  -nw            {}No exit -> The Programm closes instantly after an error and showing an error message without waiting for some Time.",
-        op, END
-    );
-    // More
-    println!("\nFor more info about Flua and the Lua API, see:");
-    println!("{}https://github.com/ShadowDara/LuaAPI-Rust{}", link, END);
-    println!("{}https://shadowdara.github.io/flua/{}", link, END);
 }

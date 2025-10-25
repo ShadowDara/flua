@@ -10,7 +10,7 @@ use crate::VERSION;
 use crate::lua_script::execute_script;
 
 #[derive(Debug, Deserialize)]
-struct Config {
+struct ModuleConfig {
     name: String,
     version: String,
     description: String,
@@ -62,7 +62,7 @@ pub fn start_module(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>>
     }
 
     let yaml_str = fs::read_to_string(&full_path)?;
-    let config: Config = serde_yaml::from_str(&yaml_str)?;
+    let config: ModuleConfig = serde_yaml::from_str(&yaml_str)?;
 
     // Check if the edition is correct
     match config.edition {
@@ -105,7 +105,7 @@ pub fn start_module(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>>
 // add this function
 // Function to run a Module
 // Führt das Modul aus
-fn handle_module_execution(basepath: &str, config: Config) -> Result<(), Box<dyn Error>> {
+fn handle_module_execution(basepath: &str, config: ModuleConfig) -> Result<(), Box<dyn Error>> {
     let full_entry_path = Path::new(basepath).join(&config.entrypoint);
 
     if !full_entry_path.exists() {
@@ -221,7 +221,7 @@ luajitversion:
 edition: 2025
 "#;
 
-        let config: Config = serde_yaml::from_str(yaml).expect("Valid YAML should parse");
+        let config: ModuleConfig = serde_yaml::from_str(yaml).expect("Valid YAML should parse");
         assert_eq!(config.name, "testmodule");
         assert_eq!(config.luajitversion.min, "2.1.0");
         assert_eq!(config.edition, 2025);
@@ -234,7 +234,7 @@ edition: 2025
 name: "broken"
 entrypoint: 123  # falscher Typ
 "#;
-        let _: Config = serde_yaml::from_str(invalid_yaml).unwrap(); // sollte fehlschlagen
+        let _: ModuleConfig = serde_yaml::from_str(invalid_yaml).unwrap(); // sollte fehlschlagen
     }
 
     use std::env::temp_dir;

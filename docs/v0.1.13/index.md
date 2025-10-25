@@ -1,5 +1,5 @@
 # Version 0.1.13
-- Release Date: XX.XX.XXXX
+- Release Date: 10.10.2025
 
 ## Download
 - [v0.1.13](https://github.com/ShadowDara/LuaAPI-Rust/releases/tag/v0.1.13)

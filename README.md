@@ -127,6 +127,12 @@ cargo run build.lua
 ```
 
 ## Testing
+`
+cargo
+```sh
+cargo test
+cargo nextest run --jobs=1 --no-fail-fast
+```
 
 Testing commands with Shell
 ```sh
