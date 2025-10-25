@@ -1,11 +1,3 @@
-<!--
-Testing Commands and Other Commands
-
-cargo build && test/command_tester.sh
-
-
--->
-
 # flua
 
 a Lua API written in Rust to make scripting much easier!
@@ -121,36 +113,6 @@ useful.
 
 ```sh
 cargo run build.lua
-```
-
-## Testing
-`
-cargo
-```sh
-cargo test
-cargo nextest run --jobs=1 --no-fail-fast
-```
-
-Testing commands with Shell
-```sh
-chmod +x ./test/command_tester.sh
-./test/command_tester.sh
-```
-
-Testing Lua
-```sh
-cargo run test/main.lua
-cargo run test/data.lua
-cargo run test/http_async.lua
-cargo run test/api_server.lua
-```
-
-## TODO
-
-run this for more Infos
-
-```sh
-make toto
 ```
 
 ## More Infos
