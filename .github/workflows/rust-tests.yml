@@ -13,7 +13,7 @@ on:
 
 jobs:
   test:
-    name: Run cargo test on ${{ matrix.os }}
+    name: Run cargo nextest on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -50,6 +50,10 @@ jobs:
       - name: Build project
         run: cargo build --all --all-features --locked --verbose
 
-      # 6️⃣ Tests ausführen
-      - name: Run tests
-        run: cargo test --all --all-features --locked --verbose
+      # 6️⃣ cargo-nextest installieren
+      - name: Install cargo-nextest
+        run: cargo install cargo-nextest --locked
+
+      # 7️⃣ Tests mit cargo nextest ausführen
+      - name: Run tests with cargo nextest
+        run: cargo nextest run --all --all-features --locked --verbose
