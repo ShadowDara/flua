@@ -1,6 +1,9 @@
 use std::env;
 use tokio;
 
+use crate::helper::exit;
+use crate::helper::print::{END, GREEN, RED, YELLOW};
+
 mod api;
 mod helper;
 mod lua_script;
@@ -12,9 +15,6 @@ mod dlm13;
 mod windows_utf8;
 
 pub const VERSION: &str = "0.2.1";
-
-use crate::helper::exit;
-use crate::helper::print::{END, GREEN, RED, YELLOW};
 
 #[tokio::main]
 async fn main() {
@@ -137,9 +137,9 @@ async fn main() {
         helper::config_help();
         exit(wait_on_exit, false);
     }
-    // Showing options for config
     if config {
-        helper::config::configstuff(args_iter.clone(), wait_on_exit)
+        let args_clone = args[2..].to_vec();
+        helper::config::configstuff(args_clone, wait_on_exit);
     }
     if module_init {
         println!("Not implemnted!");

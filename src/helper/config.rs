@@ -3,7 +3,6 @@
 use dirs_next;
 use mlua::Lua;
 use std::fs;
-use std::iter::Peekable;
 use std::path::PathBuf;
 
 use crate::helper::exit;
@@ -59,10 +58,8 @@ pub fn loadconfig(doload: bool) -> FluaConfig {
     };
 }
 
-pub fn configstuff(
-    mut args_iter: Peekable<std::slice::Iter<'_, std::string::String>>,
-    wait_on_exit: bool,
-) {
+pub fn configstuff(args: Vec<String>, wait_on_exit: bool) {
+    let mut args_iter = args.iter().peekable();
     let mut path: PathBuf = dirs_next::config_dir().expect("could not find config_dir()");
 
     path.push("@shadowdara");
@@ -147,7 +144,7 @@ mod tests {
     }
 
     // // TODO
-    // // Problem: 
+    // // Problem:
     // // The Test loads the normal Config file on the System
     // #[test]
     // fn loadconfig_returns_defaults_if_file_missing() {
@@ -162,7 +159,7 @@ mod tests {
     // }
 
     // // TODO
-    // // Problem: 
+    // // Problem:
     // // The Test loads the normal Config file on the System
     // #[test]
     // fn loadconfig_reads_values_from_lua_file() {
@@ -195,9 +192,8 @@ mod tests {
         }
 
         let args = vec![String::from("generate")];
-        let iter = args.iter().peekable();
 
-        configstuff(iter, false);
+        configstuff(args, false);
 
         let config_path = dir.path().join("@shadowdara/flua/config.lua");
         assert!(
@@ -221,9 +217,8 @@ mod tests {
         assert!(config_path.exists());
 
         let args = vec![String::from("clean")];
-        let iter = args.iter().peekable();
 
-        configstuff(iter, false);
+        configstuff(args, false);
         assert!(
             !config_path.exists(),
             "Config file should be deleted by 'clean'"
@@ -238,9 +233,8 @@ mod tests {
         }
 
         let args = vec![String::from("open")];
-        let iter = args.iter().peekable();
 
-        let _ = std::panic::catch_unwind(|| configstuff(iter, false));
+        let _ = std::panic::catch_unwind(|| configstuff(args, false));
     }
 
     #[test]
@@ -251,13 +245,12 @@ mod tests {
         }
 
         let args: Vec<String> = vec![];
-        let iter = args.iter().peekable();
 
-        configstuff(iter, false);
+        configstuff(args, false);
     }
 
     // // TODO
-    // // Problem: 
+    // // Problem:
     // // The Test loads the normal Config file on the System
     // #[test]
     // fn loadconfig_returns_default_on_invalid_lua() {
