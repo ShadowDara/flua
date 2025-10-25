@@ -85,9 +85,6 @@ chmod +x FluaInstall.sh
 Feel free to open an Issue to add Ideas to the Roadmap which could
 useful.
 
-### 0.2.0
-- [x] renaming to flua
-
 ### 0.3.0
 - [ ] remove all deprecated functions or fix them
 - [ ] multi version kompabillity
