@@ -171,6 +171,7 @@ pub fn register(lua: &Lua) -> Result<Table> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use mlua::Lua;
     use std::thread;
     use std::time::Duration;
 
@@ -229,146 +230,138 @@ mod tests {
         assert!(total > paused_time, "should continue counting after resume");
     }
 
-    #[cfg(test)]
-    mod lua_tests {
-        use super::*;
-        use mlua::Lua;
-        use std::thread;
-        use std::time::Duration;
+    #[test]
+    fn lua_can_create_and_read_stopwatch() -> Result<()> {
+        let lua = Lua::new();
+        let stopwatch_lib = register(&lua)?;
+        lua.globals().set("stopwatch", stopwatch_lib)?;
 
-        #[test]
-        fn lua_can_create_and_read_stopwatch() -> Result<()> {
-            let lua = Lua::new();
-            let stopwatch_lib = register(&lua)?;
-            lua.globals().set("stopwatch", stopwatch_lib)?;
-
-            lua.load(
-                r#"
+        lua.load(
+            r#"
             stopwatch.new_stopwatch("test1")
             stopwatch.start("test1")
         "#,
-            )
-            .exec()?;
+        )
+        .exec()?;
 
-            thread::sleep(Duration::from_millis(50));
+        thread::sleep(Duration::from_millis(50));
 
-            let elapsed: f64 = lua.load(r#"return stopwatch.read("test1")"#).eval()?;
-            assert!(elapsed > 0.0);
-            Ok(())
-        }
+        let elapsed: f64 = lua.load(r#"return stopwatch.read("test1")"#).eval()?;
+        assert!(elapsed > 0.0);
+        Ok(())
+    }
 
-        #[test]
-        fn lua_pause_and_resume_works() -> Result<()> {
-            let lua = Lua::new();
-            let stopwatch_lib = register(&lua)?;
-            lua.globals().set("stopwatch", stopwatch_lib)?;
+    #[test]
+    fn lua_pause_and_resume_works() -> Result<()> {
+        let lua = Lua::new();
+        let stopwatch_lib = register(&lua)?;
+        lua.globals().set("stopwatch", stopwatch_lib)?;
 
-            lua.load(
-                r#"
+        lua.load(
+            r#"
             stopwatch.new_stopwatch("t1")
             stopwatch.start("t1")
         "#,
-            )
-            .exec()?;
+        )
+        .exec()?;
 
-            thread::sleep(Duration::from_millis(50));
+        thread::sleep(Duration::from_millis(50));
 
-            lua.load(r#"stopwatch.pause("t1")"#).exec()?;
-            let paused_time: f64 = lua.load(r#"return stopwatch.read("t1")"#).eval()?;
-            thread::sleep(Duration::from_millis(50));
-            let still_same: f64 = lua.load(r#"return stopwatch.read("t1")"#).eval()?;
+        lua.load(r#"stopwatch.pause("t1")"#).exec()?;
+        let paused_time: f64 = lua.load(r#"return stopwatch.read("t1")"#).eval()?;
+        thread::sleep(Duration::from_millis(50));
+        let still_same: f64 = lua.load(r#"return stopwatch.read("t1")"#).eval()?;
 
-            assert!(
-                (still_same - paused_time).abs() < 0.01,
-                "Time should not increase while paused"
-            );
+        assert!(
+            (still_same - paused_time).abs() < 0.01,
+            "Time should not increase while paused"
+        );
 
-            lua.load(r#"stopwatch.start("t1")"#).exec()?;
-            thread::sleep(Duration::from_millis(50));
-            let resumed_time: f64 = lua.load(r#"return stopwatch.read("t1")"#).eval()?;
-            assert!(resumed_time > paused_time);
+        lua.load(r#"stopwatch.start("t1")"#).exec()?;
+        thread::sleep(Duration::from_millis(50));
+        let resumed_time: f64 = lua.load(r#"return stopwatch.read("t1")"#).eval()?;
+        assert!(resumed_time > paused_time);
 
-            Ok(())
-        }
+        Ok(())
+    }
 
-        #[test]
-        fn lua_stop_resets() -> Result<()> {
-            let lua = Lua::new();
-            let stopwatch_lib = register(&lua)?;
-            lua.globals().set("stopwatch", stopwatch_lib)?;
+    #[test]
+    fn lua_stop_resets() -> Result<()> {
+        let lua = Lua::new();
+        let stopwatch_lib = register(&lua)?;
+        lua.globals().set("stopwatch", stopwatch_lib)?;
 
-            lua.load(
-                r#"
+        lua.load(
+            r#"
             stopwatch.new_stopwatch("t2")
             stopwatch.start("t2")
         "#,
-            )
-            .exec()?;
-            thread::sleep(Duration::from_millis(30));
+        )
+        .exec()?;
+        thread::sleep(Duration::from_millis(30));
 
-            lua.load(r#"stopwatch.stop("t2")"#).exec()?;
-            let val: f64 = lua.load(r#"return stopwatch.read("t2")"#).eval()?;
-            assert!(val < 0.01);
-            Ok(())
-        }
+        lua.load(r#"stopwatch.stop("t2")"#).exec()?;
+        let val: f64 = lua.load(r#"return stopwatch.read("t2")"#).eval()?;
+        assert!(val < 0.01);
+        Ok(())
+    }
 
-        #[test]
-        fn lua_multiple_stopwatches_independent() -> Result<()> {
-            let lua = Lua::new();
-            let stopwatch_lib = register(&lua)?;
-            lua.globals().set("stopwatch", stopwatch_lib)?;
+    #[test]
+    fn lua_multiple_stopwatches_independent() -> Result<()> {
+        let lua = Lua::new();
+        let stopwatch_lib = register(&lua)?;
+        lua.globals().set("stopwatch", stopwatch_lib)?;
 
-            lua.load(
-                r#"
+        lua.load(
+            r#"
             stopwatch.new_stopwatch("a")
             stopwatch.new_stopwatch("b")
             stopwatch.start("a")
         "#,
-            )
-            .exec()?;
+        )
+        .exec()?;
 
-            thread::sleep(Duration::from_millis(50));
+        thread::sleep(Duration::from_millis(50));
 
-            lua.load(r#"stopwatch.start("b")"#).exec()?;
-            thread::sleep(Duration::from_millis(50));
+        lua.load(r#"stopwatch.start("b")"#).exec()?;
+        thread::sleep(Duration::from_millis(50));
 
-            let a_time: f64 = lua.load(r#"return stopwatch.read("a")"#).eval()?;
-            let b_time: f64 = lua.load(r#"return stopwatch.read("b")"#).eval()?;
-            assert!(
-                a_time > b_time,
-                "First stopwatch should have higher elapsed time"
-            );
+        let a_time: f64 = lua.load(r#"return stopwatch.read("a")"#).eval()?;
+        let b_time: f64 = lua.load(r#"return stopwatch.read("b")"#).eval()?;
+        assert!(
+            a_time > b_time,
+            "First stopwatch should have higher elapsed time"
+        );
 
-            Ok(())
-        }
+        Ok(())
+    }
 
-        #[test]
-        fn lua_wait_function_sleeps() -> Result<()> {
-            let lua = Lua::new();
-            let stopwatch_lib = register(&lua)?;
-            lua.globals().set("stopwatch", stopwatch_lib)?;
+    #[test]
+    fn lua_wait_function_sleeps() -> Result<()> {
+        let lua = Lua::new();
+        let stopwatch_lib = register(&lua)?;
+        lua.globals().set("stopwatch", stopwatch_lib)?;
 
-            let start = std::time::Instant::now();
-            lua.load(r#"stopwatch.wait(100)"#).exec()?;
-            let elapsed = start.elapsed();
-            assert!(elapsed >= Duration::from_millis(90));
-            Ok(())
-        }
+        let start = std::time::Instant::now();
+        lua.load(r#"stopwatch.wait(100)"#).exec()?;
+        let elapsed = start.elapsed();
+        assert!(elapsed >= Duration::from_millis(90));
+        Ok(())
+    }
 
-        #[test]
-        #[ignore]
-        fn lua_wait_forever_blocks() -> Result<()> {
-            // Dieser Test wird absichtlich ignoriert, da er endlos blockiert.
-            // Nur zu Testzwecken zeigen, dass waitfr() existiert.
-            let lua = Lua::new();
-            let stopwatch_lib = register(&lua)?;
-            lua.globals().set("stopwatch", stopwatch_lib)?;
-            assert!(
-                lua.globals()
-                    .get::<mlua::Function>("stopwatch.waitfr")
-                    .is_ok()
-            );
-            Ok(())
-        }
+    #[test]
+    #[ignore]
+    fn lua_wait_forever_blocks() -> Result<()> {
+        // Dieser Test wird absichtlich ignoriert, da er endlos blockiert.
+        // Nur zu Testzwecken zeigen, dass waitfr() existiert.
+        let lua = Lua::new();
+        let stopwatch_lib = register(&lua)?;
+        lua.globals().set("stopwatch", stopwatch_lib)?;
+        assert!(
+            lua.globals()
+                .get::<mlua::Function>("stopwatch.waitfr")
+                .is_ok()
+        );
+        Ok(())
     }
 }

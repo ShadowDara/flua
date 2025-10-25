@@ -13,8 +13,8 @@ mod windows_utf8;
 
 pub const VERSION: &str = "0.2.1";
 
-use crate::helper::print::{END, GREEN, RED, YELLOW};
 use crate::helper::exit;
+use crate::helper::print::{END, GREEN, RED, YELLOW};
 
 #[tokio::main]
 async fn main() {

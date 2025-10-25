@@ -1,5 +1,13 @@
 # Builds
 
+<!--
+
+Test
+
+cargo nextest run --jobs=1 --no-fail-fast
+
+-->
+
 ## Windows
 
 ### aarch64

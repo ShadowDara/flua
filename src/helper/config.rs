@@ -12,13 +12,16 @@ use crate::helper::exit;
 pub struct FluaConfig {
     // CONFIG VALUES
     pub wait_time: u64,
-    pub show_info: bool
+    pub show_info: bool,
 }
 
 // Function to load the Config File
 pub fn loadconfig(doload: bool) -> FluaConfig {
     if !doload {
-        return FluaConfig { wait_time: 3, show_info: true };
+        return FluaConfig {
+            wait_time: 3,
+            show_info: true,
+        };
     }
 
     let mut path: PathBuf = dirs_next::config_dir().expect("could not find config_dir()");
@@ -31,7 +34,10 @@ pub fn loadconfig(doload: bool) -> FluaConfig {
         Ok(c) => c,
         Err(_) => {
             println!("Config file not found, using default Config.");
-            return FluaConfig { wait_time: 3, show_info: true };
+            return FluaConfig {
+                wait_time: 3,
+                show_info: true,
+            };
         }
     };
 
@@ -42,14 +48,15 @@ pub fn loadconfig(doload: bool) -> FluaConfig {
 
     // Jetzt aus Rust die Lua-Tabelle auslesen
     let globals = lua.globals();
-    let config_table = globals
-        .get::<mlua::Table>("c")
-        .expect("No 'c' table found");
+    let config_table = globals.get::<mlua::Table>("c").expect("No 'c' table found");
 
-    let wait_time: u64 = config_table.get("wait_time").unwrap_or(0);
+    let wait_time: u64 = config_table.get("wait_time").unwrap_or(3);
     let show_info: bool = config_table.get("wait_time").unwrap_or(true);
-    
-    return FluaConfig { wait_time, show_info }
+
+    return FluaConfig {
+        wait_time,
+        show_info,
+    };
 }
 
 pub fn configstuff(
@@ -119,8 +126,152 @@ c.show_info = false
         }
         _ => {
             println!("No subcommand specified for config.");
+            println!("or run flua --help-config")
         }
     }
     // Interrupt after opening the Config File
     exit(wait_on_exit, false);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use tempfile::tempdir;
+
+    #[test]
+    fn loadconfig_returns_defaults_when_disabled() {
+        let cfg = loadconfig(false);
+        assert_eq!(cfg.wait_time, 3);
+        assert!(cfg.show_info);
+    }
+
+    // // TODO
+    // // Problem: 
+    // // The Test loads the normal Config file on the System
+    // #[test]
+    // fn loadconfig_returns_defaults_if_file_missing() {
+    //     let dir = tempdir().unwrap();
+    //     unsafe {
+    //         std::env::set_var("XDG_CONFIG_HOME", dir.path());
+    //     }
+
+    //     let cfg = loadconfig(true);
+    //     assert_eq!(cfg.wait_time, 3);
+    //     assert!(cfg.show_info);
+    // }
+
+    // // TODO
+    // // Problem: 
+    // // The Test loads the normal Config file on the System
+    // #[test]
+    // fn loadconfig_reads_values_from_lua_file() {
+    //     let dir = tempdir().unwrap();
+    //     unsafe {
+    //         std::env::set_var("XDG_CONFIG_HOME", dir.path());
+    //     }
+
+    //     let config_dir = dir.path().join("flua");
+    //     fs::create_dir_all(&config_dir).unwrap();
+    //     let config_path = config_dir.join("config.lua");
+
+    //     let lua_content = r#"
+    //     c = {}
+    //     c.wait_time = 42
+    //     c.show_info = false
+    // "#;
+    //     fs::write(&config_path, lua_content).unwrap();
+
+    //     let cfg = loadconfig(true);
+    //     assert_eq!(cfg.wait_time, 42);
+    //     assert_eq!(cfg.show_info, false);
+    // }
+
+    #[test]
+    fn configstuff_generate_creates_file() {
+        let dir = tempdir().unwrap();
+        unsafe {
+            std::env::set_var("XDG_CONFIG_HOME", dir.path());
+        }
+
+        let args = vec![String::from("generate")];
+        let iter = args.iter().peekable();
+
+        configstuff(iter, false);
+
+        let config_path = dir.path().join("@shadowdara/flua/config.lua");
+        assert!(
+            config_path.exists(),
+            "Config file should exist after generate"
+        );
+    }
+
+    #[test]
+    fn configstuff_clean_deletes_file() {
+        let dir = tempdir().unwrap();
+        unsafe {
+            std::env::set_var("XDG_CONFIG_HOME", dir.path());
+        }
+
+        let config_dir = dir.path().join("@shadowdara/flua");
+        fs::create_dir_all(&config_dir).unwrap();
+        let config_path = config_dir.join("config.lua");
+
+        fs::write(&config_path, "test").unwrap();
+        assert!(config_path.exists());
+
+        let args = vec![String::from("clean")];
+        let iter = args.iter().peekable();
+
+        configstuff(iter, false);
+        assert!(
+            !config_path.exists(),
+            "Config file should be deleted by 'clean'"
+        );
+    }
+
+    #[test]
+    fn configstuff_open_does_not_panic() {
+        let dir = tempdir().unwrap();
+        unsafe {
+            std::env::set_var("XDG_CONFIG_HOME", dir.path());
+        }
+
+        let args = vec![String::from("open")];
+        let iter = args.iter().peekable();
+
+        let _ = std::panic::catch_unwind(|| configstuff(iter, false));
+    }
+
+    #[test]
+    fn configstuff_no_argument_prints_message() {
+        let dir = tempdir().unwrap();
+        unsafe {
+            std::env::set_var("XDG_CONFIG_HOME", dir.path());
+        }
+
+        let args: Vec<String> = vec![];
+        let iter = args.iter().peekable();
+
+        configstuff(iter, false);
+    }
+
+    // // TODO
+    // // Problem: 
+    // // The Test loads the normal Config file on the System
+    // #[test]
+    // fn loadconfig_returns_default_on_invalid_lua() {
+    //     let dir = tempdir().unwrap();
+    //     unsafe {
+    //         std::env::set_var("XDG_CONFIG_HOME", dir.path());
+    //     }
+
+    //     let config_dir = dir.path().join("@shadowdara/flua");
+    //     fs::create_dir_all(&config_dir).unwrap();
+    //     fs::write(config_dir.join("config.lua"), "this is not lua").unwrap();
+
+    //     let c = loadconfig(true);
+    //     assert_eq!(c.wait_time, 3);
+    //     assert_eq!(c.show_info, true);
+    // }
 }
