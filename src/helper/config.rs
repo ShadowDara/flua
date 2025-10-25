@@ -115,7 +115,13 @@ c.show_info = false
         }
         Some("opendir") => {
             // Open the directory of the config file
-            println!("Implemented soon!");
+            path.pop();
+            open::that(path).expect("Could not open config Folder");
+        }
+        Some("dir") => {
+            // Show the directory of the config file
+            path.pop();
+            println!("Config Folder: {}", path.display());
         }
         Some("check") => {
             // Trying to load the config file if it works

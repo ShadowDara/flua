@@ -126,6 +126,14 @@ pub fn config_help() {
         op, END
     );
     println!(
+        "{}    opendir{}     to open the config file in the default programm",
+        op, END
+    );
+    println!(
+        "{}    dir{}         to open the config file in the default programm",
+        op, END
+    );
+    println!(
         "{}    check{}       to check if the config file is correct",
         op, END
     );
