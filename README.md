@@ -152,3 +152,6 @@ run this for more Infos
 ```sh
 make toto
 ```
+
+## More Infos
+More Infos are available [here](.github/INFO/)
