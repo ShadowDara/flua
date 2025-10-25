@@ -11,6 +11,7 @@
 - loading the Config File
 - added config file Infos to the help message
 - added Tests for Time
+- added Config Options
 
 ## 0.2.0
 

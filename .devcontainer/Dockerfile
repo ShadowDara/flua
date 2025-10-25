@@ -19,18 +19,7 @@ RUN apt-get update && \
 COPY . .
 
 # Install Python requirements if the file exists
-RUN if [ -f build/requirements.txt ]; then pip install -r build/requirements.txt; fi
+#RUN if [ -f build/requirements.txt ]; then pip install -r build/requirements.txt; fi
 
 # Install Rust components
 RUN rustup component add rustfmt clippy
-
-# Build Rust project
-RUN cargo build
-
-# Download and run the Luajit installer
-RUN curl -L -o "LuajitInstall.sh" "https://raw.githubusercontent.com/ShadowDara/LuaAPI-Rust/refs/heads/main/installer/install.sh" && \
-    chmod +x LuajitInstall.sh && \
-    ./LuajitInstall.sh "v0.1.13"
-
-# Run a LuaJIT test (optional – only works if `luajit` is correctly installed and build.lua exists)
-RUN if [ -f build.lua ]; then luajit build.lua; fi

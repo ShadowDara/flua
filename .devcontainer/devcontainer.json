@@ -1,8 +1,11 @@
 {
   "name": "Rust Dev Container",
   "build": {
-    "dockerfile": "Dockerfile"
+    "dockerfile": "Dockerfile",
+    "context": ".."
   },
+
+  "workspaceFolder": "/workspace",
 
   "features": {
     "ghcr.io/devcontainers/features/git:1": {}
