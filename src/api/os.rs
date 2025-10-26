@@ -1,6 +1,5 @@
 use mlua::{Lua, Result, Value};
 use std::io::Read;
-use std::io::{BufRead, BufReader};
 use std::path::Path;
 use std::process::{Command, Stdio};
 use std::thread;

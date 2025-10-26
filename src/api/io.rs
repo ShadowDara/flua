@@ -19,8 +19,32 @@ use crate::deprecated;
 
 use crate::helper::dir::copy_dir_recursive;
 
+/// Factory: erstellt eine Lua-Funktion "input" mit beliebigem Reader/Writer
+
+fn create_input<R: BufRead + 'static, W: Write + 'static>(
+    lua: &Lua,
+    mut reader: R,
+    mut writer: W,
+) -> mlua::Result<mlua::Function> {
+    lua.create_function_mut(move |_, prompt: String| {
+        let reader = &mut reader;
+        let writer = &mut writer;
+
+        write!(writer, "{}", prompt)?;
+        writer.flush()?;
+
+        let mut line = String::new();
+        reader.read_line(&mut line)?;
+        Ok(line.trim_end().to_string())
+    })
+}
+
+// function to register the Lua functions to Rust
 pub fn register(lua: &Lua) -> Result<mlua::Table> {
     let table = lua.create_table()?;
+
+    // Input function like Python
+    let input = create_input(&lua, io::BufReader::new(io::stdin()), io::stdout())?;
 
     // ZIP-Funktion
     let zip = lua.create_function(|_, (src, dest): (String, String)| {
@@ -231,6 +255,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         Ok(lua_table)
     })?;
 
+    table.set("input", input)?;
     table.set("zip", zip)?;
     table.set("unzip", unzip)?;
     table.set("get_default_directories", get_default_directories)?;
@@ -247,4 +272,67 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     table.set("read_line", read_line)?;
 
     Ok(table)
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Cursor;
+
+    #[test]
+    fn test_input_simple() {
+        let lua = Lua::new();
+        let stdin_mock = Cursor::new("Alice\n");
+        let stdout_mock = Vec::new();
+
+        let input_fn = create_input(&lua, stdin_mock, stdout_mock).unwrap();
+        lua.globals().set("input", input_fn).unwrap();
+
+        let name: String = lua.load(r#"return input("Name? ")"#).eval().unwrap();
+        assert_eq!(name, "Alice");
+    }
+
+    #[test]
+    fn test_input_multiple_lines() {
+        let lua = Lua::new();
+        let stdin_mock = Cursor::new("Bob\nCharlie\n");
+        let stdout_mock = Vec::new();
+
+        let input_fn = create_input(&lua, stdin_mock, stdout_mock).unwrap();
+        lua.globals().set("input", input_fn).unwrap();
+
+        let first: String = lua.load(r#"return input("First? ")"#).eval().unwrap();
+        let second: String = lua.load(r#"return input("Second? ")"#).eval().unwrap();
+
+        assert_eq!(first, "Bob");
+        assert_eq!(second, "Charlie");
+    }
+
+    #[test]
+    fn test_input_empty() {
+        let lua = Lua::new();
+        let stdin_mock = Cursor::new("\n");
+        let stdout_mock = Vec::new();
+
+        let input_fn = create_input(&lua, stdin_mock, stdout_mock).unwrap();
+        lua.globals().set("input", input_fn).unwrap();
+
+        let value: String = lua.load(r#"return input("Enter? ")"#).eval().unwrap();
+        assert_eq!(value, "");
+    }
+
+    #[test]
+    fn test_input_whitespace_trim() {
+        let lua = Lua::new();
+        let stdin_mock = Cursor::new("  padded input  \n");
+        let stdout_mock = Vec::new();
+
+        let input_fn = create_input(&lua, stdin_mock, stdout_mock).unwrap();
+        lua.globals().set("input", input_fn).unwrap();
+
+        let value: String = lua.load(r#"return input("Prompt? ")"#).eval().unwrap();
+        assert_eq!(value, "  padded input");
+        // trim_end() entfernt nur \n, keine Spaces, aber entfernt spaces am Ende !!!
+    }
 }

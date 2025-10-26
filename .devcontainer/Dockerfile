@@ -4,6 +4,9 @@ FROM mcr.microsoft.com/devcontainers/rust:1
 # Set working directory
 WORKDIR /workspace
 
+# Make sure cargo installs and caches happen in the user directory
+ENV CARGO_HOME=/usr/local/cargo
+
 # Install system dependencies
 RUN apt-get update && \
     apt-get install -y \
@@ -12,25 +15,31 @@ RUN apt-get update && \
         libssl-dev \
         python3 \
         python3-pip \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+        python3-venv \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Create venv directory and adjust permissions
+RUN mkdir -p /opt/venv && chown -R vscode:vscode /opt/venv
+
+# Set up Python virtual environment
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy requirements and install
+COPY build/requirements.txt build/requirements.txt
+RUN pip install --no-cache-dir -r build/requirements.txt
+
+# Install Rust components
+RUN rustup component add rustfmt clippy
+RUN rustup install nightly
 
 # Copy project files into container
 COPY . .
 
-# Install Python requirements if the file exists
-RUN if [ -f build/requirements.txt ]; then pip install -r build/requirements.txt; fi
+# Make sure workspace is writable by the dev user
+RUN chown -R vscode:vscode /workspace
 
-# Install Rust components
-RUN rustup component add rustfmt clippy
+# Switch to the non-root user for running commands
+USER vscode
 
-# Build Rust project
-RUN cargo build
-
-# Download and run the Luajit installer
-RUN curl -L -o "LuajitInstall.sh" "https://raw.githubusercontent.com/ShadowDara/LuaAPI-Rust/refs/heads/main/installer/install.sh" && \
-    chmod +x LuajitInstall.sh && \
-    ./LuajitInstall.sh "v0.1.13"
-
-# Run a LuaJIT test (optional – only works if `luajit` is correctly installed and build.lua exists)
-RUN if [ -f build.lua ]; then luajit build.lua; fi
+# sudo chown -R $(whoami):$(whoami) /workspace

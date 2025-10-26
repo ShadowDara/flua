@@ -4,6 +4,15 @@ to start, you need to import the api in your script, you can do it with
 local dapi_io = require("dapi_io")
 ```
 
+## input
+a simple function which can print a Message and then return the typed valued (same as the
+`input()` function in Python)
+
+**Usage**
+```lua
+local text = dapi_io.input("What is your Input?")
+```
+
 ## zip
 
 ## unzip

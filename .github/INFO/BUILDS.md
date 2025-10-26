@@ -4,7 +4,7 @@
 
 ### aarch64
 
-Dependencies
+aarch64 Dependencies
 ```sh
 scoop install llvm
 ```

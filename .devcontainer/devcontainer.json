@@ -1,14 +1,17 @@
 {
   "name": "Rust Dev Container",
   "build": {
-    "dockerfile": "Dockerfile"
+    "dockerfile": "Dockerfile",
+    "context": ".."
   },
+
+  "workspaceFolder": "/workspace",
 
   "features": {
     "ghcr.io/devcontainers/features/git:1": {}
   },
 
-  "postCreateCommand": "",
+  "postCreateCommand": "cargo install --locked cargo-nextest && cargo install --locked cargo-bloat && cargo build",
 
   "customizations": {
     "vscode": {
