@@ -4,7 +4,14 @@ FROM mcr.microsoft.com/devcontainers/rust:1
 # Set working directory
 WORKDIR /workspace
 
+# Make sure cargo installs and caches happen in the user directory
+ENV CARGO_HOME=/usr/local/cargo
+# Alternatively, if you prefer per-user instead of global installs:
+# ENV CARGO_HOME=/home/vscode/.cargo
+# ENV PATH="${CARGO_HOME}/bin:${PATH}"
+
 # Install system dependencies
+USER root
 RUN apt-get update && \
     apt-get install -y \
         build-essential \
@@ -12,29 +19,31 @@ RUN apt-get update && \
         libssl-dev \
         python3 \
         python3-pip \
+        python3-venv \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy project files into container
-COPY . .
+# Switch back to vscode user
+USER vscode
 
-# Install Python requirements
-RUN apt-get update && apt-get install -y python3-venv
+# Set up Python virtual environment
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
-RUN pip install -r build/requirements.txt
+COPY build/requirements.txt build/requirements.txt
+RUN pip install --no-cache-dir -r build/requirements.txt
 
 # Install Rust components
 RUN rustup component add rustfmt clippy
 
-# Install Rust Nightly Build
+# Install Rust nightly
 RUN rustup install nightly
 
-# Install Cargo Nextest
-RUN cargo install cargo-nextest
+# Install useful Cargo tools (in user space)
+RUN cargo install --locked cargo-nextest \
+ && cargo install --locked cargo-bloat
 
-# Install Cargo Bloat
-RUN cargo install cargo-bloat
+# Copy project files into container
+COPY . .
 
-# Run Cargo build
-CMD cargo build
+# Default command
+CMD ["cargo", "build"]
