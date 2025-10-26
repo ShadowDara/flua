@@ -8,7 +8,7 @@ WORKDIR /workspace
 ENV CARGO_HOME=/usr/local/cargo
 
 # Install system dependencies
-USER root
+#USER root
 RUN apt-get update && \
     apt-get install -y \
         build-essential \
@@ -23,7 +23,7 @@ RUN apt-get update && \
 RUN mkdir -p /opt/venv && chown -R vscode:vscode /opt/venv
 
 # Switch back to vscode user
-USER vscode
+#USER vscode
 
 # Set up Python virtual environment
 RUN python3 -m venv /opt/venv
@@ -34,7 +34,7 @@ COPY build/requirements.txt build/requirements.txt
 RUN pip install --no-cache-dir -r build/requirements.txt
 
 # Change USER back to codespace
-USER codespace
+#USER codespace
 
 # Install Rust components
 RUN rustup component add rustfmt clippy
