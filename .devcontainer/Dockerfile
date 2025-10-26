@@ -33,6 +33,9 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY build/requirements.txt build/requirements.txt
 RUN pip install --no-cache-dir -r build/requirements.txt
 
+# Change USER back to codespace
+USER codespace
+
 # Install Rust components
 RUN rustup component add rustfmt clippy
 RUN rustup install nightly
