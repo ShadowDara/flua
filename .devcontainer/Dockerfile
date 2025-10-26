@@ -8,7 +8,6 @@ WORKDIR /workspace
 ENV CARGO_HOME=/usr/local/cargo
 
 # Install system dependencies
-#USER root
 RUN apt-get update && \
     apt-get install -y \
         build-essential \
@@ -22,9 +21,6 @@ RUN apt-get update && \
 # Create venv directory and adjust permissions
 RUN mkdir -p /opt/venv && chown -R vscode:vscode /opt/venv
 
-# Switch back to vscode user
-#USER vscode
-
 # Set up Python virtual environment
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
@@ -33,12 +29,17 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY build/requirements.txt build/requirements.txt
 RUN pip install --no-cache-dir -r build/requirements.txt
 
-# Change USER back to codespace
-#USER codespace
-
 # Install Rust components
 RUN rustup component add rustfmt clippy
 RUN rustup install nightly
 
 # Copy project files into container
 COPY . .
+
+# Make sure workspace is writable by the dev user
+RUN chown -R vscode:vscode /workspace
+
+# Switch to the non-root user for running commands
+USER vscode
+
+# sudo chown -R $(whoami):$(whoami) /workspace
