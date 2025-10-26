@@ -12,6 +12,7 @@
 - added config file Infos to the help message
 - added Tests for Time
 - added Config Options
+- added Input functions like `input()` in Python
 
 ## 0.2.0
 
