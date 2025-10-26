@@ -24,6 +24,9 @@ RUN pip install -r build/requirements.txt
 # Install Rust components
 RUN rustup component add rustfmt clippy
 
+# Install Rust Nightly Build
+RUN rustup install nightly
+
 # Install Cargo Nextest
 RUN cargo install cargo-nextest
 
