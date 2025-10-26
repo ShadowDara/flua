@@ -36,10 +36,6 @@ RUN pip install --no-cache-dir -r build/requirements.txt
 # Install Rust components
 RUN rustup component add rustfmt clippy
 RUN rustup install nightly
-RUN cargo install --locked cargo-nextest && cargo install --locked cargo-bloat
 
 # Copy project files into container
 COPY . .
-
-# Default command
-CMD ["cargo", "build"]
