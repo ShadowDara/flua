@@ -19,6 +19,8 @@ RUN apt-get update && \
 COPY . .
 
 # Install Python requirements
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install -r build/requirements.txt
 
 # Install Rust components
