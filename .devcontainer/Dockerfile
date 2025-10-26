@@ -18,8 +18,17 @@ RUN apt-get update && \
 # Copy project files into container
 COPY . .
 
-# Install Python requirements if the file exists
-#RUN if [ -f build/requirements.txt ]; then pip install -r build/requirements.txt; fi
+# Install Python requirements
+RUN pip install -r build/requirements.txt
 
 # Install Rust components
 RUN rustup component add rustfmt clippy
+
+# Install Cargo Nextest
+RUN cargo install cargo-nextest
+
+# Install Cargo Bloat
+RUN cargo install cargo-bloat
+
+# Run Cargo build
+CMD cargo build
