@@ -27,8 +27,8 @@ RUN apt-get update && \
 USER vscode
 
 # Set up Python virtual environment
-RUN python3 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+RUN python3 -m venv /workspace/.venv
+ENV PATH="/workspace/.venv/bin:$PATH"
 COPY build/requirements.txt build/requirements.txt
 RUN pip install --no-cache-dir -r build/requirements.txt
 
