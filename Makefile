@@ -8,13 +8,15 @@ t:
 	cargo nextest run
 	cargo fmt
 
-# Search for todos in the codebase
-todo:
-	grep --color=auto --exclude-dir=target --exclude-dir=site --exclude-dir=.git -rw TODO .
-
 # Run Lua Build Script
 b:
 	cargo run build.lua
+	cargo fmt
+
+# Run Benchmarks
+# s -> stands for Speed !
+s:
+	cargo +nightly bench
 	cargo fmt
 
 # Command to Install Dependencies
@@ -24,6 +26,10 @@ i:
 # Start the Docs Server
 docs:
 	mmkdocs serve --dev-addr 0.0.0.0:9000
+
+# Search for todos in the codebase
+todo:
+	grep --color=auto --exclude-dir=target --exclude-dir=site --exclude-dir=.git -rw TODO .
 
 # The commands are always forced
 .PHONY: test docs cl pre-commit fmt

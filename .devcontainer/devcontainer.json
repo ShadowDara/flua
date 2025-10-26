@@ -17,7 +17,8 @@
     "vscode": {
       "extensions": [
         "rust-lang.rust-analyzer",
-        "ms-python.python"
+        "ms-python.python",
+        "fill-labs.dependi"
       ]
     }
   }
