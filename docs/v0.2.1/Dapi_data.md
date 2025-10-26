@@ -409,3 +409,24 @@ local t2 = dapi_xml.decode(xml)
 print(require("inspect")(t2))
 -- Output should closely match the original `t`
 ```
+
+# SQLite
+
+**Usage**
+```lua
+local sqlite = require("sqlite_api")
+
+local db = sqlite.open("test.db")
+
+-- Tabelle erstellen
+db:execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)")
+
+-- Einfügen
+db:execute("INSERT INTO users (name, age) VALUES (?, ?)", {"Alice", 30})
+
+-- Abfrage
+local rows = db:query("SELECT * FROM users")
+for i, row in ipairs(rows) do
+    print(row.id, row.name, row.age)
+end
+```

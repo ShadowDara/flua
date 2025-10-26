@@ -274,7 +274,6 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     Ok(table)
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;

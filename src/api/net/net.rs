@@ -1,8 +1,8 @@
+use mlua::Function;
 use mlua::{Error, Lua, Result};
 use reqwest::blocking::Client;
 use std::fs::File;
 use std::io::copy;
-use mlua::Function;
 
 pub fn register(lua: &Lua) -> Result<mlua::Table> {
     let table = lua.create_table()?;
