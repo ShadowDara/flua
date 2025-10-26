@@ -5,6 +5,7 @@ use crate::helper::exit;
 use crate::helper::print::{END, GREEN, RED, YELLOW};
 
 mod api;
+mod custom_flua_api;
 mod helper;
 mod lua_script;
 mod utils;

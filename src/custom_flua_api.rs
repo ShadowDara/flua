@@ -1,12 +1,14 @@
 // Rust File for the Lua API
 
+use mlua::{Lua, Table};
+
 use crate::api::{
     base, data_parsing, http as api_http, io as api_io, net as api_net, os as api_os,
     time as api_time,
 };
 
 // Funktion zum Hinzufügen aller APIs
-pub fn add_api(lua: &Lua) -> Result<()> {
+pub fn add_api(lua: &Lua) -> mlua::Result<()> {
     let dapi = base::register(lua)?;
     let dapi_io = api_io::register(lua)?;
     let dapi_os = api_os::register(lua)?;

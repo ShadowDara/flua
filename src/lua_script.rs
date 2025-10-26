@@ -2,7 +2,7 @@ use mlua::{Lua, Result, Table};
 use std::fs;
 use std::path::Path;
 
-use crate::lua_api::add_api;
+use crate::custom_flua_api::add_api;
 
 pub fn execute_script(file: &str, safe_mode: &bool, lua_args: Vec<String>) -> Result<()> {
     if *safe_mode {
