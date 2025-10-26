@@ -19,6 +19,7 @@ RUN apt-get update && \
 COPY . .
 
 # Install Python requirements
+RUN apt-get update && apt-get install -y python3-venv
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install -r build/requirements.txt
