@@ -1,4 +1,4 @@
-use mlua::{Lua, Result, Table};
+use mlua::{Lua, Result};
 use std::fs;
 use std::path::Path;
 
@@ -71,6 +71,7 @@ fn set_script_paths(lua: &Lua, file: &str) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use mlua;
     use std::fs::File;
     use std::io::Write;
     use tempfile::tempdir;
@@ -152,7 +153,7 @@ mod tests {
         set_script_paths(&lua, file_path.to_str().unwrap()).unwrap();
 
         // Lua-Variablen überprüfen
-        let globals: Table = lua.globals();
+        let globals: mlua::Table = lua.globals();
 
         let script_path: String = globals.get("SCRIPT_FULL_PATH").unwrap();
         let script_dir: String = globals.get("SCRIPT_DIRECTORY").unwrap();

@@ -5,6 +5,7 @@ use mlua::Lua;
 use std::fs;
 use std::path::PathBuf;
 
+use crate::custom_flua_api::add_api;
 use crate::helper::exit;
 
 // flua Config struct
@@ -41,6 +42,9 @@ pub fn loadconfig(doload: bool) -> FluaConfig {
     };
 
     let lua = Lua::new();
+
+    // Register all APIs
+    let _ = add_api(&lua);
 
     // Lua ausführen
     lua.load(contents).exec().expect("Failed to exec Lua");
