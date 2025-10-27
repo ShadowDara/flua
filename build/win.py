@@ -39,8 +39,6 @@ if __name__ == "__main__":
 
     os.chdir('installer')
 
-    # TODO
-    # Fix Installer Build for Windows
     print("Make Installer")
     os.chdir('nsis')
 

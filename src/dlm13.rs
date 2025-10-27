@@ -124,10 +124,12 @@ fn handle_module_execution(basepath: &str, config: ModuleConfig) -> Result<(), B
 
     let file_path = full_entry_path.to_str().ok_or("Invalid path")?;
 
-    match execute_script(file_path, &false, args) {
-        Ok(()) => {}
-        Err(e) => return Err(format!("Script execution failed: {}", e).into()),
-    };
+    // // TODO
+    // // do this new
+    // match execute_script(file_path, &false, args) {
+    //     Ok(()) => {}
+    //     Err(e) => return Err(format!("Script execution failed: {}", e).into()),
+    // };
 
     Ok(())
 }

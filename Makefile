@@ -3,6 +3,11 @@
 # Standard run
 all: testrust
 
+# Run the Code
+r:
+	cargo run
+	cargo fmt
+
 # Run the Rust tests Code
 t:
 	cargo nextest run
