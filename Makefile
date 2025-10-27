@@ -27,6 +27,8 @@ s:
 # Command to Install Dependencies
 i:
 	pip install -r build/requirements.txt
+	cargo install --locked cargo-nextest
+	cargo install --locked cargo-bloat
 
 # Start the Docs Server
 docs:
