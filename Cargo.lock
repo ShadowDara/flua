@@ -483,6 +483,7 @@ dependencies = [
  "ini",
  "json5",
  "mlua",
+ "once_cell",
  "open",
  "predicates",
  "reqwest",

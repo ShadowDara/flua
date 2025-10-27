@@ -9,19 +9,27 @@ use crate::custom_flua_api::add_api;
 use crate::helper::exit;
 
 // flua Config struct
+// #[derive(Default)]
 pub struct FluaConfig {
     // CONFIG VALUES
     pub wait_time: u64,
     pub show_info: bool,
 }
 
+// Default-Trait for FluaConfig
+impl Default for FluaConfig {
+    fn default() -> Self {
+        FluaConfig {
+            wait_time: 3,    // z. B. 3 s als Standardwert
+            show_info: true, // Standard auf true
+        }
+    }
+}
+
 // Function to load the Config File
 pub fn loadconfig(doload: bool) -> FluaConfig {
     if !doload {
-        return FluaConfig {
-            wait_time: 3,
-            show_info: true,
-        };
+        return FluaConfig::default();
     }
 
     let mut path: PathBuf = dirs_next::config_dir().expect("could not find config_dir()");
@@ -34,10 +42,7 @@ pub fn loadconfig(doload: bool) -> FluaConfig {
         Ok(c) => c,
         Err(_) => {
             println!("Config file not found, using default Config.");
-            return FluaConfig {
-                wait_time: 3,
-                show_info: true,
-            };
+            return FluaConfig::default();
         }
     };
 
@@ -45,6 +50,21 @@ pub fn loadconfig(doload: bool) -> FluaConfig {
 
     // Register all APIs
     let _ = add_api(&lua);
+
+    // Add a new Table
+    let lua_arg = match lua.create_table() {
+        Ok(table) => table,
+        Err(e) => {
+            eprintln!("Fehler beim Erstellen der Lua-Tabelle: {}", e);
+            return FluaConfig::default(); // oder eine andere Fallback-Variante
+        }
+    };
+
+    let globals = lua.globals();
+
+    if let Err(e) = globals.set("arg", lua_arg) {
+        eprintln!("Fehler beim Setzen von arg: {}", e);
+    }
 
     // Lua ausführen
     lua.load(contents).exec().expect("Failed to exec Lua");

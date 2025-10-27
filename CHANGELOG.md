@@ -15,6 +15,7 @@
 - added Input functions like `input()` in Python
 - added SQLite support
 - the wait time at the end can now be interrupted by pressing enter
+- fixed net module for windows
 
 ## 0.2.0
 

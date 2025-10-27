@@ -5,13 +5,13 @@ pub mod macros;
 pub mod print;
 pub mod update;
 
-use std::time::Duration;
-use std::thread;
-use std::sync::atomic::AtomicBool;
-use std::sync::atomic::Ordering;
-use std::sync::Arc;
 use std::io;
 use std::io::Read;
+use std::sync::Arc;
+use std::sync::atomic::AtomicBool;
+use std::sync::atomic::Ordering;
+use std::thread;
+use std::time::Duration;
 
 use crate::VERSION;
 use crate::helper::print::{BLUE, BOLD, BRIGHT_BLUE, CYAN, END, GREEN, PURPLE, RED, YELLOW};
