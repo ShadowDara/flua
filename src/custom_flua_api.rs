@@ -24,6 +24,7 @@ pub fn add_api(lua: &Lua) -> mlua::Result<()> {
     let dapi_net = api_net::net::register(lua)?;
     let dapi_time = api_time::register(lua)?;
     let dapi_api_async = api_http::async_api_server::register(lua)?;
+    let dapi_sqlite = data_parsing::sqlite_api::register(lua)?;
 
     let globals = lua.globals();
     let package: Table = globals.get("package")?;
@@ -45,6 +46,7 @@ pub fn add_api(lua: &Lua) -> mlua::Result<()> {
         ("dapi_net", dapi_net),
         ("dapi_time", dapi_time),
         ("dapi_api_async", dapi_api_async),
+        ("dapi_sqlite", dapi_sqlite),
     ];
 
     for (name, api) in apis.into_iter() {
