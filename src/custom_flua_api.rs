@@ -3,8 +3,8 @@
 use mlua::{Lua, Table};
 
 use crate::api::{
-    base, data_parsing, http as api_http, io as api_io, net as api_net, os as api_os,
-    time as api_time, lua_logger,
+    base, data_parsing, http as api_http, io as api_io, lua_logger, net as api_net, os as api_os,
+    time as api_time,
 };
 
 // Funktion zum Hinzufügen aller APIs

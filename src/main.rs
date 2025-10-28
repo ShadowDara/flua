@@ -1,10 +1,10 @@
 use std::env;
-use tokio;
 use std::sync::{Arc, Mutex};
+use tokio;
 
 use crate::helper::exit;
+use crate::helper::logger::logger;
 use crate::helper::print::{END, GREEN, RED, YELLOW};
-use crate::helper::logger::Logger;
 
 mod api;
 mod custom_flua_api;
@@ -30,7 +30,8 @@ async fn main() {
 
     // TODO
     // Logger
-    
+    logger().info("App started");
+
     // TODO
     // Refactor wait on exit for the timer
     let mut wait_on_exit = true;

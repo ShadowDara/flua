@@ -1,41 +1,12 @@
-// Logger Functions
-// can be configured soon in the Config File
-
 use chrono::Local;
 use dirs_next;
-use std::fs;
-use std::fs::OpenOptions;
+use once_cell::sync::Lazy;
+use std::fs::{self, OpenOptions};
 use std::io::Write;
-use std::path::PathBuf; // für Zeitstempel
+use std::path::PathBuf;
+use std::sync::Mutex;
 
-pub struct Logger {
-    // LoggerLevel
-    // 0 -> off
-    // 1 -> errors only
-    // 2 -> + warnings
-    // 3 -> + debug
-    // 4 -> + Info
-    // 5 -> ALL Stuff
-    loggerlevel: u8, // Can be values from 0 to 5
-    loggerdir: PathBuf,
-}
-
-impl Default for Logger {
-    fn default() -> Self {
-        let mut path: PathBuf = dirs_next::config_dir().expect("could not find config_dir()");
-        path.push("@shadowdara");
-        path.push("flua");
-        path.push("logs");
-
-        Logger {
-            loggerlevel: 2,
-            loggerdir: path,
-        }
-    }
-}
-
-// Enum for available Log Levels
-#[derive(PartialEq, PartialOrd, Debug, Copy, Clone)]
+#[derive(Clone, Copy, PartialEq, PartialOrd, Debug)]
 pub enum LogLevel {
     Off = 0,
     Error = 1,
@@ -45,70 +16,96 @@ pub enum LogLevel {
     All = 5,
 }
 
-// Display funtion for the Logger
-impl std::fmt::Display for LogLevel {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self)
-    }
+pub struct Logger {
+    level: u8,
+    dir: PathBuf,
 }
 
 impl Logger {
-    pub fn log(&self, level: LogLevel, msg: &str) {
-        if (level as u8) > self.loggerlevel || level == LogLevel::Off {
+    // Make a new Logger
+    fn new() -> Self {
+        let mut path = dirs_next::config_dir().expect("no config dir");
+        path.push("@shadowdara");
+        path.push("flua");
+        path.push("logs");
+        fs::create_dir_all(&path).unwrap();
+
+        Self {
+            level: LogLevel::Info as u8,
+            dir: path,
+        }
+    }
+
+    // Logging Function
+    fn log(&self, level: LogLevel, msg: &str) {
+        if (level as u8) > self.level || level == LogLevel::Off {
             return;
         }
 
-        // Stelle sicher, dass der Pfad existiert
-        fs::create_dir_all(&self.loggerdir).expect("Failed to create log directory");
+        // <- Sicherstellen, dass der Log-Ordner existiert
+        if let Err(e) = fs::create_dir_all(&self.dir) {
+            eprintln!("Logger: could not create log dir: {e}");
+            return;
+        }
 
-        let logfile = self.loggerdir.join("flua.log");
-        let mut file = OpenOptions::new()
-            .create(true)
-            .append(true)
-            .open(&logfile)
-            .expect("Failed to open log file");
+        let logfile = self.dir.join("flua.log");
+        let mut file = match OpenOptions::new().create(true).append(true).open(&logfile) {
+            Ok(f) => f,
+            Err(e) => {
+                eprintln!("Cannot open log file: {e}");
+                return;
+            }
+        };
 
         let timestamp = Local::now().format("%Y-%m-%d %H:%M:%S");
-        let line = format!("[{}] [{}] {}\n", timestamp, level, msg);
-        file.write_all(line.as_bytes())
-            .expect("Failed to write log");
+        let line = format!("[{}] [{:?}] {}\n", timestamp, level, msg);
+        if let Err(e) = file.write_all(line.as_bytes()) {
+            eprintln!("Logger write failed: {e}");
+        }
     }
 
     pub fn error(&self, msg: &str) {
         self.log(LogLevel::Error, msg);
     }
-
     pub fn warn(&self, msg: &str) {
         self.log(LogLevel::Warn, msg);
     }
-
     pub fn debug(&self, msg: &str) {
         self.log(LogLevel::Debug, msg);
     }
-
     pub fn info(&self, msg: &str) {
         self.log(LogLevel::Info, msg);
     }
 
-    pub fn custom(&self, msg: &str) {
-        self.log(LogLevel::All, msg);
+    // Getter for log dir
+    pub fn log_dir(&self) -> &PathBuf {
+        &self.dir
     }
 
-    pub fn luaerror(&self, msg: &str) {
-        self.log(LogLevel::Error, msg);
+    // Getter for Log Level
+    pub fn level(&self) -> LogLevel {
+        match self.level {
+            0 => LogLevel::Off,
+            1 => LogLevel::Error,
+            2 => LogLevel::Warn,
+            3 => LogLevel::Debug,
+            4 => LogLevel::Info,
+            5 => LogLevel::All,
+            _ => LogLevel::All,
+        }
     }
 
-    pub fn luawarn(&self, msg: &str) {
-        self.log(LogLevel::Warn, msg);
+    // Setter for LogLevel
+    pub fn set_level(&mut self, level: LogLevel) {
+        self.level = level as u8;
     }
+}
 
-    pub fn luadebug(&self, msg: &str) {
-        self.log(LogLevel::Debug, msg);
-    }
+static LOGGER: Lazy<Mutex<Logger>> = Lazy::new(|| Mutex::new(Logger::new()));
 
-    pub fn luainfo(&self, msg: &str) {
-        self.log(LogLevel::Info, msg);
-    }
+/// Globale Zugriffsfunktion
+pub fn logger() -> std::sync::MutexGuard<'static, Logger> {
+    LOGGER.lock().unwrap()
 }
 
 #[cfg(test)]
@@ -116,95 +113,150 @@ mod tests {
     use super::*;
     use std::fs;
     use std::io::Read;
-    use tempfile::tempdir; // für temporäre Testverzeichnisse
+    use std::thread;
+    use std::time::Duration;
 
-    fn setup_logger(level: u8) -> Logger {
-        let tmp_dir = tempdir().unwrap();
+    /// Erstellt eine Logger-Instanz mit temporärem Verzeichnis
+    fn temp_logger(level: LogLevel) -> Logger {
+        let tmp = tempfile::tempdir().unwrap();
+        let dir = tmp.path().to_path_buf();
+        fs::create_dir_all(&dir).unwrap(); // <-- sicherstellen, dass existiert
+
         Logger {
-            loggerlevel: level,
-            loggerdir: tmp_dir.path().to_path_buf(),
+            level: level as u8,
+            dir,
         }
     }
 
-    fn read_logfile(logger: &Logger) -> String {
-        let logfile = logger.loggerdir.join("flua.log");
-        let mut content = String::new();
-        let mut file = std::fs::File::open(&logfile).unwrap();
-        file.read_to_string(&mut content).unwrap();
-        content
+    /// Liest Dateiinhalt in String
+    fn read_log(logger: &Logger) -> String {
+        let logfile = logger.dir.join("flua.log");
+        if !logfile.exists() {
+            return String::new();
+        }
+        let mut buf = String::new();
+        let mut file = fs::File::open(logfile).unwrap();
+        file.read_to_string(&mut buf).unwrap();
+        buf
     }
 
     #[test]
     fn creates_log_directory_and_file() {
-        let logger = setup_logger(5);
-        logger.info("Init test log");
-
-        let logfile = logger.loggerdir.join("flua.log");
-        assert!(logfile.exists(), "Log file should exist after writing");
+        let logger = temp_logger(LogLevel::Info);
+        logger.info("init");
+        let logfile = logger.dir.join("flua.log");
+        assert!(logfile.exists(), "logfile must be created");
     }
 
     #[test]
     fn writes_message_to_file() {
-        let logger = setup_logger(5);
-        logger.info("Test message");
+        let logger = temp_logger(LogLevel::Info);
+        logger.info("Hello Logger");
+        let content = read_log(&logger);
+        assert!(content.contains("Hello Logger"));
+        assert!(content.contains("[Info]"));
+    }
 
-        let content = read_logfile(&logger);
+    #[test]
+    fn filters_by_level_correctly() {
+        let logger = temp_logger(LogLevel::Warn);
+        logger.debug("debug hidden");
+        logger.info("info hidden");
+        logger.warn("warn visible");
+        logger.error("error visible");
+
+        let content = read_log(&logger);
+        assert!(content.contains("warn visible"));
+        assert!(content.contains("error visible"));
+        assert!(!content.contains("info hidden"));
+        assert!(!content.contains("debug hidden"));
+    }
+
+    #[test]
+    fn appends_multiple_logs() {
+        let logger = temp_logger(LogLevel::All);
+        logger.info("line 1");
+        logger.info("line 2");
+        let content = read_log(&logger);
+        assert!(content.contains("line 1"));
+        assert!(content.contains("line 2"));
+        assert!(content.lines().count() >= 2);
+    }
+
+    #[test]
+    fn includes_timestamp_and_level() {
+        let logger = temp_logger(LogLevel::Info);
+        logger.info("timestamp test");
+        let content = read_log(&logger);
+        assert!(content.contains("[Info]"));
+        assert!(content.contains("timestamp test"));
+        assert!(content.chars().filter(|&c| c == '[').count() >= 2);
+    }
+
+    #[test]
+    fn error_and_warn_logged_even_when_info_disabled() {
+        let logger = temp_logger(LogLevel::Warn);
+        logger.info("ignore me");
+        logger.error("error!");
+        logger.warn("warn!");
+
+        let content = read_log(&logger);
+        assert!(content.contains("error!"));
+        assert!(content.contains("warn!"));
+        assert!(!content.contains("ignore me"));
+    }
+
+    #[test]
+    fn thread_safety_test() {
+        let logger = temp_logger(LogLevel::Info);
+        let shared = std::sync::Arc::new(std::sync::Mutex::new(logger));
+
+        let handles: Vec<_> = (0..5)
+            .map(|i| {
+                let l = shared.clone();
+                thread::spawn(move || {
+                    let msg = format!("thread-{i}");
+                    l.lock().unwrap().info(&msg);
+                })
+            })
+            .collect();
+
+        for h in handles {
+            h.join().unwrap();
+        }
+
+        // warten, bis alle schreiben
+        thread::sleep(Duration::from_millis(100));
+        let content = read_log(&shared.lock().unwrap());
+        for i in 0..5 {
+            assert!(content.contains(&format!("thread-{i}")));
+        }
+    }
+
+    #[test]
+    fn off_level_disables_all_logging() {
+        let logger = temp_logger(LogLevel::Off);
+        logger.error("nothing");
+        logger.warn("nothing");
+        let content = read_log(&logger);
         assert!(
-            content.contains("Test message"),
-            "Log file should contain message"
+            content.is_empty(),
+            "no logs should be written when level=Off"
         );
     }
 
     #[test]
-    fn includes_log_level_and_timestamp() {
-        let logger = setup_logger(5);
-        logger.warn("Something happened");
+    fn all_level_logs_everything() {
+        let logger = temp_logger(LogLevel::All);
+        logger.debug("debug");
+        logger.info("info");
+        logger.warn("warn");
+        logger.error("error");
 
-        let content = read_logfile(&logger);
-        assert!(content.contains("[Warn]"), "Log level tag missing");
-        assert!(content.contains("["), "Missing timestamp brackets");
-    }
-
-    #[test]
-    fn respects_log_level_filter() {
-        let logger = setup_logger(1); // only errors
-        logger.info("Should not log this");
-        logger.error("Should log this");
-
-        let logfile = logger.loggerdir.join("flua.log");
-        let content = fs::read_to_string(logfile).unwrap();
-
-        assert!(
-            !content.contains("Should not log this"),
-            "Info should not appear"
-        );
-        assert!(content.contains("Should log this"), "Error should appear");
-    }
-
-    #[test]
-    fn appends_logs_to_existing_file() {
-        let logger = setup_logger(5);
-        logger.debug("First message");
-        logger.debug("Second message");
-
-        let content = read_logfile(&logger);
-        assert!(content.contains("First message"));
-        assert!(content.contains("Second message"));
-    }
-
-    #[test]
-    fn handles_multiple_levels_correctly() {
-        let logger = setup_logger(3); // up to debug
-        logger.error("err1");
-        logger.warn("warn1");
-        logger.debug("debug1");
-        logger.info("info1"); // should NOT be logged
-
-        let content = read_logfile(&logger);
-
-        assert!(content.contains("err1"));
-        assert!(content.contains("warn1"));
-        assert!(content.contains("debug1"));
-        assert!(!content.contains("info1"));
+        let content = read_log(&logger);
+        assert!(content.contains("debug"));
+        assert!(content.contains("info"));
+        assert!(content.contains("warn"));
+        assert!(content.contains("error"));
     }
 }
