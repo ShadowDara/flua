@@ -22,6 +22,15 @@ pub struct Logger {
 }
 
 impl Logger {
+    /// Neues Logger-Objekt mit eigenem Pfad (für Tests)
+    pub fn new_with_path(path: &std::path::Path) -> Self {
+        std::fs::create_dir_all(path).unwrap();
+        Self {
+            level: LogLevel::Info as u8,
+            dir: path.to_path_buf(),
+        }
+    }
+
     // Make a new Logger
     fn new() -> Self {
         let mut path = dirs_next::config_dir().expect("no config dir");

@@ -7,6 +7,8 @@ use crate::api::{
     time as api_time,
 };
 
+use crate::helper::logger::logger;
+
 // Funktion zum Hinzufügen aller APIs
 pub fn add_api(lua: &Lua) -> mlua::Result<()> {
     let dapi = base::register(lua)?;
@@ -25,7 +27,7 @@ pub fn add_api(lua: &Lua) -> mlua::Result<()> {
     let dapi_time = api_time::register(lua)?;
     let dapi_api_async = api_http::async_api_server::register(lua)?;
     let dapi_sqlite = data_parsing::sqlite_api::register(lua)?;
-    let dapi_logger = lua_logger::register(lua)?;
+    let dapi_logger = lua_logger::register(lua, &logger())?;
 
     let globals = lua.globals();
     let package: Table = globals.get("package")?;
