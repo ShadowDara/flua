@@ -26,17 +26,24 @@ impl Default for FluaConfig {
     }
 }
 
+// Function to get the Config Path
+fn get_config_path() -> PathBuf {
+    let mut path: PathBuf = dirs_next::config_dir().expect("could not find config_dir()");
+
+    path.push("@shadowdara");
+    path.push("flua");
+    path.push("config.lua");
+
+    return path;
+}
+
 // Function to load the Config File
 pub fn loadconfig(doload: bool) -> FluaConfig {
     if !doload {
         return FluaConfig::default();
     }
 
-    let mut path: PathBuf = dirs_next::config_dir().expect("could not find config_dir()");
-
-    path.push("@shadowdara");
-    path.push("flua");
-    path.push("config.lua");
+    let path = get_config_path();
 
     let contents: String = match fs::read_to_string(&path) {
         Ok(c) => c,
@@ -84,11 +91,7 @@ pub fn loadconfig(doload: bool) -> FluaConfig {
 
 pub fn configstuff(args: Vec<String>, wait_on_exit: bool) {
     let mut args_iter = args.iter().peekable();
-    let mut path: PathBuf = dirs_next::config_dir().expect("could not find config_dir()");
-
-    path.push("@shadowdara");
-    path.push("flua");
-    path.push("config.lua");
+    let mut path = get_config_path();
 
     match args_iter.peek().map(|s| s.as_str()) {
         // To generate a new Config File

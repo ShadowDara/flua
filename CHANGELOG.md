@@ -17,6 +17,7 @@
 - the wait time at the end can now be interrupted by pressing enter
 - fixed net module for windows
 - added registering the SQLite API because i forgot it
+- added Logger Module and changed some stuff in the config
 
 ## 0.2.0 - 20.10.2025
 

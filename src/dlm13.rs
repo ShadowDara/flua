@@ -30,8 +30,8 @@ struct Luajitversion {
 
 // Function to start running a Module
 pub fn start_module(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
-    println!("Not Implemented yet!");
-    return Ok(());
+    // println!("Not Implemented yet!");
+    // return Ok(());
 
     let mut modulepath = "";
 

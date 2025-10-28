@@ -1,8 +1,10 @@
 use std::env;
 use tokio;
+use std::sync::{Arc, Mutex};
 
 use crate::helper::exit;
 use crate::helper::print::{END, GREEN, RED, YELLOW};
+use crate::helper::logger::Logger;
 
 mod api;
 mod custom_flua_api;
@@ -26,6 +28,9 @@ async fn main() {
     // Array of Programm Arguments
     let args: Vec<String> = env::args().collect();
 
+    // TODO
+    // Logger
+    
     // TODO
     // Refactor wait on exit for the timer
     let mut wait_on_exit = true;

@@ -14,8 +14,12 @@
 - added Config Options
 - added Input functions like `input()` in Python
 - added SQLite support
+- the wait time at the end can now be interrupted by pressing enter
+- fixed net module for windows
+- added registering the SQLite API because i forgot it
+- added Logger Module and changed some stuff in the config
 
-## 0.2.0
+## 0.2.0 - 20.10.2025
 
 ### Big Changes
 The programm is now called `flua`
@@ -67,14 +71,6 @@ be enable with an 2nd Optional Boolean Argument as `true`
 - `run3()` runs now a command with colors
 
 Read the DOCS for Version 0.2.0 for more Infos
-
-<!--
-
-TODO
-- run2() - colors in cmd output windows
-- Docs
-
--->
 
 ## 0.1.13 - 10.10.2025
 - add auto publish for the mkdocs documentation
