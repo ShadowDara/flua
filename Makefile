@@ -55,6 +55,7 @@ pr:
 # not work everywhere!
 fulltest:
 	cargo install --locked cargo-nextest
+	cargo test
 	cargo nextest run --no-fail-fast
 
 # The commands are always forced

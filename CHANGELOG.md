@@ -18,6 +18,7 @@
 - fixed net module for windows
 - added registering the SQLite API because i forgot it
 - added Logger Module and changed some stuff in the config
+- logger can now be used directly from Lua
 
 ## 0.2.0 - 20.10.2025
 
