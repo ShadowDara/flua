@@ -7,6 +7,8 @@ a TODO List with stuff which need to be fixed
 - add install Workflow
 - add Issue and PR Templates
 - clean and restructure / document the Makefile
+- split the project structure into multiple crates
+- support for other lua builds
 
 run this for more Infos
 
