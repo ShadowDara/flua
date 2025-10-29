@@ -36,7 +36,6 @@ fluaoslib = { workspace = true }
 
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3", features = ["consoleapi", "wincon"] }
-windows = { version = "0.62.1", features = ["Win32_System_Console"] }
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1"
