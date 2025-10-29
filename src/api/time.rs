@@ -52,9 +52,10 @@ impl Stopwatch {
 
     // Function to read the stopwatch
     fn read(&self) -> f64 {
-        if let Some(start_time) = self.start && !self.paused {
-                return (self.elapsed + start_time.elapsed()).as_secs_f64();
-            
+        if let Some(start_time) = self.start
+            && !self.paused
+        {
+            return (self.elapsed + start_time.elapsed()).as_secs_f64();
         }
         self.elapsed.as_secs_f64()
     }
