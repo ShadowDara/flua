@@ -17,3 +17,21 @@ macro_rules! deprecated {
         );
     };
 }
+
+// Macro for Error which should made an Issue for or uninplented Stuff
+#[macro_export]
+macro_rules! doissue {
+    ($msg:expr, $code:expr) => {
+        println!(
+            "This Feature is unimplemented!\n{}\nError Code: {}\nPlease open an Issue on GitHub with the error code if you see this!\nhttps://github.com/ShadowDara/flua",
+            $msg, $code
+        );
+    };
+
+    ($msg:expr) => {
+        println!(
+            "This Feature is unimplemented!\n{}\nPlease open an Issue on GitHub with the error code if you see this!\nhttps://github.com/ShadowDara/flua",
+            $msg
+        );
+    };
+}

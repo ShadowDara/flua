@@ -70,6 +70,11 @@ async fn main() {
     let mut lua_args: Vec<String> = Vec::new();
     let mut collect_lua_args = false;
 
+    // TODO
+    // All Config Variables should be able to be overritten via
+    // programm args but only, if overwritten is allowed in the
+    // config file
+
     while let Some(arg) = args_iter.next() {
         match arg.as_str() {
             //
@@ -77,7 +82,9 @@ async fn main() {
             //
             // To Suppress a wait Message
             "-nw" => wait_on_exit = false,
+            // to suppress loading the Config File
             "-no-config" => load_config = false,
+            // to suppress Info Messages
             "--no-info" => info = false,
             //
             // ARGUMENTS WHICH CLOSE AFTER RUNNING
@@ -123,35 +130,47 @@ async fn main() {
     // EXECUTION ORDER
 
     // 1. LOAD THE CONFIG
-
     let configvalue = helper::config::loadconfig(load_config);
-    if !configvalue.show_info {
+    if !configvalue.show_info() {
         info = false;
     }
 
+    // Set the Logger with the Config Value
+    logger().set_level(configvalue.loglevel());
+
     // 2. Run Version, Help, Module Init
 
+    // print the Version and Return
     if version {
         println!("{}", VERSION);
         exit(wait_on_exit, false);
     }
+    // print help and return
     if help {
         helper::help();
         exit(wait_on_exit, false);
     }
+    // print help for the config and return
     if helpconfig {
         helper::config_help();
         exit(wait_on_exit, false);
     }
+    // go to the config
     if config {
         let args_clone = args[2..].to_vec();
         helper::config::configstuff(args_clone, wait_on_exit);
     }
+    // init a New Module
     if module_init {
-        println!("Not implemnted!");
+        // TODO
+        // ISSUECODE 2
+        doissue!("Module Init", 2);
         exit(wait_on_exit, true);
     }
 
+    // TODO
+    // Refactor the 2nd Argparsing
+    // Parso other args
     match args.get(1).map(String::as_str) {
         // Run a Action command here
         Some("run") => {
@@ -167,6 +186,7 @@ async fn main() {
                 exit(wait_on_exit, true);
             }
         }
+        // No Valid Command provided
         None => {
             eprintln!("{}[ERROR] No command or script provided.{}", RED, END);
             exit(wait_on_exit, true);

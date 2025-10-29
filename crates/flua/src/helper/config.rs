@@ -6,22 +6,52 @@ use std::fs;
 use std::path::PathBuf;
 
 use crate::custom_flua_api::add_api;
+use crate::doissue;
 use crate::helper::exit;
+use crate::helper::logger::LogLevel;
 
 // flua Config struct
 // #[derive(Default)]
 pub struct FluaConfig {
     // FLUA CONFIG VALUES
-    pub wait_time: u64,
-    pub show_info: bool,
+    wait_time: u64,
+    show_info: bool,
+    loglevel: u8,
+}
+
+// Inplemantation for FluaConfig
+impl FluaConfig {
+    // Getter for wait_time
+    pub fn wait_time(&self) -> u64 {
+        self.wait_time
+    }
+
+    // Getter for show_info
+    pub fn show_info(&self) -> bool {
+        self.show_info
+    }
+
+    // Getter for LogLevel
+    pub fn loglevel(&self) -> LogLevel {
+        match self.loglevel {
+            0 => LogLevel::Off,
+            1 => LogLevel::Error,
+            2 => LogLevel::Warn,
+            3 => LogLevel::Debug,
+            4 => LogLevel::Info,
+            5 => LogLevel::All,
+            _ => LogLevel::All,
+        }
+    }
 }
 
 // Default-Trait for FluaConfig
 impl Default for FluaConfig {
     fn default() -> Self {
         FluaConfig {
-            wait_time: 3,    // z. B. 3 s als Standardwert
-            show_info: true, // Standard auf true
+            wait_time: 3,       // z. B. 3 s als Standardwert
+            show_info: true,    // Standard auf true
+            loglevel: 3         // Set Loglevel to Debug
         }
     }
 }
@@ -86,10 +116,12 @@ pub fn loadconfig(doload: bool) -> FluaConfig {
 
     let wait_time: u64 = config_table.get("wait_time").unwrap_or(3);
     let show_info: bool = config_table.get("wait_time").unwrap_or(true);
+    let loglevel: u8 = config_table.get("loglevel").unwrap_or(3);
 
     return FluaConfig {
         wait_time,
         show_info,
+        loglevel
     };
 }
 
@@ -125,6 +157,15 @@ c.wait_time = 0
 
 -- Setting for Info printing in the Terminal
 c.show_info = false
+
+-- Setting for the LogLevel
+-- - 0 -> off
+-- - 1 -> Error
+-- - 2 -> Warnings
+-- - 3 -> Debug
+-- - 4 -> Info
+-- - 5 -> All
+c.loglevel = 3
 "#;
 
                 match fs::write(path.clone(), contents) {
@@ -157,9 +198,8 @@ c.show_info = false
         }
         Some("check") => {
             // Trying to load the config file if it works
-            println!(
-                "Config Check Implemented soon!\nPlease open an Issue on GitHub if you see this!"
-            );
+            // ISSUECODE 1
+            doissue!("Config Check", 1);
         }
         _ => {
             println!("No subcommand specified for config.");
