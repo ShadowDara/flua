@@ -5,7 +5,7 @@ all: t
 
 # Run the Code
 r:
-	cargo run
+	cargo run -p flua
 	cargo fmt
 
 # Run the Rust tests Code
@@ -15,7 +15,7 @@ t:
 
 # Run Lua Build Script
 b:
-	cargo run build.lua
+	cargo run -p flua build.lua
 	cargo fmt
 
 # Run Benchmarks
@@ -75,7 +75,7 @@ test:
 
 # Testing a Module
 testmodule:
-	cargo run -- run module -path=test/datestmodule
+	cargo run -p flua -- run module -path=test/datestmodule
 
 # Count Line Stats with cloc
 stats:
