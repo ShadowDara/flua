@@ -6,6 +6,11 @@ use std::io::Write;
 use std::path::PathBuf;
 use std::sync::Mutex;
 
+// TODO
+// Option to redirect the Logger into the Terminal instead of logging into
+// a file or even both
+
+// Different Loglevels for the Logger and pre names in the logging file
 #[derive(Clone, Copy, PartialEq, PartialOrd, Debug)]
 pub enum LogLevel {
     Off = 0,
@@ -16,6 +21,7 @@ pub enum LogLevel {
     All = 5,
 }
 
+// Logger Struct
 pub struct Logger {
     level: u8,
     dir: PathBuf,
@@ -73,15 +79,19 @@ impl Logger {
         }
     }
 
+    // Logger Error
     pub fn error(&self, msg: &str) {
         self.log(LogLevel::Error, msg);
     }
+    // Logger Warn
     pub fn warn(&self, msg: &str) {
         self.log(LogLevel::Warn, msg);
     }
+    // Logger Debug
     pub fn debug(&self, msg: &str) {
         self.log(LogLevel::Debug, msg);
     }
+    // Logger Info
     pub fn info(&self, msg: &str) {
         self.log(LogLevel::Info, msg);
     }
@@ -110,6 +120,7 @@ impl Logger {
     }
 }
 
+// Static Logger Instance
 static LOGGER: Lazy<Mutex<Logger>> = Lazy::new(|| Mutex::new(Logger::new()));
 
 /// Globale Zugriffsfunktion

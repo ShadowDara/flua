@@ -11,7 +11,9 @@ struct Stopwatch {
     paused: bool,
 }
 
+// Implementation for the Stopwatch
 impl Stopwatch {
+    // Function to create a new Stopwatch
     fn new() -> Self {
         Stopwatch {
             start: None,
@@ -20,6 +22,7 @@ impl Stopwatch {
         }
     }
 
+    // Function to start the stopwatch
     fn start(&mut self) {
         if self.start.is_none() && !self.paused {
             self.start = Some(Instant::now());
@@ -29,6 +32,7 @@ impl Stopwatch {
         }
     }
 
+    // Function to pause the stopwatch
     fn pause(&mut self) {
         if let Some(start_time) = self.start {
             if !self.paused {
@@ -39,22 +43,24 @@ impl Stopwatch {
         }
     }
 
+    // Function to stop the stopwach
     fn stop(&mut self) {
         self.start = None;
         self.elapsed = Duration::ZERO;
         self.paused = false;
     }
 
+    // Function to read the stopwatch
     fn read(&self) -> f64 {
-        if let Some(start_time) = self.start {
-            if !self.paused {
+        if let Some(start_time) = self.start && !self.paused {
                 return (self.elapsed + start_time.elapsed()).as_secs_f64();
-            }
+            
         }
         self.elapsed.as_secs_f64()
     }
 }
 
+// Function to register the stopwatch for Lua
 pub fn register(lua: &Lua) -> Result<Table> {
     // HashMap zur Verwaltung mehrerer Stoppuhren per ID
     let watches: Arc<Mutex<HashMap<String, Stopwatch>>> = Arc::new(Mutex::new(HashMap::new()));

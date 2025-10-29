@@ -9,24 +9,28 @@ pub fn register(lua: &Lua, logger: &Logger) -> Result<Table> {
 
     let logger_ref = logger as *const Logger; // Zeiger, damit Lua den Logger referenzieren kann
 
+    // Logger Info
     let info_fn = lua.create_function(move |_, msg: String| {
         unsafe { (*logger_ref).info(&msg) };
         Ok(())
     })?;
     table.set("info", info_fn)?;
 
+    // Logger Warn
     let warn_fn = lua.create_function(move |_, msg: String| {
         unsafe { (*logger_ref).warn(&msg) };
         Ok(())
     })?;
     table.set("warn", warn_fn)?;
 
+    // Logger Debug
     let debug_fn = lua.create_function(move |_, msg: String| {
         unsafe { (*logger_ref).debug(&msg) };
         Ok(())
     })?;
     table.set("debug", debug_fn)?;
 
+    // Logger Error
     let error_fn = lua.create_function(move |_, msg: String| {
         unsafe { (*logger_ref).error(&msg) };
         Ok(())

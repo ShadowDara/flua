@@ -11,7 +11,7 @@ use crate::helper::exit;
 // flua Config struct
 // #[derive(Default)]
 pub struct FluaConfig {
-    // CONFIG VALUES
+    // FLUA CONFIG VALUES
     pub wait_time: u64,
     pub show_info: bool,
 }
@@ -43,8 +43,10 @@ pub fn loadconfig(doload: bool) -> FluaConfig {
         return FluaConfig::default();
     }
 
+    // Get the Path for the Config File
     let path = get_config_path();
 
+    // Read the Content for the config File
     let contents: String = match fs::read_to_string(&path) {
         Ok(c) => c,
         Err(_) => {
@@ -53,6 +55,7 @@ pub fn loadconfig(doload: bool) -> FluaConfig {
         }
     };
 
+    // Create a new Lua Instance
     let lua = Lua::new();
 
     // Register all APIs
@@ -67,6 +70,7 @@ pub fn loadconfig(doload: bool) -> FluaConfig {
         }
     };
 
+    // Try to add the created Table to the Lua globals
     let globals = lua.globals();
 
     if let Err(e) = globals.set("arg", lua_arg) {
@@ -89,6 +93,7 @@ pub fn loadconfig(doload: bool) -> FluaConfig {
     };
 }
 
+// Function to handle CLI Input for the Config for Flua
 pub fn configstuff(args: Vec<String>, wait_on_exit: bool) {
     let mut args_iter = args.iter().peekable();
     let mut path = get_config_path();
@@ -165,6 +170,7 @@ c.show_info = false
     exit(wait_on_exit, false);
 }
 
+// Tests for the Config
 #[cfg(test)]
 mod tests {
     use super::*;

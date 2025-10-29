@@ -4,20 +4,25 @@ use std::path::Path;
 
 use crate::custom_flua_api::add_api;
 
+// Function to execute a Lua script
 pub fn execute_script(file: &str, safe_mode: &bool, lua_args: Vec<String>) -> Result<()> {
+    // Check for Safe Mode
     if *safe_mode {
         println!("Safe mode not yet implemented.");
         return Ok(());
     }
 
+    // Check if the file exists
     if !Path::new(file).exists() {
         eprintln!("Error: File '{}' not found!", file);
         return Ok(());
     }
 
+    // Read the Content of the Lua script
     let script = fs::read_to_string(file)
         .map_err(|e| mlua::Error::external(format!("Error while reading: {}", e)))?;
 
+    // Create a new Lua Instance
     let lua = Lua::new();
 
     // Collect Arguments for Lua
@@ -26,6 +31,7 @@ pub fn execute_script(file: &str, safe_mode: &bool, lua_args: Vec<String>) -> Re
         lua_arg.set(i + 1, arg.clone())?;
     }
 
+    // Set the Lua gloabls
     let globals = lua.globals();
 
     // Add Arguments as a Lua table
@@ -46,9 +52,11 @@ pub fn execute_script(file: &str, safe_mode: &bool, lua_args: Vec<String>) -> Re
 fn set_script_paths(lua: &Lua, file: &str) -> Result<()> {
     let globals = lua.globals();
 
+    // Get the fullpath for the script
     let full_path = std::fs::canonicalize(Path::new(file))
         .map_err(|e| mlua::Error::external(format!("Path does not work: {}", e)))?;
 
+    // Set the script path as Lua Global
     globals.set("SCRIPT_FULL_PATH", full_path.to_string_lossy().to_string())?;
 
     if let Some(script_dir) = full_path.parent() {

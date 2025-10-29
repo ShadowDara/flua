@@ -58,6 +58,9 @@ fulltest:
 	cargo test
 	cargo nextest run --no-fail-fast
 
+deprecated:
+	grep --color=auto --exclude-dir=target --exclude-dir=site --exclude-dir=.git -rw DEPRECATED .
+
 # The commands are always forced
 .PHONY: test docs cl pre-commit fmt fulltest
 

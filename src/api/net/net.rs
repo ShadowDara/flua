@@ -51,7 +51,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
                 .build()
                 .map_err(|e| Error::external(format!("Client error: {}", e)))?;
 
-            let mut resp = client
+            let resp = client
                 .get(&url)
                 .send()
                 .await

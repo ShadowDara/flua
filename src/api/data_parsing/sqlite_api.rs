@@ -1,5 +1,5 @@
 use mlua::{Error, Lua, Result, Table, Value};
-use rusqlite::{Connection, ToSql};
+use rusqlite::Connection;
 use std::sync::{Arc, Mutex};
 
 #[derive(Clone)]
@@ -63,7 +63,7 @@ impl LuaDb {
     }
 }
 
-fn lua_value_to_sql(lua: &Lua, val: Value) -> Result<rusqlite::types::Value> {
+fn lua_value_to_sql(_lua: &Lua, val: Value) -> Result<rusqlite::types::Value> {
     Ok(match val {
         Value::Nil => rusqlite::types::Value::Null,
         Value::Integer(i) => rusqlite::types::Value::Integer(i),
@@ -119,7 +119,6 @@ pub fn register(lua: &Lua) -> Result<Table> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use mlua::{Lua, Value};
 
     fn init() -> (Lua, mlua::Table) {
@@ -130,7 +129,7 @@ mod tests {
 
     #[test]
     fn create_insert_query_update_delete() {
-        let (lua, sqlite) = init();
+        let (_lua, sqlite) = init();
         let open = sqlite.get::<mlua::Function>("open").unwrap();
         let db = open.call::<mlua::Table>(":memory:").unwrap();
         let exec = db.get::<mlua::Function>("execute").unwrap();
@@ -215,7 +214,7 @@ mod tests {
 
     #[test]
     fn constraint_and_error_handling() {
-        let (lua, sqlite) = init();
+        let (_lua, sqlite) = init();
         let db = sqlite
             .get::<mlua::Function>("open")
             .unwrap()

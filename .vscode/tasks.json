@@ -1,0 +1,29 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+		{
+            "label": "build-and-test",
+            "dependsOn": ["cargo build", "cargo test"]
+        },
+        {
+            "label": "cargo build.lua",
+            "type": "shell",
+            "command": "cargo run build.lua",
+            "problemMatcher": ["$rustc"]
+        },
+        // Task Used
+        {
+            "label": "cargo test",
+            "type": "shell",
+            "command": "echo \"If you don't have nextest installed, run:\ncargo install --locked cargo-nextest\" && cargo nextest run",
+            "problemMatcher": ["$rustc"]
+        },
+        // Task Used
+		{
+			"label": "cargo fmt",
+			"type": "shell",
+			"command": "cargo fmt --all",
+			"problemMatcher": ["$rustc"]
+		}
+    ]
+}

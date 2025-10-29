@@ -1,5 +1,4 @@
 use std::env;
-use std::sync::{Arc, Mutex};
 use tokio;
 
 use crate::helper::exit;
@@ -30,7 +29,7 @@ async fn main() {
 
     // TODO
     // Logger
-    logger().info("App started");
+    logger().info("Flua started");
 
     // TODO
     // Refactor wait on exit for the timer

@@ -15,6 +15,7 @@ use std::time::Duration;
 
 use crate::VERSION;
 use crate::helper::print::{BLUE, BOLD, BRIGHT_BLUE, CYAN, END, GREEN, PURPLE, RED, YELLOW};
+use crate::logger;
 
 // TODO
 // add no color argument for no color output
@@ -177,5 +178,17 @@ pub fn exit(wait: bool, error: bool) {
         }
     }
 
-    std::process::exit(if error { 1 } else { 0 });
+    // TODO
+    // Add option to add a custom error code
+    // and a custom Error Message
+
+    // Close the programm with an Error
+    if error {
+        logger().info("Flua finished with an Error!");
+        std::process::exit(1);
+    }
+
+    // Close the programm without an Error
+    logger().info("lua finished!");
+    std::process::exit(0);
 }

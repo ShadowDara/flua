@@ -11,6 +11,7 @@ use crate::helper::logger::logger;
 
 // Funktion zum Hinzufügen aller APIs
 pub fn add_api(lua: &Lua) -> mlua::Result<()> {
+    // All the Register functions from the different Lua Modules
     let dapi = base::register(lua)?;
     let dapi_io = api_io::register(lua)?;
     let dapi_os = api_os::register(lua)?;
@@ -29,6 +30,7 @@ pub fn add_api(lua: &Lua) -> mlua::Result<()> {
     let dapi_sqlite = data_parsing::sqlite_api::register(lua)?;
     let dapi_logger = lua_logger::register(lua, &logger())?;
 
+    // Set the Modules as Lua Globals
     let globals = lua.globals();
     let package: Table = globals.get("package")?;
     let preload: Table = package.get("preload")?;
