@@ -7,7 +7,7 @@ use crate::api::{
     time as api_time,
 };
 
-use crate::helper::logger::logger;
+use flualogger::logger;
 
 // Funktion zum Hinzufügen aller APIs
 pub fn add_api(lua: &Lua) -> mlua::Result<()> {

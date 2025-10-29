@@ -783,6 +783,7 @@ dependencies = [
  "dirs-next",
  "dotenv",
  "either",
+ "flualogger",
  "fluaoslib",
  "httptest",
  "ini",
@@ -807,6 +808,16 @@ dependencies = [
  "winres",
  "xmltree",
  "zip",
+]
+
+[[package]]
+name = "flualogger"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "dirs-next",
+ "once_cell",
+ "tempfile",
 ]
 
 [[package]]

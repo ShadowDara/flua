@@ -20,6 +20,7 @@
 - added Logger Module and changed some stuff in the config
 - logger can now be used directly from Lua
 - add Folder and File Dialog Functions to the Lue OS Lib
+- logger can now be turned on or off from the config file!
 
 ## 0.2.0 - 20.10.2025
 

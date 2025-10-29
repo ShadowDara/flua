@@ -1,6 +1,7 @@
 // Some Config File Stuff
 
 use dirs_next;
+use flualogger::LogLevel;
 use mlua::Lua;
 use std::fs;
 use std::path::PathBuf;
@@ -8,7 +9,6 @@ use std::path::PathBuf;
 use crate::custom_flua_api::add_api;
 use crate::doissue;
 use crate::helper::exit;
-use crate::helper::logger::LogLevel;
 
 // flua Config struct
 // #[derive(Default)]
@@ -49,9 +49,9 @@ impl FluaConfig {
 impl Default for FluaConfig {
     fn default() -> Self {
         FluaConfig {
-            wait_time: 3,       // z. B. 3 s als Standardwert
-            show_info: true,    // Standard auf true
-            loglevel: 3         // Set Loglevel to Debug
+            wait_time: 3,    // z. B. 3 s als Standardwert
+            show_info: true, // Standard auf true
+            loglevel: 3,     // Set Loglevel to Debug
         }
     }
 }
@@ -121,7 +121,7 @@ pub fn loadconfig(doload: bool) -> FluaConfig {
     return FluaConfig {
         wait_time,
         show_info,
-        loglevel
+        loglevel,
     };
 }
 

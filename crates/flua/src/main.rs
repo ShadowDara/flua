@@ -1,8 +1,8 @@
+use flualogger::logger;
 use std::env;
 use tokio;
 
 use crate::helper::exit;
-use crate::helper::logger::logger;
 use crate::helper::print::{END, GREEN, RED, YELLOW};
 
 mod api;

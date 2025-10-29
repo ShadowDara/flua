@@ -1,6 +1,6 @@
 // Lua Logger
 
-use crate::helper::logger::Logger;
+use flualogger::Logger;
 use mlua::{Lua, Result, Table};
 
 /// Register a Lua logger for a specific Logger instance
@@ -47,7 +47,7 @@ mod tests {
     use tempfile::TempDir;
 
     use crate::api::lua_logger;
-    use crate::helper::logger::{LogLevel, Logger};
+    use flualogger::{LogLevel, Logger};
 
     // Hilfsfunktion: temporären Logger erzeugen
     fn temp_logger(level: LogLevel) -> (Logger, TempDir) {

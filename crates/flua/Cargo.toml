@@ -33,6 +33,7 @@ rusqlite = { version = "0.31", features = ["bundled", "blob"] }
 once_cell = "1"
 chrono = { version = "0.4", features = ["clock"] }
 fluaoslib = { workspace = true }
+flualogger = { workspace = true }
 
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3", features = ["consoleapi", "wincon"] }

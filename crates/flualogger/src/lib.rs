@@ -1,3 +1,5 @@
+// Logger Library for Flua
+
 use chrono::Local;
 use dirs_next;
 use once_cell::sync::Lazy;
@@ -9,6 +11,11 @@ use std::sync::Mutex;
 // TODO
 // Option to redirect the Logger into the Terminal instead of logging into
 // a file or even both
+
+// TODO
+// add a Logger Force function which always prints the logger
+// add a Logger manager for multiple log files / log zipping
+// to prevent creating a huge logs
 
 // Different Loglevels for the Logger and pre names in the logging file
 #[derive(Clone, Copy, PartialEq, PartialOrd, Debug)]

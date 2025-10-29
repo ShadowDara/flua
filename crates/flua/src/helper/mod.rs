@@ -1,6 +1,5 @@
 pub mod config;
 pub mod dir;
-pub mod logger;
 pub mod macros;
 pub mod print;
 pub mod update;
@@ -189,6 +188,6 @@ pub fn exit(wait: bool, error: bool) {
     }
 
     // Close the programm without an Error
-    logger().info("lua finished!");
+    logger().info("Flua finished!");
     std::process::exit(0);
 }
