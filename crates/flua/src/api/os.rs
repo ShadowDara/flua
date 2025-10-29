@@ -1,3 +1,4 @@
+use fluaoslib;
 use mlua::{Lua, Result, Value};
 use std::io::Read;
 use std::path::Path;
@@ -251,6 +252,29 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         Ok(join_path(vec))
     })?;
 
+    // DOCS add this function to the Docs
+    // Function to open a Folder Dialogue to select a Folder
+    let folderdialog =
+        lua.create_function(|_, ()| match fluaoslib::folderdialog::select_folder() {
+            Ok(folderpath) => Ok(folderpath),
+            Err(e) => Err(mlua::Error::external(e)),
+        })?;
+
+    // DOCS add this function to the Docs
+    // Function to open a File Selecting Dialogue for Multiple Files
+    let filesdialog =
+        lua.create_function(|_, ()| match fluaoslib::folderdialog::select_files() {
+            Ok(folderpath) => Ok(folderpath),
+            Err(e) => Err(mlua::Error::external(e)),
+        })?;
+
+    // DOCS add this function to the Docs
+    // Function to open a file selecting Dialogue for one File
+    let filedialog = lua.create_function(|_, ()| match fluaoslib::folderdialog::select_file() {
+        Ok(folderpath) => Ok(folderpath),
+        Err(e) => Err(mlua::Error::external(e)),
+    })?;
+
     table.set("get_os_info", get_os_info)?;
     table.set("os", os)?;
     table.set("chdir", chdir)?;
@@ -263,6 +287,9 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     table.set("split_path", split_fn)?;
     table.set("secure_path", secure_fn)?;
     table.set("join_path", join_fn)?;
+    table.set("folderdialog", folderdialog)?;
+    table.set("filesdialog", filesdialog)?;
+    table.set("filedialog", filedialog)?;
 
     Ok(table)
 }
