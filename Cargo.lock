@@ -502,6 +502,7 @@ dependencies = [
  "dirs-next",
  "dotenv",
  "either",
+ "fluaoslib",
  "httptest",
  "ini",
  "json5",
@@ -526,6 +527,14 @@ dependencies = [
  "winres",
  "xmltree",
  "zip",
+]
+
+[[package]]
+name = "fluaoslib"
+version = "0.1.0"
+dependencies = [
+ "winapi",
+ "windows",
 ]
 
 [[package]]

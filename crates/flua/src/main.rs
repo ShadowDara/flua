@@ -14,7 +14,7 @@ mod utils;
 mod dlm13;
 
 #[cfg(windows)]
-mod windows_utf8;
+use fluaoslib;
 
 pub const VERSION: &str = "0.2.1";
 
@@ -22,7 +22,7 @@ pub const VERSION: &str = "0.2.1";
 async fn main() {
     // Windows UTF-8 Support aktivieren
     #[cfg(windows)]
-    let _ = windows_utf8::enable_utf8();
+    let _ = fluaoslib::windows_utf8::enable_utf8();
 
     // Array of Programm Arguments
     let args: Vec<String> = env::args().collect();

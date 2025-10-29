@@ -1,7 +1,8 @@
 # cargo run -p flua
 
 [workspace]
-members = ["crates/flua"]
+members = ["crates/flua", "crates/fluaoslib"]
 resolver = "3"
 
 [workspace.dependencies]
+fluaoslib = { path = "crates/fluaoslib" }

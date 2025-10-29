@@ -1,0 +1,8 @@
+[package]
+name = "fluaoslib"
+version = "0.1.0"
+edition = "2024"
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["consoleapi", "wincon"] }
+windows = { version = "0.62.1", features = ["Win32_System_Console"] }
