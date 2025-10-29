@@ -75,6 +75,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         Ok(())
     })?;
 
+    // DEPRECATED
     // Function to run a command in the commandline
     let run = lua.create_function(|lua, command: String| {
         deprecated!(

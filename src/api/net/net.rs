@@ -1,62 +1,84 @@
 use mlua::{Error, Lua, Result};
-use reqwest::blocking::Client;
+use reqwest::Client;
 use std::fs::File;
 use std::io::copy;
-use mlua::Function;
+use tokio::runtime::Runtime;
+
+// TODO
+// Improve this Code and make it very Performant
+
+/// Globale Tokio-Runtime (nur einmal erzeugt)
+static RUNTIME: once_cell::sync::Lazy<Runtime> =
+    once_cell::sync::Lazy::new(|| Runtime::new().expect("Tokio runtime creation failed"));
 
 pub fn register(lua: &Lua) -> Result<mlua::Table> {
     let table = lua.create_table()?;
 
-    // Ein Client, der für beide Funktionen wiederverwendet wird
-    let client = Client::builder()
-        .timeout(std::time::Duration::from_secs(10))
-        .build()
-        .map_err(Error::external)?;
+    // Fetch (asynchron ausgeführt)
+    let fetch = lua.create_function(|_, url: String| {
+        let result = RUNTIME.block_on(async {
+            let client = Client::builder()
+                .timeout(std::time::Duration::from_secs(10))
+                .build()
+                .map_err(|e| Error::external(format!("Client error: {}", e)))?;
 
-    // Fetch-Funktion
-    let fetch_client = client.clone();
-    let fetch = lua.create_function(move |_, url: String| {
-        let resp = fetch_client
-            .get(&url)
-            .header("User-Agent", "MyLuaRustApp/1.0")
-            .send()
-            .map_err(|e| Error::external(format!("HTTP-Fehler: {}", e)))?;
+            let resp = client
+                .get(&url)
+                .header("User-Agent", "MyLuaRustApp/1.0")
+                .send()
+                .await
+                .map_err(|e| Error::external(format!("HTTP error: {}", e)))?;
 
-        if !resp.status().is_success() {
-            return Err(Error::external(format!("HTTP-Status: {}", resp.status())));
-        }
+            if !resp.status().is_success() {
+                return Err(Error::external(format!("HTTP status: {}", resp.status())));
+            }
 
-        let body = resp
-            .text()
-            .map_err(|e| Error::external(format!("Fehler beim Lesen des Bodys: {}", e)))?;
+            let body = resp
+                .text()
+                .await
+                .map_err(|e| Error::external(format!("Read body error: {}", e)))?;
 
-        Ok(body)
+            Ok(body)
+        });
+        result
     })?;
 
-    // Download-Funktion
-    let download_client = client.clone();
-    let download_file = lua.create_function(move |_, (url, destination): (String, String)| {
-        let mut resp = download_client
-            .get(&url)
-            .send()
-            .map_err(|e| Error::external(format!("HTTP-Fehler: {}", e)))?;
+    // Download (asynchron ausgeführt)
+    let download_file = lua.create_function(|_, (url, destination): (String, String)| {
+        let result = RUNTIME.block_on(async {
+            let client = Client::builder()
+                .timeout(std::time::Duration::from_secs(30))
+                .build()
+                .map_err(|e| Error::external(format!("Client error: {}", e)))?;
 
-        if !resp.status().is_success() {
-            return Err(Error::external(format!("HTTP-Status: {}", resp.status())));
-        }
+            let resp = client
+                .get(&url)
+                .send()
+                .await
+                .map_err(|e| Error::external(format!("HTTP error: {}", e)))?;
 
-        let mut out = File::create(&destination)
-            .map_err(|e| Error::external(format!("Datei erstellen fehlgeschlagen: {}", e)))?;
+            if !resp.status().is_success() {
+                return Err(Error::external(format!("HTTP status: {}", resp.status())));
+            }
 
-        copy(&mut resp, &mut out)
-            .map_err(|e| Error::external(format!("Fehler beim Schreiben: {}", e)))?;
+            let bytes = resp
+                .bytes()
+                .await
+                .map_err(|e| Error::external(format!("Download read error: {}", e)))?;
 
-        Ok(true)
+            let mut out = File::create(&destination)
+                .map_err(|e| Error::external(format!("Create file error: {}", e)))?;
+
+            copy(&mut bytes.as_ref(), &mut out)
+                .map_err(|e| Error::external(format!("Write error: {}", e)))?;
+
+            Ok(true)
+        });
+        result
     })?;
 
     table.set("fetch", fetch)?;
     table.set("download_file", download_file)?;
-
     Ok(table)
 }
 
@@ -65,6 +87,7 @@ mod tests {
     use super::*;
     use httptest::matchers::request;
     use httptest::{Expectation, Server, responders::*};
+    use mlua::Function;
     use mlua::Lua;
     use std::fs;
 

@@ -22,6 +22,7 @@ use crate::helper::print::{
 pub fn register(lua: &Lua) -> Result<mlua::Table> {
     let table = lua.create_table()?;
 
+    // DEPRECATED
     // a Simple greet function which will be removed soon!
     let greet = lua.create_function(|_, name: String| {
         deprecated!("dapi.greet", "0.1.8", "Why do you even want to use it?");
@@ -29,6 +30,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         Ok(())
     })?;
 
+    // DEPRECATED
     // a Simple add fucntion which will be removed probably soon
     let add = lua.create_function(|_, (a, b): (i64, i64)| {
         deprecated!("dapi.add", "0.1.8", "Its completely useless bro");
@@ -84,6 +86,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         return Err::<(), mlua::Error>(mlua::Error::external(msg));
     })?;
 
+    // DEPRECATED
     // Function to download a file
     let download = lua.create_function(|_, (url, destination): (String, String)| {
         deprecated!(
@@ -108,6 +111,8 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         }
     })?;
 
+    // DEPRECATED
+    // Function to wait for a certain amount of time
     let wait = lua.create_function(|_, time: u64| {
         deprecated!("dapi.greet", "0.1.13", "Use dapi_time.wait() instead!");
         thread::sleep(Duration::from_millis(time));

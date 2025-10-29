@@ -50,6 +50,7 @@ pub fn version_checker(version: &str, this_version: &str) -> bool {
     true
 }
 
+// Function to update flua, not working yet!
 pub fn update() -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(windows)]
     {
@@ -69,6 +70,7 @@ pub fn update() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+// Function to install new updates for flua, not working yet!
 pub fn install() -> Result<(), Box<dyn std::error::Error>> {
     // Download ZIP from GitHub Releases and extract it
     // to APPDATA Local

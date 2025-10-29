@@ -5,8 +5,17 @@ pub mod macros;
 pub mod print;
 pub mod update;
 
+use std::io;
+use std::io::Read;
+use std::sync::Arc;
+use std::sync::atomic::AtomicBool;
+use std::sync::atomic::Ordering;
+use std::thread;
+use std::time::Duration;
+
 use crate::VERSION;
 use crate::helper::print::{BLUE, BOLD, BRIGHT_BLUE, CYAN, END, GREEN, PURPLE, RED, YELLOW};
+use crate::logger;
 
 // TODO
 // add no color argument for no color output
@@ -145,16 +154,41 @@ pub fn config_help() {
 
 // Function to wait some to read the command in an open Terminal Window
 // when an Error appears
-//
-// TODO
-// Make this Interuptable with pressing Enter
 pub fn exit(wait: bool, error: bool) {
     if wait {
-        std::thread::sleep(std::time::Duration::from_secs(3));
+        // Print Info Message
+        println!("Press Enter exit immediatly!");
+
+        let interrupted = Arc::new(AtomicBool::new(false));
+        let flag = interrupted.clone();
+
+        // Thread to listen for Enter
+        thread::spawn(move || {
+            let _ = io::stdin().read(&mut [0u8]).ok(); // Wait for any input (Enter)
+            flag.store(true, Ordering::SeqCst);
+        });
+
+        let total = Duration::from_secs(5);
+        let tick = Duration::from_millis(100);
+        let mut elapsed = Duration::ZERO;
+
+        while elapsed < total && !interrupted.load(Ordering::SeqCst) {
+            thread::sleep(tick);
+            elapsed += tick;
+        }
     }
+
+    // TODO
+    // Add option to add a custom error code
+    // and a custom Error Message
+
+    // Close the programm with an Error
     if error {
+        logger().info("Flua finished with an Error!");
         std::process::exit(1);
-    } else {
-        std::process::exit(0);
     }
+
+    // Close the programm without an Error
+    logger().info("lua finished!");
+    std::process::exit(0);
 }

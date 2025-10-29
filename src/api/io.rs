@@ -46,6 +46,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
     // Input function like Python
     let input = create_input(&lua, io::BufReader::new(io::stdin()), io::stdout())?;
 
+    // DEPRECATED
     // ZIP-Funktion
     let zip = lua.create_function(|_, (src, dest): (String, String)| {
         deprecated!(
@@ -78,6 +79,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         zip_dir(src_str, dest_str).map_err(|e| mlua::Error::external(format!("Zip-Fehler: {}", e)))
     })?;
 
+    // DEPRECATED
     // UNZIP-Funktion
     let unzip = lua.create_function(|_, (zip_file, dest): (String, String)| {
         deprecated!(
@@ -160,6 +162,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
         Ok(())
     })?;
 
+    // DEPRECATED
     // Create a file
     let create_file = lua.create_function(|_, file: String| {
         deprecated!(
@@ -172,6 +175,7 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
             .map_err(|e| mlua::Error::external(format!("Create file error: {}", e)))
     })?;
 
+    // DEPRECATED
     // Write Data to a file
     let write_file = lua.create_function(|_, (file, content): (String, String)| {
         deprecated!(
@@ -273,7 +277,6 @@ pub fn register(lua: &Lua) -> Result<mlua::Table> {
 
     Ok(table)
 }
-
 
 #[cfg(test)]
 mod tests {

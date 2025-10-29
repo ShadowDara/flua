@@ -2,9 +2,11 @@ use std::env;
 use tokio;
 
 use crate::helper::exit;
+use crate::helper::logger::logger;
 use crate::helper::print::{END, GREEN, RED, YELLOW};
 
 mod api;
+mod custom_flua_api;
 mod helper;
 mod lua_script;
 mod utils;
@@ -24,6 +26,10 @@ async fn main() {
 
     // Array of Programm Arguments
     let args: Vec<String> = env::args().collect();
+
+    // TODO
+    // Logger
+    logger().info("Flua started");
 
     // TODO
     // Refactor wait on exit for the timer

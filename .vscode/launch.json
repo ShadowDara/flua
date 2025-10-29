@@ -1,0 +1,31 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Cargo Nextest",
+            "type": "lldb",
+            "request": "launch",
+            "preLaunchTask": "cargo test",
+            "program": "${workspaceFolder}/target/debug/flua",
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "sourceLanguages": ["rust"]
+        },
+        {
+            "name": "Cargo Buildscript",
+            "type": "lldb",
+            "request": "launch",
+            "preLaunchTask": "cargo build.lua",
+            "program": "${workspaceFolder}/target/release/flua",
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "sourceLanguages": ["rust"]
+        },
+        {
+            "name": "Cargo fmt",
+            "type": "cppdbg",
+            "request": "launch",
+            "preLaunchTask": "cargo fmt"
+        }
+    ]
+}
