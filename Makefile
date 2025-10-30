@@ -61,6 +61,9 @@ fulltest:
 deprecated:
 	grep --color=auto --exclude-dir=target --exclude-dir=site --exclude-dir=.git -rw DEPRECATED .
 
+issue:
+	grep --color=auto --exclude-dir=target --exclude-dir=site --exclude-dir=.git -rw ISSUECODE .
+
 # The commands are always forced
 .PHONY: test docs cl pre-commit fmt fulltest
 

@@ -7,6 +7,7 @@ use windows::Win32::System::Console::{
 };
 use windows::core::Result;
 
+// Enable UTF-8 for windows
 pub fn enable_utf8() -> Result<()> {
     unsafe {
         // UTF-8 Codepage setzen
@@ -26,6 +27,7 @@ pub fn enable_utf8() -> Result<()> {
         // Flag hinzufügen
         let new_mode = mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 
+        // Set the Console Output to the new handle
         SetConsoleMode(h_out, new_mode)?;
     }
 

@@ -154,6 +154,14 @@ pub fn config_help() {
 // Function to wait some to read the command in an open Terminal Window
 // when an Error appears
 pub fn exit(wait: bool, error: bool) {
+    // Write the Logger
+    if error {
+        logger().info("Flua finished with an Error!");
+    } else {
+        logger().info("Flua finished!");
+    }
+
+    // Make the interruptable Wait Time
     if wait {
         // Print Info Message
         println!("Press Enter exit immediatly!");
@@ -183,11 +191,9 @@ pub fn exit(wait: bool, error: bool) {
 
     // Close the programm with an Error
     if error {
-        logger().info("Flua finished with an Error!");
         std::process::exit(1);
     }
 
     // Close the programm without an Error
-    logger().info("Flua finished!");
     std::process::exit(0);
 }

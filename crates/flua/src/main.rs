@@ -28,8 +28,7 @@ async fn main() {
     let args: Vec<String> = env::args().collect();
 
     // TODO
-    // Logger
-    logger().info("Flua started");
+    // add using the Logger
 
     // TODO
     // Refactor wait on exit for the timer
@@ -92,7 +91,8 @@ async fn main() {
             // Safe Mode
             "--safe" => {
                 safe = true;
-                eprintln!("{}[ERROR] Safe is not implemented yet{}", RED, END);
+                // ISSUECODE 3
+                doissue!("Safe is not implemented yet", 3);
                 exit(wait_on_exit, true);
             }
             // Showing the version
@@ -138,6 +138,9 @@ async fn main() {
     // Set the Logger with the Config Value
     logger().set_level(configvalue.loglevel());
 
+    // Write into the Log for the first Time
+    logger().info("Flua started");
+
     // 2. Run Version, Help, Module Init
 
     // print the Version and Return
@@ -175,6 +178,7 @@ async fn main() {
         // Run a Action command here
         Some("run") => {
             if let Err(e) = handle_run_command(&args).await {
+                logger().error(&e);
                 eprintln!("{}[ERROR] {}{}", RED, e, END);
                 exit(wait_on_exit, true);
             }
@@ -182,12 +186,15 @@ async fn main() {
         // Run a Lua Script here
         Some(script_path) => {
             if let Err(e) = handle_script_execution(script_path, safe, info, lua_args).await {
+                logger().error(&e);
                 eprintln!("{}[FLUA-ERROR] {}{}", RED, e, END);
                 exit(wait_on_exit, true);
             }
         }
         // No Valid Command provided
         None => {
+            // Logging into the File
+            logger().error("No command or script provided.");
             eprintln!("{}[ERROR] No command or script provided.{}", RED, END);
             exit(wait_on_exit, true);
         }
@@ -240,9 +247,13 @@ async fn handle_script_execution(
     info: bool,
     lua_args: Vec<String>,
 ) -> Result<(), String> {
+    // Writing Info to the Terminal
     if info {
         println!("{}[LUAJIT-INFO] Running script: {}{}", GREEN, path, END);
     }
+
+    // Writing Info in the Logger
+    logger().info(&("Running Script".to_owned() + path));
 
     let path = path.to_string();
     let path2 = path.clone();

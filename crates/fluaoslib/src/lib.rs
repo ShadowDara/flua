@@ -3,4 +3,7 @@
 // and other Stuff
 
 pub mod folderdialog;
+
+// Module for enabling UTF8 for windows
+#[cfg(windows)]
 pub mod windows_utf8;

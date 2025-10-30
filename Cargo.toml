@@ -1,7 +1,11 @@
-# cargo run -p flua
+# cargo run -p flua run build.lua
 
 [workspace]
-members = ["crates/flua", "crates/fluaoslib", "crates/flualogger"]
+members = [
+    "crates/flua",
+    "crates/fluaoslib",
+    "crates/flualogger"
+]
 resolver = "3"
 
 [workspace.dependencies]
@@ -11,7 +15,9 @@ flualogger = { path = "crates/flualogger" }
 [profile.dev]
 opt-level = 0 # fastest build, slowest runtime
 lto = false   # "thin" works, but slows compile
-strip = false
+strip = false # dont strip debug infos
+debug = true
+incremental = true
 
 [profile.release]
 opt-level = 3     # 0 -> no optimizing, 3 -> max speed
@@ -19,3 +25,12 @@ lto = "fat"       # oder "thin" für schnelleren Build
 codegen-units = 1 # bessere Optimierung, aber langsamerer Compile
 panic = "abort"   # spart etwas Platz, leicht schneller
 strip = true      # entfernt Debug-Symbole (optional)
+debug = false
+incremental = false
+
+# cargo build --profile staging
+# cargo bloat --profile staging
+# Profile for Testing / Experimentil with the File Size
+[profile.staging]
+inherits = "release"
+opt-level = "z"
